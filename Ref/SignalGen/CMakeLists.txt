@@ -5,11 +5,6 @@
 # MOD_DEPS: (optional) module dependencies
 #
 ####
-add_compile_options(
-    -Wno-conversion
-    -Wno-double-promotion
-    -Wno-shadow
-)
 set(SOURCE_FILES
   "${CMAKE_CURRENT_LIST_DIR}/SignalGen.fpp"
   "${CMAKE_CURRENT_LIST_DIR}/SignalGen.cpp"

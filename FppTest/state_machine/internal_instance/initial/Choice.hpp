@@ -52,7 +52,7 @@ class Choice : public ChoiceComponentBase {
     //! Destroy Choice object
     ~Choice();
 
-  private:
+  PRIVATE:
     // ----------------------------------------------------------------------
     // Implementations for internal state machine actions
     // ----------------------------------------------------------------------
@@ -72,7 +72,7 @@ class Choice : public ChoiceComponentBase {
         FppTest_SmInstanceInitial_Choice_Choice::Signal signal  //!< The signal
         ) override;
 
-  private:
+  PRIVATE:
     // ----------------------------------------------------------------------
     // Implementations for internal state machine guards
     // ----------------------------------------------------------------------
@@ -109,8 +109,8 @@ class Choice : public ChoiceComponentBase {
     // ----------------------------------------------------------------------
 
     //! Helper function for checking actions and guards
-    void checkActionsAndGuards(FwIndexType expectedActionSize,  //!< The expected action size
-                               FwIndexType expectedGuardSize    //!< The expected guard size
+    void checkActionsAndGuards(FwSizeType expectedActionSize,  //!< The expected action size
+                               FwSizeType expectedGuardSize    //!< The expected guard size
     );
 
   private:

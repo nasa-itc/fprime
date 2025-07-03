@@ -528,8 +528,8 @@ namespace Svc {
   void FileManagerTester ::
     system(const char *const cmd)
   {
-    const int status = ::system(cmd);
-    ASSERT_EQ(static_cast<int>(0), status);
+    const NATIVE_INT_TYPE status = ::system(cmd);
+    ASSERT_EQ(static_cast<NATIVE_INT_TYPE>(0), status);
   }
 
   void FileManagerTester ::
@@ -677,7 +677,7 @@ namespace Svc {
   }
   void FileManagerTester ::
     from_pingOut_handler(
-        const FwIndexType portNum,
+        const NATIVE_INT_TYPE portNum,
         U32 key
     )
   {

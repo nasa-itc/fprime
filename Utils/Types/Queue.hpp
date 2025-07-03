@@ -12,7 +12,7 @@
  */
 #ifndef _UTILS_TYPES_QUEUE_HPP
 #define _UTILS_TYPES_QUEUE_HPP
-#include <Fw/FPrimeBasicTypes.hpp>
+#include <FpConfig.hpp>
 #include <Fw/Types/BasicTypes.hpp>
 #include <Fw/Types/Serializable.hpp>
 #include <Utils/Types/CircularBuffer.hpp>
@@ -73,14 +73,14 @@ class Queue {
     /**
      * Return the largest tracked allocated size
      */
-    FwSizeType get_high_water_mark() const;
+    NATIVE_UINT_TYPE get_high_water_mark() const;
 
     /**
      * Clear tracking of the largest allocated size
      */
     void clear_high_water_mark();
 
-    FwSizeType getQueueSize() const;
+    NATIVE_UINT_TYPE getQueueSize() const;
 
   private:
     CircularBuffer m_internal;

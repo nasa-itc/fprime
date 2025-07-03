@@ -1,4 +1,5 @@
 /**
+ * \file
  * \author T. Canham
  * \brief RateGroupDivider component implementation
  *
@@ -18,7 +19,7 @@
 #define SVC_RATEGROUPDRIVER_HPP
 
 #include <Svc/RateGroupDriver/RateGroupDriverComponentAc.hpp>
-#include <Fw/FPrimeBasicTypes.hpp>
+#include <FpConfig.hpp>
 
 namespace Svc {
 
@@ -29,13 +30,11 @@ namespace Svc {
     //! Output rate is CycleIn rate/divider[port]
     //!
 
-    class RateGroupDriver final : public RateGroupDriverComponentBase {
-
-        friend class RateGroupDriverImplTester;
+    class RateGroupDriver : public RateGroupDriverComponentBase {
 
         public:
             //! Size of the divider table, provided as a constants to users passing the table in
-            static const FwIndexType DIVIDER_SIZE = NUM_CYCLEOUT_OUTPUT_PORTS;
+            static const NATIVE_UINT_TYPE DIVIDER_SIZE = NUM_CYCLEOUT_OUTPUT_PORTS;
 
             //! \class Divider
             //! \brief Struct describing a divider
@@ -43,14 +42,14 @@ namespace Svc {
                 //! Initializes divisor and offset to 0 (unused)
                 Divider() : divisor(0), offset(0)
                 {}
-                //! Initializes divisor and offset to passed-in pair
-                Divider(FwSizeType divisorIn, FwSizeType offsetIn) :
+                //! Initializes divisor and offset to passed-in pair 
+                Divider(NATIVE_INT_TYPE divisorIn, NATIVE_INT_TYPE offsetIn) :
                     divisor(divisorIn), offset(offsetIn)
                 {}
                 //! Divisor
-                FwSizeType divisor;
+                NATIVE_INT_TYPE divisor;
                 //! Offset
-                FwSizeType offset;
+                NATIVE_INT_TYPE offset;
             };
 
             //! \class DividerSet
@@ -78,20 +77,20 @@ namespace Svc {
 
             ~RateGroupDriver();
 
-        private:
+        PRIVATE:
 
             //! downcall for input port
             //! NOTE: This port can execute in ISR context.
-            void CycleIn_handler(FwIndexType portNum, Os::RawTime& cycleStart);
+            void CycleIn_handler(NATIVE_INT_TYPE portNum, Os::RawTime& cycleStart);
 
             //! divider array
             Divider m_dividers[NUM_CYCLEOUT_OUTPUT_PORTS];
 
             //! tick counter
-            FwSizeType m_ticks;
+            NATIVE_INT_TYPE m_ticks;
 
             //! rollover counter
-            FwSizeType m_rollover;
+            NATIVE_INT_TYPE m_rollover;
 
             //! has the configure method been called
             bool m_configured;

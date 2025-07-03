@@ -6,12 +6,12 @@ module Drv {
     # General ports
     # ----------------------------------------------------------------------
 
-    import ByteStreamDriver
+    include "../Interfaces/ByteStreamDriverInterface.fppi"
 
     @ Allocation port used for allocating memory in the receive task
     output port allocate: Fw.BufferGet
 
-    @ Deallocation of allocated buffers
+    @ Deallocates buffers passed to the "send" port
     output port deallocate: Fw.BufferSend
 
     # ----------------------------------------------------------------------

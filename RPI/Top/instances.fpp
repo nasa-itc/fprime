@@ -23,7 +23,7 @@ module RPI {
   {
 
     phase Fpp.ToCpp.Phases.configObjects """
-    U32 context[] = { RpiDemo::RG_CONTEXT_10Hz, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    NATIVE_INT_TYPE context[] = { RpiDemo::RG_CONTEXT_10Hz, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     """
 
     phase Fpp.ToCpp.Phases.configComponents """
@@ -100,7 +100,7 @@ module RPI {
   {
 
     phase Fpp.ToCpp.Phases.configObjects """
-    U32 context[] = { 0, 0, RpiDemo::RG_CONTEXT_1Hz, 0, 0, 0, 0, 0, 0, 0 };
+    NATIVE_INT_TYPE context[] = { 0, 0, RpiDemo::RG_CONTEXT_1Hz, 0, 0, 0, 0, 0, 0, 0 };
     """
 
     phase Fpp.ToCpp.Phases.configComponents """
@@ -148,30 +148,6 @@ module RPI {
     stack size Default.stackSize \
     priority 30
 
-  instance comQueue: Svc.ComQueue base id 0x1100 \
-      queue size 50 \
-      stack size Default.stackSize \
-      priority 100 \
-  {
-    phase Fpp.ToCpp.Phases.configObjects """
-      Svc::ComQueue::QueueConfigurationTable configurationTable;
-      """
-    phase Fpp.ToCpp.Phases.configComponents """
-      // Events (highest-priority)
-      ConfigObjects::RPI_comQueue::configurationTable.entries[0].depth = 100;
-      ConfigObjects::RPI_comQueue::configurationTable.entries[0].priority = 0;
-      // Telemetry
-      ConfigObjects::RPI_comQueue::configurationTable.entries[1].depth = 500;
-      ConfigObjects::RPI_comQueue::configurationTable.entries[1].priority = 2;
-      // File Downlink
-      ConfigObjects::RPI_comQueue::configurationTable.entries[2].depth = 100;
-      ConfigObjects::RPI_comQueue::configurationTable.entries[2].priority = 1;
-
-      RPI::comQueue.configure(ConfigObjects::RPI_comQueue::configurationTable, 0, Allocation::mallocator);
-    """
-  }
-
-
   # ----------------------------------------------------------------------
   # Queued component instances
   # ----------------------------------------------------------------------
@@ -202,13 +178,13 @@ module RPI {
 
   instance fatalHandler: Svc.FatalHandler base id 100
 
-  instance commsBufferManager: Svc.BufferManager base id 900 \
+  instance fileUplinkBufferManager: Svc.BufferManager base id 900 \
   {
 
     phase Fpp.ToCpp.Phases.configConstants """
     enum {
       STORE_SIZE = 3000,
-      STORE_COUNT = 30,
+      QUEUE_SIZE = 30,
       MGR_ID = 200
     };
     """
@@ -217,10 +193,10 @@ module RPI {
     {
       Svc::BufferManager::BufferBins bufferBins;
       memset(&bufferBins, 0, sizeof(bufferBins));
-      using namespace ConfigConstants::RPI_commsBufferManager;
+      using namespace ConfigConstants::RPI_fileUplinkBufferManager;
       bufferBins.bins[0].bufferSize = STORE_SIZE;
-      bufferBins.bins[0].numBuffers = STORE_COUNT;
-      RPI::commsBufferManager.setup(
+      bufferBins.bins[0].numBuffers = QUEUE_SIZE;
+      RPI::fileUplinkBufferManager.setup(
           MGR_ID,
           0,
           Allocation::mallocator,
@@ -231,18 +207,42 @@ module RPI {
     """
 
     phase Fpp.ToCpp.Phases.tearDownComponents """
-    RPI::commsBufferManager.cleanup();
+    RPI::fileUplinkBufferManager.cleanup();
     """
 
   }
 
   instance fatalAdapter: Svc.AssertFatalAdapter base id 1000
 
-  instance framer: Svc.FprimeFramer base id 1220
+  instance staticMemory: Svc.StaticMemory base id 1200
 
-  instance deframer: Svc.FprimeDeframer base id 1240
+  instance downlink: Svc.Framer base id 1220 \
+  {
 
-  instance comDriver: Drv.TcpClient base id 1260 \
+    phase Fpp.ToCpp.Phases.configObjects """
+    Svc::FprimeFraming framing;
+    """
+
+    phase Fpp.ToCpp.Phases.configComponents """
+    RPI::downlink.setup(ConfigObjects::RPI_downlink::framing);
+    """
+
+  }
+
+  instance uplink: Svc.Deframer base id 1240 \
+  {
+
+    phase Fpp.ToCpp.Phases.configObjects """
+    Svc::FprimeDeframing deframing;
+    """
+
+    phase Fpp.ToCpp.Phases.configComponents """
+    RPI::uplink.setup(ConfigObjects::RPI_uplink::deframing);
+    """
+
+  }
+
+  instance comm: Drv.TcpClient base id 1260 \
   {
 
     phase Fpp.ToCpp.Phases.configConstants """
@@ -255,7 +255,7 @@ module RPI {
     phase Fpp.ToCpp.Phases.configComponents """
     // Configure socket server if and only if there is a valid specification
     if (state.hostName != nullptr && state.portNumber != 0) {
-        RPI::comDriver.configure(state.hostName, state.portNumber);
+        RPI::comm.configure(state.hostName, state.portNumber);
     }
     """
 
@@ -264,20 +264,20 @@ module RPI {
     if (state.hostName != nullptr && state.portNumber != 0) {
         // Uplink is configured for receive so a socket task is started
         Os::TaskString name("ReceiveTask");
-        RPI::comDriver.start(
+        RPI::comm.start(
             name,
-            ConfigConstants::RPI_comDriver::PRIORITY,
-            ConfigConstants::RPI_comDriver::STACK_SIZE
+            ConfigConstants::RPI_comm::PRIORITY,
+            ConfigConstants::RPI_comm::STACK_SIZE
         );
     }
     """
 
     phase Fpp.ToCpp.Phases.stopTasks """
-    RPI::comDriver.stop();
+    RPI::comm.stop();
     """
 
     phase Fpp.ToCpp.Phases.freeThreads """
-    (void) RPI::comDriver.join();
+    (void) RPI::comm.join();
     """
 
   }
@@ -464,30 +464,6 @@ module RPI {
     RPI::uartBufferManager.cleanup();
     """
   }
-
-  instance frameAccumulator: Svc.FrameAccumulator base id 2900 \
-  {
-    phase Fpp.ToCpp.Phases.configObjects """
-        Svc::FrameDetectors::FprimeFrameDetector fprimeFrameDetector;
-    """
-
-    phase Fpp.ToCpp.Phases.configComponents """
-    {
-      RPI::frameAccumulator.configure(ConfigObjects::RPI_frameAccumulator::fprimeFrameDetector, 1, Allocation::mallocator, 2048);
-    }
-    """
-
-    phase Fpp.ToCpp.Phases.tearDownComponents """
-    {
-      RPI::frameAccumulator.cleanup();
-    }
-    """
-
-  }
-
-  instance fprimeRouter: Svc.FprimeRouter base id 3000
-
-  instance comStub: Svc.ComStub base id 3100
 
 
 }

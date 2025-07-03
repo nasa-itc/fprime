@@ -17,7 +17,7 @@
 
 namespace Drv {
 
-  class LinuxI2cDriver final :
+  class LinuxI2cDriver :
     public LinuxI2cDriverComponentBase
   {
 
@@ -36,7 +36,7 @@ namespace Drv {
       //!
       ~LinuxI2cDriver();
 
-    private:
+    PRIVATE:
 
       // ----------------------------------------------------------------------
       // Handler implementations for user-defined typed input ports
@@ -45,7 +45,7 @@ namespace Drv {
       //! Handler implementation for write
       //!
       I2cStatus write_handler(
-          const FwIndexType portNum, /*!< The port number*/
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
           U32 addr,
           Fw::Buffer &serBuffer
       );
@@ -53,7 +53,7 @@ namespace Drv {
       //! Handler implementation for read
       //!
       I2cStatus read_handler(
-          const FwIndexType portNum, /*!< The port number*/
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
           U32 addr,
           Fw::Buffer &serBuffer
       );
@@ -61,7 +61,7 @@ namespace Drv {
       //! Handler implementation for writeRead
       //!
       I2cStatus  writeRead_handler(
-          const FwIndexType portNum, /*!< The port number*/
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
           U32 addr,
           Fw::Buffer &writeBuffer,
           Fw::Buffer &readBuffer
@@ -69,7 +69,7 @@ namespace Drv {
 
       // Prevent unused field error when using stub
       #ifndef STUBBED_LINUX_I2C_DRIVER
-      int m_fd; //!< i2c file descriptor
+      NATIVE_INT_TYPE m_fd; //!< i2c file descriptor
       #endif
     };
 

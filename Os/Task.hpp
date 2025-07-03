@@ -5,7 +5,7 @@
 #ifndef Os_Task_hpp_
 #define Os_Task_hpp_
 
-#include <Fw/FPrimeBasicTypes.hpp>
+#include <FpConfig.hpp>
 #include <Fw/Time/TimeInterval.hpp>
 #include <Fw/Types/Serializable.hpp>
 #include <Os/Os.hpp>
@@ -14,9 +14,6 @@
 
 #include <Fw/Deprecate.hpp>
 #include <limits>
-
-// Forward declare for UTs
-namespace Os {namespace Test {namespace Task { struct Tester; }}}
 
 namespace Os {
 
@@ -29,7 +26,6 @@ namespace Os {
     class TaskInterface {
         public:
         static constexpr FwSizeType TASK_DEFAULT = std::numeric_limits<FwSizeType>::max();
-        static constexpr FwTaskPriorityType TASK_PRIORITY_DEFAULT = std::numeric_limits<FwTaskPriorityType>::max();
             enum Status {
                 OP_OK, //!< message sent/received okay
                 INVALID_HANDLE, //!< Task handle invalid
@@ -79,19 +75,19 @@ namespace Os {
                 //! \param identifier: (optional) identifier for this task
                 Arguments(const Fw::StringBase& name, const taskRoutine routine,
                           void* const routine_argument = nullptr,
-                          const FwTaskPriorityType priority = TASK_PRIORITY_DEFAULT,
+                          const FwSizeType priority = TASK_DEFAULT,
                           const FwSizeType stackSize = TASK_DEFAULT,
                           const FwSizeType cpuAffinity = TASK_DEFAULT,
-                          const FwTaskIdType identifier = static_cast<FwTaskIdType>(TASK_DEFAULT));
+                          const PlatformUIntType identifier = static_cast<PlatformUIntType>(TASK_DEFAULT));
 
               public:
                 const Os::TaskString m_name;
                 taskRoutine m_routine;
                 void* m_routine_argument;
-                FwTaskPriorityType m_priority;
+                FwSizeType m_priority;
                 FwSizeType m_stackSize;
                 FwSizeType m_cpuAffinity;
-                FwTaskIdType m_identifier;
+                PlatformUIntType m_identifier;
             };
 
             //! \brief default constructor
@@ -199,7 +195,6 @@ namespace Os {
     //! parent class. Instead it wraps a delegate provided by `TaskInterface::getDelegate()` to provide system specific
     //! behaviour.
     class Task final : public TaskInterface {
-      friend struct Os::Test::Task::Tester;
       public:
         //! Wrapper for task routine that ensures `onStart()` is called once the task actually begins
         class TaskRoutineWrapper {
@@ -265,7 +260,7 @@ namespace Os {
         //! \param identifier: (optional) identifier of this task
         //! \return: status of the start call
         DEPRECATED(Status start(const Fw::StringBase &name, const taskRoutine routine, void* const arg = nullptr,
-                                const FwTaskPriorityType priority = TASK_PRIORITY_DEFAULT,
+                                const ParamType priority = TASK_DEFAULT,
                                 const ParamType stackSize = TASK_DEFAULT,
                                 const ParamType cpuAffinity = TASK_DEFAULT,
                                 const ParamType identifier = TASK_DEFAULT), "Switch to Task::start(Arguments&)");
@@ -337,7 +332,7 @@ namespace Os {
         bool isCooperative() override;
 
         //! \brief get the task priority
-        FwTaskPriorityType getPriority();
+        FwSizeType getPriority();
 
         //! \brief return the underlying task handle (implementation specific)
         //! \return internal task handle representation
@@ -367,7 +362,7 @@ namespace Os {
         //! \return status of the delay
         static Status delay(Fw::TimeInterval interval);
 
-      private:
+      PRIVATE:
         static TaskRegistry* s_taskRegistry; //!< Pointer to registered task registry
         static FwSizeType s_numTasks; //!< Stores the number of tasks created.
         static Mutex s_taskMutex; //!< Guards s_numTasks
@@ -376,7 +371,7 @@ namespace Os {
         TaskInterface::State m_state = Task::NOT_STARTED;
         Mutex m_lock; //!< Guards state transitions
         TaskRoutineWrapper m_wrapper; //!< Concrete storage for task routine wrapper
-        FwTaskPriorityType m_priority = 0; // Storage of priority
+        FwSizeType m_priority = 0; // Storage of priority
 
         bool m_registered = false; //!< Was this task registered
 

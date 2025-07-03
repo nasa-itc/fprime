@@ -1,7 +1,7 @@
 module Drv {
 
   passive component LinuxGpioDriver {
-    import Gpio
+    include "../Interfaces/GpioInterface.fppi"
 
 
     # ----------------------------------------------------------------------

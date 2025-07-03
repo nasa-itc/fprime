@@ -10,17 +10,17 @@
 
 #include <Svc/ActiveLogger/ActiveLoggerComponentAc.hpp>
 #include <Fw/Log/LogPacket.hpp>
-#include <config/ActiveLoggerImplCfg.hpp>
+#include <ActiveLoggerImplCfg.hpp>
 
 namespace Svc {
 
-    class ActiveLoggerImpl final : public ActiveLoggerComponentBase {
+    class ActiveLoggerImpl: public ActiveLoggerComponentBase {
         public:
             ActiveLoggerImpl(const char* compName); //!< constructor
             virtual ~ActiveLoggerImpl(); //!< destructor
-        protected:
-        private:
-            void LogRecv_handler(FwIndexType portNum, FwEventIdType id, Fw::Time &timeTag, const Fw::LogSeverity& severity, Fw::LogBuffer &args);
+        PROTECTED:
+        PRIVATE:
+            void LogRecv_handler(NATIVE_INT_TYPE portNum, FwEventIdType id, Fw::Time &timeTag, const Fw::LogSeverity& severity, Fw::LogBuffer &args);
             void loqQueue_internalInterfaceHandler(FwEventIdType id, const Fw::Time &timeTag, const Fw::LogSeverity& severity, const Fw::LogBuffer &args);
 
             void SET_EVENT_FILTER_cmdHandler(
@@ -32,7 +32,7 @@ namespace Svc {
             void SET_ID_FILTER_cmdHandler(
                     FwOpcodeType opCode, //!< The opcode
                     U32 cmdSeq, //!< The command sequence number
-                    FwEventIdType ID,
+                    U32 ID,
                     ActiveLogger_Enabled idFilterEnabled //!< ID filter state
                 );
 
@@ -44,7 +44,7 @@ namespace Svc {
             //! Handler implementation for pingIn
             //!
             void pingIn_handler(
-                const FwIndexType portNum, /*!< The port number*/
+                const NATIVE_INT_TYPE portNum, /*!< The port number*/
                 U32 key /*!< Value to return to pinger*/
             );
 

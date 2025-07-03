@@ -1,4 +1,4 @@
-#include <Fw/FPrimeBasicTypes.hpp>
+#include <FpConfig.hpp>
 #include <Fw/Comp/ActiveComponentBase.hpp>
 #include <Fw/Types/Assert.hpp>
 #include <Os/TaskString.hpp>
@@ -8,7 +8,7 @@ namespace Fw {
     class ActiveComponentExitSerializableBuffer : public Fw::SerializeBufferBase {
 
         public:
-            FwSizeType getBuffCapacity() const {
+            NATIVE_UINT_TYPE getBuffCapacity() const {
                 return sizeof(m_buff);
             }
 
@@ -33,7 +33,7 @@ namespace Fw {
     ActiveComponentBase::~ActiveComponentBase() {
     }
 
-    void ActiveComponentBase::init(FwEnumStoreType instance) {
+    void ActiveComponentBase::init(NATIVE_INT_TYPE instance) {
         QueuedComponentBase::init(instance);
     }
 
@@ -43,7 +43,7 @@ namespace Fw {
     }
 #endif
 
-    void ActiveComponentBase::start(FwTaskPriorityType priority, FwSizeType stackSize, FwSizeType cpuAffinity, FwTaskIdType identifier) {
+    void ActiveComponentBase::start(Os::Task::ParamType priority, Os::Task::ParamType stackSize, Os::Task::ParamType cpuAffinity, Os::Task::ParamType identifier) {
         Os::TaskString taskName;
 
 #if FW_OBJECT_NAMES == 1
@@ -54,15 +54,15 @@ namespace Fw {
         // Cooperative threads tasks externalize the task loop, and as such use the state machine as their task function
         // Standard multithreading tasks use the task loop to respectively call the state machine
         Os::Task::taskRoutine routine = (m_task.isCooperative()) ? this->s_taskStateMachine : this->s_taskLoop;
-        Os::Task::Arguments arguments(taskName, routine, this, priority, stackSize, cpuAffinity, identifier);
+        Os::Task::Arguments arguments(taskName, routine, this, priority, stackSize, cpuAffinity, static_cast<PlatformUIntType>(identifier));
         Os::Task::Status status = this->m_task.start(arguments);
-        FW_ASSERT(status == Os::Task::Status::OP_OK,static_cast<FwAssertArgType>(status));
+        FW_ASSERT(status == Os::Task::Status::OP_OK,static_cast<NATIVE_INT_TYPE>(status));
     }
 
     void ActiveComponentBase::exit() {
         ActiveComponentExitSerializableBuffer exitBuff;
         SerializeStatus stat = exitBuff.serialize(static_cast<I32>(ACTIVE_COMPONENT_EXIT));
-        FW_ASSERT(FW_SERIALIZE_OK == stat,static_cast<FwAssertArgType>(stat));
+        FW_ASSERT(FW_SERIALIZE_OK == stat,static_cast<NATIVE_INT_TYPE>(stat));
         (void)this->m_queue.send(exitBuff,0,Os::Queue::BlockingType::NONBLOCKING);
     }
 

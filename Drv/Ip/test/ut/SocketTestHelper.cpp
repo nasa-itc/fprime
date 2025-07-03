@@ -10,14 +10,14 @@
 #include <unistd.h>
 #include <cerrno>
 #include <arpa/inet.h>
-#include <config/IpCfg.hpp>
+#include <IpCfg.hpp>
 
 namespace Drv {
 namespace Test {
 
 const U32 MAX_DRV_TEST_MESSAGE_SIZE = 1024;
 
-void force_recv_timeout(int fd, Drv::IpSocket& socket) {
+void force_recv_timeout(NATIVE_INT_TYPE fd, Drv::IpSocket& socket) {
     // Set timeout socket option
     struct timeval timeout;
     timeout.tv_sec = 0;
@@ -25,15 +25,15 @@ void force_recv_timeout(int fd, Drv::IpSocket& socket) {
     setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, reinterpret_cast<char *>(&timeout), sizeof(timeout));
 }
 
-void validate_random_data(U8 *data, U8 *truth, FwSizeType size) {
-    for (FwSizeType i = 0; i < size; i++) {
+void validate_random_data(U8 *data, U8 *truth, U32 size) {
+    for (U32 i = 0; i < size; i++) {
         ASSERT_EQ(data[i], truth[i]);
     }
 }
 
-void fill_random_data(U8 *data, FwSizeType size) {
+void fill_random_data(U8 *data, U32 size) {
     ASSERT_NE(size, 0u) << "Trying to fill random data of size 0";
-    for (FwSizeType i = 0; i < size; i++) {
+    for (U32 i = 0; i < size; i++) {
         data[i] = static_cast<U8>(STest::Pick::any());
     }
 }
@@ -44,7 +44,7 @@ void validate_random_buffer(Fw::Buffer &buffer, U8 *data) {
 }
 
 U32 fill_random_buffer(Fw::Buffer &buffer) {
-    buffer.setSize(static_cast<FwSizeType>(STest::Pick::lowerUpper(1, static_cast<U32>(buffer.getSize()))));
+    buffer.setSize(STest::Pick::lowerUpper(1, buffer.getSize()));
     fill_random_data(buffer.getData(), buffer.getSize());
     return static_cast<U32>(buffer.getSize());
 }
@@ -91,5 +91,5 @@ U64 get_configured_delay_ms() {
            (static_cast<U64>(SOCKET_RETRY_INTERVAL.getUSeconds()) / 1000);
 }
 
-}
-}
+};
+};

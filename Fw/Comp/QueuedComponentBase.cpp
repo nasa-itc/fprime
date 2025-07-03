@@ -1,6 +1,6 @@
 #include <Fw/Comp/QueuedComponentBase.hpp>
 #include <Fw/Types/Assert.hpp>
-#include <Fw/FPrimeBasicTypes.hpp>
+#include <FpConfig.hpp>
 #include <Os/QueueString.hpp>
 
 #include <cstdio>
@@ -15,7 +15,7 @@ namespace Fw {
 
     }
 
-    void QueuedComponentBase::init(FwEnumStoreType instance) {
+    void QueuedComponentBase::init(NATIVE_INT_TYPE instance) {
         PassiveComponentBase::init(instance);
     }
 
@@ -36,7 +36,7 @@ namespace Fw {
     	return this->m_queue.create(queueName, depth, msgSize);
     }
 
-    FwSizeType QueuedComponentBase::getNumMsgsDropped() {
+    NATIVE_INT_TYPE QueuedComponentBase::getNumMsgsDropped() {
         return this->m_msgsDropped;
     }
 

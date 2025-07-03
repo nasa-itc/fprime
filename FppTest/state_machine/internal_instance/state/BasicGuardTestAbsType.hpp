@@ -49,7 +49,7 @@ class BasicGuardTestAbsType : public BasicGuardTestAbsTypeComponentBase {
     //! Destroy BasicGuardTestAbsType object
     ~BasicGuardTestAbsType();
 
-  private:
+  PRIVATE:
     // ----------------------------------------------------------------------
     // Implementations for internal state machine actions
     // ----------------------------------------------------------------------
@@ -63,7 +63,7 @@ class BasicGuardTestAbsType : public BasicGuardTestAbsTypeComponentBase {
         const SmHarness::TestAbsType& value                    //!< The value
         ) override;
 
-  private:
+  PRIVATE:
     // ----------------------------------------------------------------------
     // Implementations for internal state machine guards
     // ----------------------------------------------------------------------
@@ -77,7 +77,7 @@ class BasicGuardTestAbsType : public BasicGuardTestAbsTypeComponentBase {
         const SmHarness::TestAbsType& value                    //!< The value
     ) const override;
 
-  private:
+  PRIVATE:
     // ----------------------------------------------------------------------
     // Overflow hook implementations for internal state machines
     // ----------------------------------------------------------------------

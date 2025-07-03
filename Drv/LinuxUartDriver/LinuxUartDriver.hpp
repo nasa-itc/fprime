@@ -21,7 +21,7 @@
 
 namespace Drv {
 
-class LinuxUartDriver final : public LinuxUartDriverComponentBase {
+class LinuxUartDriver : public LinuxUartDriverComponentBase {
   public:
     // ----------------------------------------------------------------------
     // Construction, initialization, and destruction
@@ -43,21 +43,21 @@ class LinuxUartDriver final : public LinuxUartDriverComponentBase {
 #ifdef TGT_OS_TYPE_LINUX
       BAUD_460K=460800,
       BAUD_921K=921600,
-      BAUD_1000K=1000000,
-      BAUD_1152K=1152000,
-      BAUD_1500K=1500000,
-      BAUD_2000K=2000000,
+      BAUD_1000K=1000000000,
+      BAUD_1152K=1152000000,
+      BAUD_1500K=1500000000,
+      BAUD_2000K=2000000000,
 #ifdef B2500000
-      BAUD_2500K=2500000,
+      BAUD_2500K=2500000000,
 #endif
 #ifdef B3000000
-      BAUD_3000K=3000000,
+      BAUD_3000K=3000000000,
 #endif
 #ifdef B3500000
-      BAUD_3500K=3500000,
+      BAUD_3500K=3500000000,
 #endif
 #ifdef B4000000
-      BAUD_4000K=4000000
+      BAUD_4000K=4000000000
 #endif
 #endif
     };
@@ -67,12 +67,12 @@ class LinuxUartDriver final : public LinuxUartDriverComponentBase {
     enum UartParity { PARITY_NONE, PARITY_ODD, PARITY_EVEN };
 
     // Open device with specified baud and flow control.
-    bool open(const char* const device, UartBaudRate baud, UartFlowControl fc, UartParity parity, FwSizeType allocationSize);
+    bool open(const char* const device, UartBaudRate baud, UartFlowControl fc, UartParity parity, U32 allocationSize);
 
     //! start the serial poll thread.
     //! buffSize is the max receive buffer size
     //!
-    void start(FwTaskPriorityType priority = Os::Task::TASK_PRIORITY_DEFAULT,
+    void start(Os::Task::ParamType priority = Os::Task::TASK_DEFAULT,
                Os::Task::ParamType stackSize = Os::Task::TASK_DEFAULT,
                Os::Task::ParamType cpuAffinity = Os::Task::TASK_DEFAULT);
 
@@ -86,25 +86,19 @@ class LinuxUartDriver final : public LinuxUartDriverComponentBase {
     //!
     ~LinuxUartDriver();
 
-  private:
+  PRIVATE:
     // ----------------------------------------------------------------------
     // Handler implementations for user-defined typed input ports
     // ----------------------------------------------------------------------
 
     //! Handler implementation for serialSend
     //!
-    void send_handler(FwIndexType portNum, /*!< The port number*/
-                                 Fw::Buffer& serBuffer) override;
+    Drv::SendStatus send_handler(NATIVE_INT_TYPE portNum, /*!< The port number*/
+                                 Fw::Buffer& serBuffer);
 
-    //! Handler implementation for recvReturnIn
-    //!
-    //! Port receiving back ownership of data sent out on $recv port
-    void recvReturnIn_handler(FwIndexType portNum,  //!< The port number
-                                Fw::Buffer& fwBuffer  //!< The buffer
-                                ) override;
 
-    int m_fd;  //!< file descriptor returned for I/O device
-    FwSizeType m_allocationSize; //!< size of allocation request to memory manager
+    NATIVE_INT_TYPE m_fd;  //!< file descriptor returned for I/O device
+    U32 m_allocationSize; //!< size of allocation request to memory manager
     const char* m_device;  //!< original device path
 
     //! This method will be called by the new thread to wait for input on the serial port.

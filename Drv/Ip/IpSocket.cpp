@@ -12,7 +12,7 @@
 #include <cstring>
 #include <Drv/Ip/IpSocket.hpp>
 #include <Fw/Types/Assert.hpp>
-#include <Fw/FPrimeBasicTypes.hpp>
+#include <FpConfig.hpp>
 #include <Fw/Types/StringUtils.hpp>
 #include <sys/time.h>
 
@@ -65,7 +65,7 @@ bool IpSocket::isValidPort(U16 port) {
     return true;
 }
 
-SocketIpStatus IpSocket::setupTimeouts(int socketFd) {
+SocketIpStatus IpSocket::setupTimeouts(PlatformIntType socketFd) {
 // Get the IP address from host
 #ifdef TGT_OS_TYPE_VXWORKS
     // No timeouts set on Vxworks
@@ -87,7 +87,7 @@ SocketIpStatus IpSocket::addressToIp4(const char* address, void* ip4) {
     FW_ASSERT(ip4 != nullptr);
     // Get the IP address from host
 #ifdef TGT_OS_TYPE_VXWORKS
-    int ip = inet_addr(address);
+    NATIVE_INT_TYPE ip = inet_addr(address);
     if (ip == ERROR) {
         return SOCK_INVALID_IP_ADDRESS;
     }
@@ -109,7 +109,7 @@ void IpSocket::close(const SocketDescriptor& socketDescriptor) {
 
 void IpSocket::shutdown(const SocketDescriptor& socketDescriptor) {
     errno = 0;
-    int status = ::shutdown(socketDescriptor.fd, SHUT_RDWR);
+    PlatformIntType status = ::shutdown(socketDescriptor.fd, SHUT_RDWR);
     // If shutdown fails, go straight to the hard-shutdown
     if (status != 0) {
         this->close(socketDescriptor);
@@ -129,10 +129,6 @@ SocketIpStatus IpSocket::open(SocketDescriptor& socketDescriptor) {
 }
 
 SocketIpStatus IpSocket::send(const SocketDescriptor& socketDescriptor, const U8* const data, const U32 size) {
-    FW_ASSERT(socketDescriptor.fd != -1, static_cast<FwAssertArgType>(socketDescriptor.fd));
-    FW_ASSERT(data != nullptr);
-    FW_ASSERT(size > 0);
-    
     U32 total = 0;
     I32 sent  = 0;
     // Attempt to send out data and retry as necessary
@@ -152,7 +148,7 @@ SocketIpStatus IpSocket::send(const SocketDescriptor& socketDescriptor, const U8
         else if (sent == -1) {
             return SOCK_SEND_ERROR;
         }
-        FW_ASSERT(sent > 0, static_cast<FwAssertArgType>(sent));
+        FW_ASSERT(sent > 0, sent);
         total += static_cast<U32>(sent);
     }
     // Failed to retry enough to send all data
@@ -165,53 +161,40 @@ SocketIpStatus IpSocket::send(const SocketDescriptor& socketDescriptor, const U8
 }
 
 SocketIpStatus IpSocket::recv(const SocketDescriptor& socketDescriptor, U8* data, U32& req_read) {
-    //TODO: Uncomment FW_ASSERT for socketDescriptor.fd once we fix TcpClientTester to not pass in uninitialized socketDescriptor
-    // FW_ASSERT(socketDescriptor.fd != -1, static_cast<FwAssertArgType>(socketDescriptor.fd));
-    FW_ASSERT(data != nullptr);
-
-    
-    I32 bytes_received_or_status; // Stores the return value from recvProtocol
-
-    // Loop primarily for EINTR. Other conditions should lead to an earlier exit.
-    for (U32 i = 0; i < SOCKET_MAX_ITERATIONS; i++) {
+    I32 size = 0;
+    // Try to read until we fail to receive data
+    for (U32 i = 0; (i < SOCKET_MAX_ITERATIONS) && (size <= 0); i++) {
         errno = 0;
-        // Pass the current value of req_read (max buffer size) to recvProtocol.
-        // recvProtocol returns bytes read or -1 on error.
-        bytes_received_or_status = this->recvProtocol(socketDescriptor, data, req_read);
+        // Attempt to recv out data
+        size = this->recvProtocol(socketDescriptor, data, req_read);
 
-        if (bytes_received_or_status > 0) {
-            // Successfully read data
-            req_read = static_cast<U32>(bytes_received_or_status);
-            return SOCK_SUCCESS;
-        } else if (bytes_received_or_status == 0) {
-            // Handle zero return based on protocol-specific behavior
+        // Nothing to be received
+        if ((size == -1) && ((errno == EAGAIN) || (errno == EWOULDBLOCK))) {
             req_read = 0;
-            return this->handleZeroReturn();
-        } else { // bytes_received_or_status == -1, an error occurred
-            if ((errno == EAGAIN) || (errno == EWOULDBLOCK)) {
-                // Non-blocking socket would block, or SO_RCVTIMEO timeout occurred.
-                req_read = 0;
-                return SOCK_NO_DATA_AVAILABLE;
-            } else if ((errno == ECONNRESET) || (errno == EBADF)) {
-                // Connection reset or bad file descriptor.
-                req_read = 0;
-                return SOCK_DISCONNECTED; // Or a more specific error like SOCK_READ_ERROR
-            } else {
-                // Other socket read error.
-                req_read = 0;
-                return SOCK_READ_ERROR;
-            }
+            return SOCK_NO_DATA_AVAILABLE;
+        }
+
+        // Error is EINTR, just try again
+        if ((size == -1) && (errno == EINTR)) {
+            continue;
+        }
+        // Zero bytes read reset or bad ef means we've disconnected
+        else if (size == 0 || ((size == -1) && ((errno == ECONNRESET) || (errno == EBADF)))) {
+            req_read = static_cast<U32>(size);
+            return SOCK_DISCONNECTED;
+        }
+        // Error returned, and it wasn't an interrupt, nor a disconnect
+        else if (size == -1) {
+            req_read = static_cast<U32>(size);
+            return SOCK_READ_ERROR;  // Stop recv task on error
         }
     }
-    // If the loop completes, it means SOCKET_MAX_ITERATIONS of EINTR occurred.
-    req_read = 0;
-    return SOCK_INTERRUPTED_TRY_AGAIN;
-}
-
-SocketIpStatus IpSocket::handleZeroReturn() {
-    // For TCP (which IpSocket primarily serves as a base for, or when not overridden),
-    // a return of 0 from ::recv means the peer has performed an orderly shutdown.
-    return SOCK_DISCONNECTED;
+    req_read = static_cast<U32>(size);
+    // Prevent interrupted socket being viewed as success
+    if (size == -1) {
+        return SOCK_INTERRUPTED_TRY_AGAIN;
+    }
+    return SOCK_SUCCESS;
 }
 
 }  // namespace Drv

@@ -15,15 +15,9 @@
 
 #include <CFDP/Checksum/Checksum.hpp>
 #include <Fw/Buffer/Buffer.hpp>
-#include <Fw/FPrimeBasicTypes.hpp>
+#include <FpConfig.hpp>
 #include <Fw/Types/SerialBuffer.hpp>
 #include <Fw/Types/Serializable.hpp>
-
-// Forward declaration for UTs
-namespace Svc {
-  class FileUplinkTester;
-  class FileDownlinkTester;
-}
 
 namespace Fw {
 
@@ -50,16 +44,14 @@ namespace Fw {
       //! The type of a path name
       class PathName {
 
-        friend union FilePacket;
-        friend class Svc::FileDownlinkTester;
-        friend class Svc::FileUplinkTester;
+          friend union FilePacket;
 
         public:
 
           //! The maximum length of a path name
           enum { MAX_LENGTH = 255 };
 
-        private:
+        PRIVATE:
 
           //! The length
           U8 m_length;
@@ -87,7 +79,7 @@ namespace Fw {
               return this->m_value;
           };
 
-        private:
+        PRIVATE:
 
           //! Initialize this PathName from a SerialBuffer
           SerializeStatus fromSerialBuffer(SerialBuffer& serialBuffer);
@@ -101,11 +93,8 @@ namespace Fw {
       class Header {
 
           friend union FilePacket;
-          friend class FilePacketTester;
-          friend class Svc::FileDownlinkTester;
-          friend class Svc::FileUplinkTester;
 
-        private:
+        PRIVATE:
 
           //! The packet type
           Type m_type;
@@ -118,7 +107,7 @@ namespace Fw {
           //! Header size
           enum { HEADERSIZE = sizeof(U8) + sizeof(U32) };
 
-        private:
+        PRIVATE:
 
           //! Initialize a file packet header
           void initialize(
@@ -151,7 +140,7 @@ namespace Fw {
 
           friend union FilePacket;
 
-        private:
+        PRIVATE:
 
           //! The packet header
           Header m_header;
@@ -180,11 +169,6 @@ namespace Fw {
           //! Convert this StartPacket to a Buffer
           SerializeStatus toBuffer(Buffer& buffer) const;
 
-          //! Get this as a Header
-          const FilePacket::Header& asHeader() const {
-              return this->m_header;
-          };
-
           //! Get the destination path
           const PathName& getDestinationPath() const {
               return this->m_destinationPath;
@@ -199,7 +183,7 @@ namespace Fw {
           U32 getFileSize() const {
               return this->m_fileSize;
           };
-        private:
+        PRIVATE:
 
           //! Initialize this StartPacket from a SerialBuffer
           SerializeStatus fromSerialBuffer(SerialBuffer& serialBuffer);
@@ -213,10 +197,8 @@ namespace Fw {
       class DataPacket {
 
           friend union FilePacket;
-          friend class Svc::FileDownlinkTester;
-          friend class Svc::FileUplinkTester;
 
-        private:
+        PRIVATE:
 
           //! The packet header
           Header m_header;
@@ -270,7 +252,7 @@ namespace Fw {
           const U8* getData() const {
               return this->m_data;
           };
-        private:
+        PRIVATE:
 
           //! Initialize this DataPacket from a SerialBuffer
           SerializeStatus fromSerialBuffer(SerialBuffer& serialBuffer);
@@ -287,10 +269,8 @@ namespace Fw {
       class EndPacket {
 
           friend union FilePacket;
-          friend class Svc::FileDownlinkTester;
-          friend class Svc::FileUplinkTester;
 
-        private:
+        PRIVATE:
 
           //! The packet header
           Header m_header;
@@ -321,7 +301,7 @@ namespace Fw {
               const CFDP::Checksum& checksum //!< The checksum
           );
 
-        private:
+        PRIVATE:
 
           //! The checksum
           U32 m_checksumValue;
@@ -338,10 +318,8 @@ namespace Fw {
       class CancelPacket {
 
           friend union FilePacket;
-          friend class Svc::FileDownlinkTester;
-          friend class Svc::FileUplinkTester;
 
-        private:
+        PRIVATE:
 
           //! The packet header
           Header m_header;
@@ -363,7 +341,7 @@ namespace Fw {
           const FilePacket::Header& asHeader() const {
               return this->m_header;
           };
-        private:
+        PRIVATE:
 
           //! Initialize this CancelPacket from a SerialBuffer
           SerializeStatus fromSerialBuffer(SerialBuffer& serialBuffer);
@@ -432,7 +410,7 @@ namespace Fw {
       //!
       SerializeStatus toBuffer(Buffer& buffer) const;
 
-    private:
+    PRIVATE:
 
       // ----------------------------------------------------------------------
       // Private methods
@@ -442,7 +420,7 @@ namespace Fw {
       //!
       SerializeStatus fromSerialBuffer(SerialBuffer& serialBuffer);
 
-    private:
+    PRIVATE:
 
       // ----------------------------------------------------------------------
       // Private data

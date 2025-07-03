@@ -78,7 +78,7 @@ namespace Svc {
 
   void BufferLoggerTester ::
     from_bufferSendOut_handler(
-        const FwIndexType portNum,
+        const NATIVE_INT_TYPE portNum,
         Fw::Buffer& fwBuffer
     )
   {
@@ -87,7 +87,7 @@ namespace Svc {
 
   void BufferLoggerTester ::
     from_pingOut_handler(
-        const FwIndexType portNum,
+        const NATIVE_INT_TYPE portNum,
         U32 key
     )
   {
@@ -265,7 +265,7 @@ namespace Svc {
 
     {
       // Make sure the file size is within bounds
-      FwSizeType actualSize = 0;
+      FwSignedSizeType actualSize = 0;
       const Os::FileSystem::Status status =
         Os::FileSystem::getFileSize(fileName, actualSize);
       ASSERT_EQ(Os::FileSystem::OP_OK, status);
@@ -284,7 +284,7 @@ namespace Svc {
     U8 buf[expectedSize];
     for (U32 i = 0; i < expectedNumBuffers; ++i) {
       // Get length of buffer to read
-      FwSizeType length = static_cast<FwSizeType>(sizeof(SIZE_TYPE));
+      FwSignedSizeType length = sizeof(SIZE_TYPE);
       Os::File::Status status = file.read(buf, length);
       ASSERT_EQ(Os::File::OP_OK, status);
       ASSERT_EQ(sizeof(SIZE_TYPE), static_cast<U32>(length));
@@ -305,7 +305,7 @@ namespace Svc {
 
     // Make sure we reached the end of the file
     {
-      FwSizeType length = 10;
+      FwSignedSizeType length = 10;
       const Os::File::Status status = file.read(buf, length);
       ASSERT_EQ(Os::File::OP_OK, status);
       ASSERT_EQ(0, length);

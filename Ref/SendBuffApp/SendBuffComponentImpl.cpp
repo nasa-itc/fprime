@@ -1,5 +1,5 @@
 #include <Ref/SendBuffApp/SendBuffComponentImpl.hpp>
-#include <Fw/FPrimeBasicTypes.hpp>
+#include <FpConfig.hpp>
 #include <Fw/Types/Assert.hpp>
 #include <Os/Console.hpp>
 #include <cstring>
@@ -27,7 +27,7 @@ namespace Ref {
 
     }
 
-    void SendBuffImpl::SchedIn_handler(FwIndexType portNum, U32 context) {
+    void SendBuffImpl::SchedIn_handler(NATIVE_INT_TYPE portNum, U32 context) {
 
         // first, dequeue any messages
 
@@ -57,8 +57,8 @@ namespace Ref {
             this->tlmWrite_PacketsSent(this->m_buffsSent);
             // write data
             U8 testData[24];
-            FwSizeType dataSize = static_cast<FwSizeType>(sizeof(testData));
-            memset(testData,0xFF,static_cast<size_t>(dataSize));
+            NATIVE_UINT_TYPE dataSize = sizeof(testData);
+            memset(testData,0xFF,dataSize);
             // compute checksum
             U32 csum = 0;
             for (U32 byte = 0; byte < dataSize; byte++) {

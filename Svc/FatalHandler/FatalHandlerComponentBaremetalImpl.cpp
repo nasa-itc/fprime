@@ -7,7 +7,7 @@
 #include <cstdlib>
 #include <Fw/Logger/Logger.hpp>
 #include <Svc/FatalHandler/FatalHandlerComponentImpl.hpp>
-#include <Fw/FPrimeBasicTypes.hpp>
+#include <FpConfig.hpp>
 
 namespace Svc {
 
@@ -16,7 +16,7 @@ namespace Svc {
     // ----------------------------------------------------------------------
 
     void FatalHandlerComponentImpl::FatalReceive_handler(
-            const FwIndexType portNum,
+            const NATIVE_INT_TYPE portNum,
             FwEventIdType Id) {
         Fw::Logger::log("FATAL %" PRI_FwEventIdType "handled.\n",Id);
         while (true) {} // Returning might be bad

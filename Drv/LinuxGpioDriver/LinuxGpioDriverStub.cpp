@@ -11,7 +11,7 @@
 // ======================================================================
 
 #include <Drv/LinuxGpioDriver/LinuxGpioDriver.hpp>
-#include <Fw/FPrimeBasicTypes.hpp>
+#include <FpConfig.hpp>
 #include <Fw/Time/Time.hpp>
 
 namespace Drv {
@@ -22,18 +22,18 @@ LinuxGpioDriver ::~LinuxGpioDriver() {}
 // Handler implementations for user-defined typed input ports
 // ----------------------------------------------------------------------
 
-Os::File::Status LinuxGpioDriver ::setupLineHandle(const int chip_descriptor,
+Os::File::Status LinuxGpioDriver ::setupLineHandle(const PlatformIntType chip_descriptor,
                                                    const U32 gpio,
                                                    const GpioConfiguration& configuration,
                                                    const Fw::Logic& default_state,
-                                                   int& fd) {
+                                                   PlatformIntType& fd) {
     return Os::File::Status::NOT_SUPPORTED;
 }
 
-Os::File::Status LinuxGpioDriver ::setupLineEvent(const int chip_descriptor,
+Os::File::Status LinuxGpioDriver ::setupLineEvent(const PlatformIntType chip_descriptor,
                                                   const U32 gpio,
                                                   const GpioConfiguration& configuration,
-                                                  int& fd) {
+                                                  PlatformIntType& fd) {
     return Os::File::Status::NOT_SUPPORTED;
 }
 
@@ -44,11 +44,11 @@ Os::File::Status LinuxGpioDriver ::open(const char* device,
     return Os::File::Status::NOT_SUPPORTED;
 }
 
-Drv::GpioStatus LinuxGpioDriver ::gpioRead_handler(const FwIndexType portNum, Fw::Logic& state) {
+Drv::GpioStatus LinuxGpioDriver ::gpioRead_handler(const NATIVE_INT_TYPE portNum, Fw::Logic& state) {
     return Drv::GpioStatus::UNKNOWN_ERROR;
 }
 
-Drv::GpioStatus LinuxGpioDriver ::gpioWrite_handler(const FwIndexType portNum, const Fw::Logic& state) {
+Drv::GpioStatus LinuxGpioDriver ::gpioWrite_handler(const NATIVE_INT_TYPE portNum, const Fw::Logic& state) {
     return Drv::GpioStatus::UNKNOWN_ERROR;
 }
 

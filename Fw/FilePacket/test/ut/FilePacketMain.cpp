@@ -1,5 +1,5 @@
 // ----------------------------------------------------------------------
-// Main.cpp
+// Main.cpp 
 // ----------------------------------------------------------------------
 
 #include <gtest/gtest.h>
@@ -11,51 +11,30 @@
 
 namespace Fw {
 
-    class FilePacketTester{
-          public:
-              // ----------------------------------------------------------------------
-              // Construction and destruction
-              // ----------------------------------------------------------------------
-              FilePacketTester(){}
-
-              ~FilePacketTester(){}
-
-              // ----------------------------------------------------------------------
-              // Tests
-              // ----------------------------------------------------------------------
-              void test_Header()
-              {
-                // const FilePacket::Header expected = {
-                // FilePacket::T_DATA, // Packet type
-                // 10 // Sequence number
-                // };
-                Fw::FilePacket::Header expected;
-                expected.initialize(FilePacket::T_DATA, 10);
-                const U32 size = expected.bufferSize();
-                U8 bytes[size];
-                SerialBuffer serialBuffer(bytes, size);
-                {
-                const SerializeStatus status =
-                    expected.toSerialBuffer(serialBuffer);
-                FW_ASSERT(status == FW_SERIALIZE_OK);
-                }
-                FilePacket::Header actual;
-                {
-                const SerializeStatus status =
-                    actual.fromSerialBuffer(serialBuffer);
-                FW_ASSERT(status == FW_SERIALIZE_OK);
-                }
-                GTest::FilePackets::Header::compare(
-                    expected,
-                    actual
-                );
-              }
-      };
-
   // Serialize and deserialize a file packet header
   TEST(FilePacket, Header) {
-    FilePacketTester tester;
-    tester.test_Header();
+    const FilePacket::Header expected = {
+      FilePacket::T_DATA, // Packet type
+      10 // Sequence number
+    };
+    const U32 size = expected.bufferSize();
+    U8 bytes[size];
+    SerialBuffer serialBuffer(bytes, size);
+    {
+      const SerializeStatus status = 
+        expected.toSerialBuffer(serialBuffer);
+      FW_ASSERT(status == FW_SERIALIZE_OK);
+    }
+    FilePacket::Header actual;
+    {
+      const SerializeStatus status = 
+        actual.fromSerialBuffer(serialBuffer);
+      FW_ASSERT(status == FW_SERIALIZE_OK);
+    }
+    GTest::FilePackets::Header::compare(
+        expected, 
+        actual
+    );
   }
 
 
@@ -72,20 +51,20 @@ namespace Fw {
     Buffer buffer(bytes, size);
     SerialBuffer serialBuffer(bytes, size);
     {
-      const SerializeStatus status =
+      const SerializeStatus status = 
         expected.toBuffer(buffer);
       ASSERT_EQ(status, FW_SERIALIZE_OK);
     }
     FilePacket actual;
     {
-      const SerializeStatus status =
+      const SerializeStatus status = 
         actual.fromBuffer(buffer);
       ASSERT_EQ(status, FW_SERIALIZE_OK);
     }
     const FilePacket::StartPacket& actualStartPacket =
       actual.asStartPacket();
     GTest::FilePackets::StartPacket::compare(
-        expected,
+        expected, 
         actualStartPacket
     );
   }
@@ -106,20 +85,20 @@ namespace Fw {
     Buffer buffer(bytes, size);
     SerialBuffer serialBuffer(bytes, size);
     {
-      const SerializeStatus status =
+      const SerializeStatus status = 
         expected.toBuffer(buffer);
       FW_ASSERT(status == FW_SERIALIZE_OK);
     }
     FilePacket actual;
     {
-      const SerializeStatus status =
+      const SerializeStatus status = 
         actual.fromBuffer(buffer);
       FW_ASSERT(status == FW_SERIALIZE_OK);
     }
     const FilePacket::DataPacket& actualDataPacket =
       actual.asDataPacket();
     GTest::FilePackets::DataPacket::compare(
-        expected,
+        expected, 
         actualDataPacket
     );
   }
@@ -137,20 +116,20 @@ namespace Fw {
     Buffer buffer(bytes, size);
     SerialBuffer serialBuffer(bytes, size);
     {
-      const SerializeStatus status =
+      const SerializeStatus status = 
         expected.toBuffer(buffer);
       FW_ASSERT(status == FW_SERIALIZE_OK);
     }
     FilePacket actual;
     {
-      const SerializeStatus status =
+      const SerializeStatus status = 
         actual.fromBuffer(buffer);
       FW_ASSERT(status == FW_SERIALIZE_OK);
     }
     const FilePacket::EndPacket& actualEndPacket =
       actual.asEndPacket();
     GTest::FilePackets::EndPacket::compare(
-        expected,
+        expected, 
         actualEndPacket
     );
   }
@@ -167,20 +146,20 @@ namespace Fw {
     Buffer buffer(bytes, size);
     SerialBuffer serialBuffer(bytes, size);
     {
-      const SerializeStatus status =
+      const SerializeStatus status = 
         expected.toBuffer(buffer);
       FW_ASSERT(status == FW_SERIALIZE_OK);
     }
     FilePacket actual;
     {
-      const SerializeStatus status =
+      const SerializeStatus status = 
         actual.fromBuffer(buffer);
       FW_ASSERT(status == FW_SERIALIZE_OK);
     }
     const FilePacket::CancelPacket& actualCancelPacket =
       actual.asCancelPacket();
     GTest::FilePackets::CancelPacket::compare(
-        expected,
+        expected, 
         actualCancelPacket
     );
   }

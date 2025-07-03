@@ -1,4 +1,4 @@
-#include <Fw/FPrimeBasicTypes.hpp>
+#include <FpConfig.hpp>
 #include <Fw/Port/InputPortBase.hpp>
 #include <Fw/Types/Assert.hpp>
 #include <cstdio>
@@ -20,8 +20,8 @@ namespace Fw {
 
     }
 
-    void InputPortBase::setPortNum(FwIndexType portNum) {
-        FW_ASSERT(portNum >= 0, static_cast<FwAssertArgType>(portNum));
+    void InputPortBase::setPortNum(NATIVE_INT_TYPE portNum) {
+        FW_ASSERT(portNum >= 0,portNum);
         this->m_portNum = portNum;
     }
 

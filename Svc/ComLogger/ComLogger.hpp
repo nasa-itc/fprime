@@ -19,11 +19,9 @@
 
 namespace Svc {
 
-  class ComLogger final :
+  class ComLogger :
     public ComLoggerComponentBase
   {
-    friend class ComLoggerTester;
-
       // ----------------------------------------------------------------------
       // Construction, initialization, and destruction
       // ----------------------------------------------------------------------
@@ -58,10 +56,10 @@ namespace Svc {
       // Handler implementations
       // ----------------------------------------------------------------------
 
-    private:
+    PRIVATE:
 
       void comIn_handler(
-          FwIndexType portNum,
+          NATIVE_INT_TYPE portNum,
           Fw::ComBuffer &data,
           U32 context
       );
@@ -74,7 +72,7 @@ namespace Svc {
       //! Handler implementation for pingIn
       //!
       void pingIn_handler(
-          const FwIndexType portNum, /*!< The port number*/
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
           U32 key /*!< Value to return to pinger*/
       );
 

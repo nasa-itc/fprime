@@ -10,6 +10,7 @@ set(SOURCE_FILES
 )
 
 set(MOD_DEPS
+  Fw/Cfg
   Fw/Types
 )
 register_fprime_module()

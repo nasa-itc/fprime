@@ -50,7 +50,7 @@ namespace Svc {
     init(
         const char *const logFilePrefix,
         const char *const logFileSuffix,
-        const FwSizeType maxFileSize,
+        const U32 maxFileSize,
         const U8 sizeOfSize
     )
   {
@@ -62,7 +62,7 @@ namespace Svc {
       this->m_maxSize = maxFileSize;
       this->m_sizeOfSize = sizeOfSize;
 
-      FW_ASSERT(sizeOfSize <= sizeof(FwSizeType), static_cast<FwAssertArgType>(sizeOfSize));
+      FW_ASSERT(sizeOfSize <= sizeof(U32), sizeOfSize);
       FW_ASSERT(m_maxSize > sizeOfSize, static_cast<FwAssertArgType>(m_maxSize));
   }
 
@@ -82,12 +82,12 @@ namespace Svc {
   void BufferLogger::File ::
     logBuffer(
         const U8 *const data,
-        const FwSizeType size
+        const U32 size
     )
   {
     // Close the file if it will be too big
     if (this->m_mode == File::Mode::OPEN) {
-      const FwSizeType projectedByteCount =
+      const U32 projectedByteCount =
         this->m_bytesWritten + this->m_sizeOfSize + size;
       if (projectedByteCount > this->m_maxSize) {
         this->closeAndEmitEvent();
@@ -124,7 +124,7 @@ namespace Svc {
 
     // NOTE(mereweth) - check that file path has been set and that initLog has been called
     if ((this->m_baseName.toChar()[0] == '\0') ||
-        (this->m_sizeOfSize > sizeof(FwSizeType)) ||
+        (this->m_sizeOfSize > sizeof(U32)) ||
         (this->m_maxSize <= this->m_sizeOfSize)) {
         this->m_bufferLogger.log_WARNING_HI_BL_NoLogFileOpenInitError();
         return;
@@ -140,7 +140,7 @@ namespace Svc {
     }
     else {
         this->m_name.format(
-            "%s%s%" PRI_FwSizeType "%s",
+            "%s%s%d%s",
             this->m_prefix.toChar(),
             this->m_baseName.toChar(),
             this->m_fileCounter,
@@ -168,7 +168,7 @@ namespace Svc {
   bool BufferLogger::File ::
     writeBuffer(
         const U8 *const data,
-        const FwSizeType size
+        const U32 size
     )
   {
     bool status = this->writeSize(size);
@@ -179,11 +179,11 @@ namespace Svc {
   }
 
   bool BufferLogger::File ::
-    writeSize(const FwSizeType size)
+    writeSize(const U32 size)
   {
-    FW_ASSERT(this->m_sizeOfSize <= sizeof(FwSizeType));
-    U8 sizeBuffer[sizeof(FwSizeType)];
-    FwSizeType sizeRegister = size;
+    FW_ASSERT(this->m_sizeOfSize <= sizeof(U32));
+    U8 sizeBuffer[sizeof(U32)];
+    U32 sizeRegister = size;
     for (U8 i = 0; i < this->m_sizeOfSize; ++i) {
       sizeBuffer[this->m_sizeOfSize - i - 1] = sizeRegister & 0xFF;
       sizeRegister >>= 8;
@@ -198,20 +198,21 @@ namespace Svc {
   bool BufferLogger::File ::
     writeBytes(
         const void *const data,
-        const FwSizeType length
+        const U32 length
     )
   {
-    FwSizeType size = length;
+    FW_ASSERT(length > 0, static_cast<FwAssertArgType>(length));
+    FwSignedSizeType size = length;
     const Os::File::Status fileStatus = this->m_osFile.write(reinterpret_cast<const U8*>(data), size);
     bool status;
-    if (fileStatus == Os::File::OP_OK && static_cast<FwSizeType>(size) == length) {
+    if (fileStatus == Os::File::OP_OK && size == static_cast<NATIVE_INT_TYPE>(length)) {
       this->m_bytesWritten += length;
       status = true;
     }
     else {
       Fw::LogStringArg string(this->m_name.toChar());
 
-      this->m_bufferLogger.log_WARNING_HI_BL_LogFileWriteError(fileStatus, static_cast<U32>(size), static_cast<U32>(length), string);
+      this->m_bufferLogger.log_WARNING_HI_BL_LogFileWriteError(fileStatus, static_cast<U32>(size), length, string);
       status = false;
     }
     return status;

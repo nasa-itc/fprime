@@ -41,10 +41,10 @@ namespace Drv {
   // ----------------------------------------------------------------------
 
   void LinuxI2cDriverTester ::
-    sendData(U32 addr, U8* data, Fw::Buffer::SizeType size)
+    sendData(U32 addr, U8* data, NATIVE_INT_TYPE size)
   {
       Fw::Buffer dataBuff;
-      dataBuff.setdata(static_cast<PlatformPointerCastType>(data));
+      dataBuff.setdata(static_cast<POINTER_CAST>(data));
       dataBuff.setsize(size);
       this->invoke_to_write(0,addr,dataBuff);
   }

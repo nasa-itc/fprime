@@ -29,10 +29,9 @@ DpWriterTester ::~DpWriterTester() {}
 // Handlers for typed from ports
 // ----------------------------------------------------------------------
 
-void DpWriterTester::from_procBufferSendOut_handler(FwIndexType portNum, Fw::Buffer& buffer) {
+void DpWriterTester::from_procBufferSendOut_handler(NATIVE_INT_TYPE portNum, Fw::Buffer& buffer) {
     this->pushFromPortEntry_procBufferSendOut(buffer);
-    this->abstractState.m_procTypes =
-        static_cast<Fw::DpCfg::ProcType::SerialType>(this->abstractState.m_procTypes | (1 << portNum));
+    this->abstractState.m_procTypes |= (1 << portNum);
 }
 
 // ----------------------------------------------------------------------
@@ -69,7 +68,7 @@ void DpWriterTester::constructDpFileName(FwDpIdType id, const Fw::Time& timeTag,
 }
 
 void DpWriterTester::checkProcTypes(const Fw::DpContainer& container) {
-    U32 expectedNumProcTypes = 0;
+    FwIndexType expectedNumProcTypes = 0;
     const Fw::DpCfg::ProcType::SerialType procTypes = container.getProcTypes();
     for (FwIndexType i = 0; i < Fw::DpCfg::ProcType::NUM_CONSTANTS; i++) {
         if (procTypes & (1 << i)) {
@@ -86,38 +85,6 @@ void DpWriterTester::checkTelemetry() {
     TESTER_CHECK_CHANNEL(NumSuccessfulWrites);
     TESTER_CHECK_CHANNEL(NumFailedWrites);
     TESTER_CHECK_CHANNEL(NumErrors);
-}
-
-void DpWriterTester::doDispatch() {
-    this->component.doDispatch();
-}
-
-FwIndexType DpWriterTester::getBufferTooSmallForDataThrottleCount() {
-    return this->component.DpWriterComponentBase::m_BufferTooSmallForDataThrottle;
-}
-
-FwIndexType DpWriterTester::getBufferTooSmallForPacketThrottleCount() {
-    return this->component.DpWriterComponentBase::m_BufferTooSmallForPacketThrottle;
-}
-
-FwIndexType DpWriterTester::getFileOpenErrorThrottleCount() {
-    return this->component.DpWriterComponentBase::m_FileOpenErrorThrottle;
-}
-
-FwIndexType DpWriterTester::getFileWriteErrorThrottleCount() {
-    return this->component.DpWriterComponentBase::m_FileWriteErrorThrottle;
-}
-
-FwIndexType DpWriterTester::getInvalidBufferThrottleCount() {
-    return this->component.DpWriterComponentBase::m_InvalidBufferThrottle;
-}
-
-FwIndexType DpWriterTester::getInvalidHeaderHashThrottleCount() {
-    return this->component.DpWriterComponentBase::m_InvalidHeaderHashThrottle;
-}
-
-FwIndexType DpWriterTester::getInvalidHeaderThrottleCount() {
-    return this->component.DpWriterComponentBase::m_InvalidHeaderThrottle;
 }
 
 }  // namespace Svc

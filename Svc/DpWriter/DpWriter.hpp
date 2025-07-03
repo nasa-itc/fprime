@@ -7,7 +7,7 @@
 #ifndef Svc_DpWriter_HPP
 #define Svc_DpWriter_HPP
 
-#include <config/DpCfg.hpp>
+#include <DpCfg.hpp>
 
 #include "Fw/Dp/DpContainer.hpp"
 #include "Fw/Types/FileNameString.hpp"
@@ -17,10 +17,7 @@
 
 namespace Svc {
 
-class DpWriter final : public DpWriterComponentBase {
-
-  friend class DpWriterTester;
-
+class DpWriter : public DpWriterComponentBase {
   public:
     // ----------------------------------------------------------------------
     // Construction, initialization, and destruction
@@ -39,24 +36,24 @@ class DpWriter final : public DpWriterComponentBase {
     void configure(const Fw::StringBase& dpFileNamePrefix  //!< The file name prefix for writing DP files
     );
 
-  private:
+  PRIVATE:
     // ----------------------------------------------------------------------
     // Handler implementations for user-defined typed input ports
     // ----------------------------------------------------------------------
 
     //! Handler implementation for bufferSendIn
     //!
-    void bufferSendIn_handler(const FwIndexType portNum,  //!< The port number
+    void bufferSendIn_handler(const NATIVE_INT_TYPE portNum,  //!< The port number
                               Fw::Buffer& fwBuffer            //!< The buffer
                               ) final;
 
     //! Handler implementation for schedIn
     //!
-    void schedIn_handler(const FwIndexType portNum,  //!< The port number
+    void schedIn_handler(const NATIVE_INT_TYPE portNum,  //!< The port number
                          U32 context                     //!< The call order
                          ) final;
 
-  private:
+  PRIVATE:
     // ----------------------------------------------------------------------
     // Handler implementations for commands
     // ----------------------------------------------------------------------
@@ -68,7 +65,7 @@ class DpWriter final : public DpWriterComponentBase {
                                          U32 cmdSeq            //!< The command sequence number
                                          ) final;
 
-  private:
+  PRIVATE:
     // ----------------------------------------------------------------------
     // Private helper functions
     // ----------------------------------------------------------------------
@@ -96,7 +93,7 @@ class DpWriter final : public DpWriterComponentBase {
                           FwSizeType packetSize                //!< The packet size
     );
 
-  private:
+  PRIVATE:
     // ----------------------------------------------------------------------
     // Private member variables
     // ----------------------------------------------------------------------

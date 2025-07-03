@@ -6,7 +6,7 @@ module Drv {
     # Interfaces
     # ----------------------------------------------------------------------
     
-    import Drv.Spi
+    include "../../Drv/Interfaces/SpiInterface.fppi"
 
     # ----------------------------------------------------------------------
     # Special ports

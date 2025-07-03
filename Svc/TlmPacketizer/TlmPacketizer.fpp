@@ -22,9 +22,6 @@ module Svc {
     @ Telemetry input port
     sync input port TlmRecv: Fw.Tlm
 
-    @ Telemetry getter port
-    sync input port TlmGet: Fw.TlmGet
-
     # ----------------------------------------------------------------------
     # Special ports
     # ----------------------------------------------------------------------
@@ -56,7 +53,7 @@ module Svc {
 
     @ Set telemetry send level
     async command SET_LEVEL(
-                             level: FwChanIdType @< The I32 command argument
+                             level: U32 @< The I32 command argument
                            ) \
       opcode 0
 
@@ -72,7 +69,7 @@ module Svc {
 
     @ Telemetry channel is not part of a telemetry packet.
     event NoChan(
-                  Id: FwChanIdType @< The telemetry ID
+                  Id: U32 @< The telemetry ID
                 ) \
       severity warning low \
       id 0 \
@@ -80,7 +77,7 @@ module Svc {
 
     @ Telemetry send level set
     event LevelSet(
-                    $id: FwChanIdType @< The level
+                    $id: U32 @< The level
                   ) \
       severity activity high \
       id 1 \
@@ -88,8 +85,8 @@ module Svc {
 
     @ Telemetry send level set
     event MaxLevelExceed(
-                          level: FwChanIdType @< The level
-                          max: FwChanIdType @< The max packet level
+                          level: U32 @< The level
+                          max: U32 @< The max packet level
                         ) \
       severity warning low \
       id 2 \
@@ -116,7 +113,7 @@ module Svc {
     # ----------------------------------------------------------------------
 
     @ Telemetry send level
-    telemetry SendLevel: FwChanIdType id 0
+    telemetry SendLevel: U32 id 0
 
   }
 

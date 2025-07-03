@@ -13,7 +13,7 @@
 #ifndef TestUtils_OnChangeChannel_HPP
 #define TestUtils_OnChangeChannel_HPP
 
-#include <Fw/FPrimeBasicTypes.hpp>
+#include <FpConfig.hpp>
 #include <cstring>
 
 #include "TestUtils/Option.hpp"
@@ -28,7 +28,7 @@ template <typename T>
 class OnChangeChannel {
   public:
     //! Constructor
-    explicit OnChangeChannel(T a_value) : value(a_value) {}
+    explicit OnChangeChannel(T value) : value(value) {}
     //! Update the previous value
     OnChangeStatus updatePrev() {
         const auto status = ((!this->prev.hasValue()) || (this->value != this->prev.get()))

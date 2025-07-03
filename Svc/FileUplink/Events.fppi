@@ -35,7 +35,7 @@ event FileWriteError(
 
 @ The File Uplink component received a packet with a type that was invalid for the current receive mode
 event InvalidReceiveMode(
-                          packetType: FwPacketDescriptorType @< The type of the packet received
+                          packetType: U32 @< The type of the packet received
                           mode: U32 @< The receive mode
                         ) \
   severity warning high \
@@ -85,11 +85,3 @@ event DecodeError(
   severity warning high \
   id 9 \
   format "Unable to decode file packet. Status: {}"
-
-@ Invalid packet received
-event InvalidPacketReceived(
-                   packetType: FwPacketDescriptorType @< The packet type received
-                 ) \
-  severity warning high \
-  id 10 \
-  format "Invalid packet received. Wrong packet type: {}"

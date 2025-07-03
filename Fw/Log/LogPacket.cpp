@@ -11,7 +11,7 @@
 namespace Fw {
 
     LogPacket::LogPacket() : m_id(0) {
-        this->m_type = ComPacketType::FW_PACKET_LOG;
+        this->m_type = FW_PACKET_LOG;
     }
 
     LogPacket::~LogPacket() {
@@ -35,7 +35,7 @@ namespace Fw {
         }
 
         // We want to add data but not size for the ground software
-        return buffer.serialize(this->m_logBuffer.getBuffAddr(),m_logBuffer.getBuffLength(),Fw::Serialization::OMIT_LENGTH);
+        return buffer.serialize(this->m_logBuffer.getBuffAddr(),m_logBuffer.getBuffLength(),true);
 
     }
 
@@ -56,12 +56,12 @@ namespace Fw {
         }
 
         // remainder of buffer must be telemetry value
-        FwSizeType size = buffer.getBuffLeft();
-        stat = buffer.deserialize(this->m_logBuffer.getBuffAddr(),size,Fw::Serialization::OMIT_LENGTH);
+        NATIVE_UINT_TYPE size = buffer.getBuffLeft();
+        stat = buffer.deserialize(this->m_logBuffer.getBuffAddr(),size,true);
         if (stat == FW_SERIALIZE_OK) {
             // Shouldn't fail
             stat = this->m_logBuffer.setBuffLen(size);
-            FW_ASSERT(stat == FW_SERIALIZE_OK,static_cast<FwAssertArgType>(stat));
+            FW_ASSERT(stat == FW_SERIALIZE_OK,static_cast<NATIVE_INT_TYPE>(stat));
         }
         return stat;
     }

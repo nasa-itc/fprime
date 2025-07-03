@@ -78,9 +78,9 @@ module Ref {
     # ----------------------------------------------------------------------
     # Interfaces
     # ----------------------------------------------------------------------
-    import Fw.Event
-    import Fw.Command
-    import Fw.Channel
+    include "../../Fw/Interfaces/EventInterface.fppi"
+    include "../../Fw/Interfaces/CommandInterface.fppi"
+    include "../../Fw/Interfaces/ChannelInterface.fppi"
 
   }
 

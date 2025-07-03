@@ -19,13 +19,11 @@
 
 namespace Svc {
 
-  class FileUplink final :
+  class FileUplink :
     public FileUplinkComponentBase
   {
 
-    friend class FileUplinkTester;
-
-    private:
+    PRIVATE:
 
       // ----------------------------------------------------------------------
       // Types
@@ -36,8 +34,6 @@ namespace Svc {
 
       //! An object representing an incoming file
       class File {
-
-        friend class FileUplinkTester;
 
         public:
 
@@ -50,7 +46,7 @@ namespace Svc {
           //! The underlying OS file
           Os::File osFile;
 
-        private:
+        PRIVATE:
 
           //! The checksum for the file
           ::CFDP::Checksum m_checksum;
@@ -79,8 +75,6 @@ namespace Svc {
       //! Object to record files received
       class FilesReceived {
 
-        friend class FileUplinkTester;
-
         public:
 
           //! Construct a FilesReceived object
@@ -97,7 +91,7 @@ namespace Svc {
             this->m_fileUplink->tlmWrite_FilesReceived(m_received_files_counter);
           }
 
-        private:
+        PRIVATE:
 
           //! The total number of files received
           U32 m_received_files_counter;
@@ -109,8 +103,6 @@ namespace Svc {
 
       //! Object to record packets received
       class PacketsReceived {
-
-        friend class FileUplinkTester;
 
         public:
 
@@ -128,7 +120,7 @@ namespace Svc {
             this->m_fileUplink->tlmWrite_PacketsReceived(m_received_packet_count);
           }
 
-        private:
+        PRIVATE:
 
           //! The total number of received packets
           U32 m_received_packet_count;
@@ -140,8 +132,6 @@ namespace Svc {
 
       //! Object to record warnings
       class Warnings {
-
-        friend class FileUplinkTester;
 
         public:
 
@@ -185,7 +175,7 @@ namespace Svc {
               const U32 read
           );
 
-        private:
+        PRIVATE:
 
           //! Record a warning
           void warning() {
@@ -193,7 +183,7 @@ namespace Svc {
             this->m_fileUplink->tlmWrite_Warnings(m_warning_count);
           }
 
-        private:
+        PRIVATE:
 
           //! The total number of warnings
           U32 m_warning_count;
@@ -219,7 +209,7 @@ namespace Svc {
       //!
       ~FileUplink();
 
-    private:
+    PRIVATE:
 
       // ----------------------------------------------------------------------
       // Handler implementations for user-defined typed input ports
@@ -228,19 +218,19 @@ namespace Svc {
       //! Handler implementation for bufferSendIn
       //!
       void bufferSendIn_handler(
-          const FwIndexType portNum, //!< The port number
+          const NATIVE_INT_TYPE portNum, //!< The port number
           Fw::Buffer& buffer //!< Buffer wrapping data
       );
 
       //! Handler implementation for pingIn
       //!
       void pingIn_handler(
-          const FwIndexType portNum, /*!< The port number*/
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
           U32 key /*!< Value to return to pinger*/
       );
 
 
-    private:
+    PRIVATE:
 
       // ----------------------------------------------------------------------
       // Private helper functions
@@ -273,7 +263,7 @@ namespace Svc {
       //! Go to DATA mode
       void goToDataMode();
 
-    private:
+    PRIVATE:
 
       // ----------------------------------------------------------------------
       // Member variables

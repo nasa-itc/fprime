@@ -1,6 +1,6 @@
 #include <Fw/Comp/PassiveComponentBase.hpp>
 #include <Fw/Types/Assert.hpp>
-#include <Fw/FPrimeBasicTypes.hpp>
+#include <FpConfig.hpp>
 
 #include <Fw/Types/ExternalString.hpp>
 
@@ -14,7 +14,7 @@ namespace Fw {
         return "Comp: %s";
     }
 
-    void PassiveComponentBase::toString(char* buffer, FwSizeType size) {
+    void PassiveComponentBase::toString(char* buffer, NATIVE_INT_TYPE size) {
         FW_ASSERT(size > 0);
         FW_ASSERT(buffer != nullptr);
         Fw::FormatStatus status = Fw::ExternalString(buffer, static_cast<Fw::ExternalString::SizeType>(size)).format(
@@ -34,22 +34,22 @@ namespace Fw {
     PassiveComponentBase::~PassiveComponentBase() {
     }
 
-    void PassiveComponentBase::init(FwEnumStoreType instance) {
+    void PassiveComponentBase::init(NATIVE_INT_TYPE instance) {
         ObjBase::init();
         this->m_instance = instance;
     }
 
-    FwEnumStoreType PassiveComponentBase::getInstance() const {
+    NATIVE_INT_TYPE PassiveComponentBase::getInstance() const {
         return this->m_instance;
     }
 
     void PassiveComponentBase ::
-      setIdBase(const FwIdType idBase)
+      setIdBase(const U32 idBase)
     {
       this->m_idBase = idBase;
     }
 
-    FwIdType PassiveComponentBase ::
+    U32 PassiveComponentBase ::
       getIdBase() const
     {
       return this->m_idBase;

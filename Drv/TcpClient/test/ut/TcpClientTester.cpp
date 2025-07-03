@@ -40,7 +40,7 @@ void TcpClientTester ::setup_helper(Drv::TcpServerSocket& server, Drv::SocketDes
     if (recv_thread) {
         Os::TaskString name("receiver thread");
         this->component.setAutomaticOpen(reconnect);
-        this->component.start(name, Os::Task::TASK_PRIORITY_DEFAULT, Os::Task::TASK_DEFAULT);
+        this->component.start(name, Os::Task::TASK_DEFAULT, Os::Task::TASK_DEFAULT);
     }
 }
 
@@ -79,10 +79,8 @@ void TcpClientTester ::test_with_loop(U32 iterations, bool recv_thread) {
             Drv::Test::force_recv_timeout(server_fd.serverFd, server);
             m_data_buffer.setSize(sizeof(m_data_storage));
             size = Drv::Test::fill_random_buffer(m_data_buffer);
-            invoke_to_send(0, m_data_buffer);
-            ASSERT_from_sendReturnOut_SIZE(i + 1);
-            Drv::ByteStreamStatus status = this->fromPortHistory_sendReturnOut->at(i).status;
-            EXPECT_EQ(status, ByteStreamStatus::OP_OK);
+            Drv::SendStatus status = invoke_to_send(0, m_data_buffer);
+            EXPECT_EQ(status, SendStatus::SEND_OK);
             Drv::Test::receive_all(server, server_fd, buffer, size);
             Drv::Test::validate_random_buffer(m_data_buffer, buffer);
             // If receive thread is live, try the other way
@@ -91,6 +89,7 @@ void TcpClientTester ::test_with_loop(U32 iterations, bool recv_thread) {
                 m_data_buffer.setSize(sizeof(m_data_storage));
                 status2 = server.send(server_fd, m_data_buffer.getData(), m_data_buffer.getSize());
                 EXPECT_EQ(status2, Drv::SOCK_SUCCESS);
+                from_deallocate_handler(0, m_data_buffer);
                 while (not m_spinner) {}
             }
         }
@@ -180,28 +179,19 @@ void TcpClientTester ::test_no_automatic_recv_connection() {
     server.terminate(server_fd);
 }
 
-void TcpClientTester ::test_buffer_deallocation() {
-    U8 data[1];
-    Fw::Buffer buffer(data, sizeof(data));
-    this->invoke_to_recvReturnIn(0, buffer);
-    ASSERT_from_deallocate_SIZE(1);     // incoming buffer should be deallocated
-    ASSERT_EQ(this->fromPortHistory_deallocate->at(0).fwBuffer.getData(), data);
-    ASSERT_EQ(this->fromPortHistory_deallocate->at(0).fwBuffer.getSize(), sizeof(data));
-}
-
 // ----------------------------------------------------------------------
-// Handler overrides for typed from ports
+// Handlers for typed from ports
 // ----------------------------------------------------------------------
 
   void TcpClientTester ::
     from_recv_handler(
-        const FwIndexType portNum,
+        const NATIVE_INT_TYPE portNum,
         Fw::Buffer &recvBuffer,
-        const ByteStreamStatus &ByteStreamStatus
+        const RecvStatus &recvStatus
     )
   {
-    this->pushFromPortEntry_recv(recvBuffer, ByteStreamStatus);
-    if (ByteStreamStatus == ByteStreamStatus::OP_OK){
+    this->pushFromPortEntry_recv(recvBuffer, recvStatus);
+    if (recvStatus == RecvStatus::RECV_OK){
         // Make sure we can get to unblocking the spinner
         EXPECT_EQ(m_data_buffer.getSize(), recvBuffer.getSize()) << "Invalid transmission size";
         Drv::Test::validate_random_buffer(m_data_buffer, recvBuffer.getData());
@@ -211,16 +201,29 @@ void TcpClientTester ::test_buffer_deallocation() {
     delete[] recvBuffer.getData();
 }
 
+void TcpClientTester ::from_ready_handler(const NATIVE_INT_TYPE portNum) {
+    this->pushFromPortEntry_ready();
+}
+
 Fw::Buffer TcpClientTester ::
     from_allocate_handler(
-        const FwIndexType portNum,
-        FwSizeType size
+        const NATIVE_INT_TYPE portNum,
+        U32 size
     )
   {
     this->pushFromPortEntry_allocate(size);
     Fw::Buffer buffer(new U8[size], size);
     m_data_buffer2 = buffer;
     return buffer;
+  }
+
+  void TcpClientTester ::
+    from_deallocate_handler(
+        const NATIVE_INT_TYPE portNum,
+        Fw::Buffer &fwBuffer
+    )
+  {
+    this->pushFromPortEntry_deallocate(fwBuffer);
   }
 
 }  // end namespace Drv

@@ -13,7 +13,7 @@
 #ifndef UTILS_HASH_BUFFER_HPP
 #define UTILS_HASH_BUFFER_HPP
 
-#include <Fw/FPrimeBasicTypes.hpp>
+#include <FpConfig.hpp>
 #include <Fw/Types/Assert.hpp>
 #include <Fw/Types/Serializable.hpp>
 #include <Utils/Hash/HashConfig.hpp>
@@ -31,7 +31,7 @@ class HashBuffer : public Fw::SerializeBufferBase {
 
     //! Construct a HashBuffer object
     //!
-    HashBuffer(const U8* args, FwSizeType size);
+    HashBuffer(const U8* args, NATIVE_UINT_TYPE size);
     HashBuffer(const HashBuffer& other);
     HashBuffer();
 
@@ -57,7 +57,7 @@ class HashBuffer : public Fw::SerializeBufferBase {
 
     //! Get the total buffer length of a hash buffer
     //!
-    FwSizeType getBuffCapacity() const;  // !< returns capacity, not current size, of buffer
+    NATIVE_UINT_TYPE getBuffCapacity() const;  // !< returns capacity, not current size, of buffer
 
     //! Get a pointer to the buffer within the hash buffer
     //!

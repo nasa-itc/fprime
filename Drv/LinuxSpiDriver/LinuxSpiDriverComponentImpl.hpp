@@ -37,22 +37,22 @@ namespace Drv {
      * SPI Mode Select
      *
      * Defines the SPI Clock Polarity and Phase for each SPI Transaction.
-     *
+     * 
      * SPI Clock Polarity(CPOL): Defines clock polarity as idle low (CPOL = 0) or idle high(CPOL = 1)
-     * SPI Clock Phase(CPHA): Defines if data is shifted out on the rising clock edge and sampled
-     *                        on the falling clock edge(CPHA = 0) or if data is shifted out on the
+     * SPI Clock Phase(CPHA): Defines if data is shifted out on the rising clock edge and sampled 
+     *                        on the falling clock edge(CPHA = 0) or if data is shifted out on the 
      *                        falling clock edge and sampled on the rising clock edge(CPHA=1)
-     *
+     * 
      */
     enum SpiMode
     {
-        SPI_MODE_CPOL_LOW_CPHA_LOW, ///< (CPOL = 0, CPHA = 0)
+        SPI_MODE_CPOL_LOW_CPHA_LOW, ///< (CPOL = 0, CPHA = 0) 
         SPI_MODE_CPOL_LOW_CPHA_HIGH,///< (CPOL = 0, CPHA = 1)
         SPI_MODE_CPOL_HIGH_CPHA_LOW,///< (CPOL = 1, CPHA = 0)
         SPI_MODE_CPOL_HIGH_CPHA_HIGH,///< (CPOL = 1, CPHA = 1)
     };
 
-    class LinuxSpiDriverComponentImpl final : public LinuxSpiDriverComponentBase {
+    class LinuxSpiDriverComponentImpl: public LinuxSpiDriverComponentBase {
 
         public:
 
@@ -71,12 +71,12 @@ namespace Drv {
             ~LinuxSpiDriverComponentImpl();
 
             //! Open device
-            bool open(FwIndexType device,
-                      FwIndexType select,
+            bool open(NATIVE_INT_TYPE device,
+                      NATIVE_INT_TYPE select,
                       SpiFrequency clock,
                       SpiMode spiMode = SpiMode::SPI_MODE_CPOL_LOW_CPHA_LOW);
 
-        private:
+        PRIVATE:
 
             // ----------------------------------------------------------------------
             // Handler implementations for user-defined typed input ports
@@ -84,13 +84,13 @@ namespace Drv {
 
             //! Handler implementation for SpiReadWrite
             //!
-            void SpiReadWrite_handler(const FwIndexType portNum, /*!< The port number*/
+            void SpiReadWrite_handler(const NATIVE_INT_TYPE portNum, /*!< The port number*/
             Fw::Buffer &WriteBuffer, Fw::Buffer &readBuffer);
 
-            int m_fd;
-            FwIndexType m_device;
-            FwIndexType m_select;
-            FwSizeType m_bytes;
+            NATIVE_INT_TYPE m_fd;
+            NATIVE_INT_TYPE m_device;
+            NATIVE_INT_TYPE m_select;
+            U32 m_bytes;
 
     };
 

@@ -42,18 +42,18 @@ class BufferAccumulatorTester : public BufferAccumulatorGTestBase {
   //! Handler for from_bufferSendOutDrain
   //!
   void from_bufferSendOutDrain_handler(
-      const FwIndexType portNum,  //!< The port number
+      const NATIVE_INT_TYPE portNum,  //!< The port number
       Fw::Buffer& fwBuffer);
 
   //! Handler for from_bufferSendOutReturn
   //!
   void from_bufferSendOutReturn_handler(
-      const FwIndexType portNum,  //!< The port number
+      const NATIVE_INT_TYPE portNum,  //!< The port number
       Fw::Buffer& fwBuffer);
 
   //! Handler for from_pingOut
   //!
-  void from_pingOut_handler(const FwIndexType portNum,  //!< The port number
+  void from_pingOut_handler(const NATIVE_INT_TYPE portNum,  //!< The port number
                             U32 key  //!< Value to return to pinger
   );
 
@@ -81,14 +81,6 @@ class BufferAccumulatorTester : public BufferAccumulatorGTestBase {
 
   //! Whether to allocate/deallocate a queue for the user
   bool doAllocateQueue;
-
-
-  // ----------------------------------------------------------------------
-  //  Methods
-  // ----------------------------------------------------------------------
-
-  //! Helper method to call doDispatch
-  void doDispatch(void);
 };
 
 }  // end namespace Svc

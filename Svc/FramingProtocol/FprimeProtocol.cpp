@@ -10,7 +10,7 @@
 //
 // ======================================================================
 #include "FprimeProtocol.hpp"
-#include "Fw/FPrimeBasicTypes.hpp"
+#include "FpConfig.hpp"
 #include "Utils/Hash/Hash.hpp"
 
 namespace Svc {
@@ -19,36 +19,42 @@ FprimeFraming::FprimeFraming(): FramingProtocol() {}
 
 FprimeDeframing::FprimeDeframing(): DeframingProtocol() {}
 
-void FprimeFraming::frame(const U8* const data, const U32 size, Fw::ComPacketType packet_type) {
-    // NOTE: packet_type is not used in this implementation
-
+void FprimeFraming::frame(const U8* const data, const U32 size, Fw::ComPacket::ComPacketType packet_type) {
     FW_ASSERT(data != nullptr);
     FW_ASSERT(m_interface != nullptr);
-
-    FpFrameHeader::TokenType totalSize = size + FpFrameHeader::SIZE + HASH_DIGEST_LENGTH;
-    Fw::Buffer buffer = m_interface->allocate(totalSize);
-    auto serializer = buffer.getSerializer();
+    // Use of I32 size is explicit as ComPacketType will be specifically serialized as an I32
+    FpFrameHeader::TokenType real_data_size =
+        size + ((packet_type != Fw::ComPacket::FW_PACKET_UNKNOWN) ?
+        static_cast<Svc::FpFrameHeader::TokenType>(sizeof(I32)) :
+        0);
+    FpFrameHeader::TokenType total = real_data_size + FpFrameHeader::SIZE + HASH_DIGEST_LENGTH;
+    Fw::Buffer buffer = m_interface->allocate(total);
+    Fw::SerializeBufferBase& serializer = buffer.getSerializeRepr();
     Utils::HashBuffer hash;
 
-    // Serialize start word
+    // Serialize data
     Fw::SerializeStatus status;
     status = serializer.serialize(FpFrameHeader::START_WORD);
     FW_ASSERT(status == Fw::FW_SERIALIZE_OK, status);
 
-    // Serialize data size
-    status = serializer.serialize(size);
+    status = serializer.serialize(real_data_size);
     FW_ASSERT(status == Fw::FW_SERIALIZE_OK, status);
 
-    // Serialize data
-    status = serializer.serialize(data, size, Fw::Serialization::OMIT_LENGTH);  // Serialize without length
+    // Serialize packet type if supplied, otherwise it *must* be present in the data
+    if (packet_type != Fw::ComPacket::FW_PACKET_UNKNOWN) {
+        status = serializer.serialize(static_cast<I32>(packet_type)); // I32 used for enum storage
+        FW_ASSERT(status == Fw::FW_SERIALIZE_OK, status);
+    }
+
+    status = serializer.serialize(data, size, true);  // Serialize without length
     FW_ASSERT(status == Fw::FW_SERIALIZE_OK, status);
 
     // Calculate and add transmission hash
-    Utils::Hash::hash(buffer.getData(), static_cast<FwSizeType>(totalSize - HASH_DIGEST_LENGTH), hash);
-    status = serializer.serialize(hash.getBuffAddr(), HASH_DIGEST_LENGTH, Fw::Serialization::OMIT_LENGTH);
+    Utils::Hash::hash(buffer.getData(), static_cast<NATIVE_INT_TYPE>(total - HASH_DIGEST_LENGTH), hash);
+    status = serializer.serialize(hash.getBuffAddr(), HASH_DIGEST_LENGTH, true);
     FW_ASSERT(status == Fw::FW_SERIALIZE_OK, status);
 
-    buffer.setSize(totalSize);
+    buffer.setSize(total);
 
     m_interface->send(buffer);
 }

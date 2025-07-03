@@ -4,8 +4,8 @@
 # UTs target implementation.
 ####
 include(target/build) # Borrows some implementation
-set(FPRIME__INTERNAL_UT_TARGET "ut_exe") # For historical reasons
-set(FPRIME__INTERNAL_UT_CLEAN_SCRIPT "${CMAKE_BINARY_DIR}/clean.cmake")
+set(UT_TARGET "ut_exe") # For historical reasons
+set(UT_CLEAN_SCRIPT "${CMAKE_BINARY_DIR}/clean.cmake")
 
 
 ####
@@ -16,14 +16,14 @@ set(FPRIME__INTERNAL_UT_CLEAN_SCRIPT "${CMAKE_BINARY_DIR}/clean.cmake")
 ####
 function(_ut_setup_clean_file)
     set(REMOVAL_GLOB "*.gcda")
-    file(WRITE "${FPRIME__INTERNAL_UT_CLEAN_SCRIPT}" "
+    file(WRITE "${UT_CLEAN_SCRIPT}" "
         file(GLOB_RECURSE GCDA_FILES \"${CMAKE_BINARY_DIR}/**/${REMOVAL_GLOB}\")
         if (GCDA_FILES)
             file(REMOVE \${GCDA_FILES})
         endif()
     ")
     set_property(DIRECTORY APPEND PROPERTY
-        TEST_INCLUDE_FILES "${FPRIME__INTERNAL_UT_CLEAN_SCRIPT}"
+        TEST_INCLUDE_FILES "${UT_CLEAN_SCRIPT}"
     )
 endfunction(_ut_setup_clean_file)
 
@@ -34,7 +34,7 @@ endfunction(_ut_setup_clean_file)
 ####
 function(ut_add_global_target TARGET)
     if (FPRIME_ENABLE_UTIL_TARGETS)
-        add_custom_target(${FPRIME__INTERNAL_UT_TARGET})
+        add_custom_target(${UT_TARGET})
     endif()
     _ut_setup_clean_file()
 endfunction(ut_add_global_target)
@@ -55,13 +55,13 @@ function(ut_add_deployment_target MODULE TARGET SOURCES DEPENDENCIES FULL_DEPEND
         return()
     endif()
     set_property(DIRECTORY APPEND PROPERTY
-        TEST_INCLUDE_FILES "${FPRIME__INTERNAL_UT_CLEAN_SCRIPT}"
+        TEST_INCLUDE_FILES "${UT_CLEAN_SCRIPT}"
     )
-    add_custom_target("${MODULE}_${FPRIME__INTERNAL_UT_TARGET}")
+    add_custom_target("${MODULE}_${UT_TARGET}")
     foreach(DEPENDENCY IN LISTS FULL_DEPENDENCIES)
         get_property(DEPENDENCY_UTS TARGET "${DEPENDENCY}" PROPERTY FPRIME_UTS)
         if (DEPENDENCY_UTS)
-            add_dependencies("${MODULE}_${FPRIME__INTERNAL_UT_TARGET}" ${DEPENDENCY_UTS})
+            add_dependencies("${MODULE}_${UT_TARGET}" ${DEPENDENCY_UTS})
         endif()
     endforeach()
 endfunction(ut_add_deployment_target)
@@ -80,7 +80,6 @@ function(ut_setup_unit_test_include_directories UT_EXE_NAME SOURCE_FILES)
     set(UT_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_BINARY_DIR}")
     # When running with auto-helpers, we need to include the .hpp directories as things are imported without path
     # e.g. "#include <Tester.hpp>" and there is no guarantee for the location of these files
-    get_target_property(UT_AUTO_HELPERS "${UT_EXE_NAME}" FPRIME_UT_AUTO_HELPERS)
     if (DEFINED UT_AUTO_HELPERS AND UT_AUTO_HELPERS)
         foreach(SOURCE_FILE IN LISTS SOURCE_FILES)
             get_filename_component(SOURCE_EXT "${SOURCE_FILE}" LAST_EXT)
@@ -110,20 +109,21 @@ function(ut_add_module_target MODULE_NAME TARGET_NAME SOURCE_FILES DEPENDENCIES)
     endif()
     # Set some local variables
     set(UT_EXECUTABLE_TARGET "${MODULE_NAME}")
-    set(UT_MODULE_TARGET "${FPRIME_CURRENT_MODULE}_${FPRIME__INTERNAL_UT_TARGET}")
+    set(UT_MODULE_TARGET "${FPRIME_CURRENT_MODULE}_${UT_TARGET}")
     message(STATUS "Adding Unit Test: ${UT_EXECUTABLE_TARGET}")
     set_property(DIRECTORY APPEND PROPERTY
-        TEST_INCLUDE_FILES "${FPRIME__INTERNAL_UT_CLEAN_SCRIPT}"
+        TEST_INCLUDE_FILES "${UT_CLEAN_SCRIPT}"
     )
-    run_ac_set("${UT_EXECUTABLE_TARGET}" autocoder/fpp autocoder/fpp_ut)
+    run_ac_set("${SOURCE_FILES}" autocoder/fpp autocoder/fpp_ut)
+    resolve_dependencies(RESOLVED gtest_main ${DEPENDENCIES} ${AC_DEPENDENCIES})
 
     # Create lists of hand-coded and generated sources not "consumed" by an autocoder
-    fprime__internal_standard_build_target_setup("${UT_EXECUTABLE_TARGET}" "-ut")
-    target_link_libraries("${UT_EXECUTABLE_TARGET}" PUBLIC gtest_main)
-    is_target_library(IS_LIBRARY "${FPRIME_CURRENT_MODULE}")
-    if (IS_LIBRARY)
-        target_link_libraries("${UT_EXECUTABLE_TARGET}" PUBLIC "${FPRIME_CURRENT_MODULE}")
-    endif()
+    filter_lists("${AC_SOURCES}" SOURCE_FILES AC_GENERATED)
+    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/module-ut-info.txt"
+        "${UT_HEADER_FILES}\n${SOURCE_FILES_FILTERED}\n${AC_GENERATED}\n${AC_FILE_DEPENDENCIES}\n${DEPENDENCIES}"
+    )
+    build_setup_build_module("${UT_EXECUTABLE_TARGET}" "${SOURCE_FILES_FILTERED}" "${AC_GENERATED_FILTERED}" "${RESOLVED}")
+
     ut_setup_unit_test_include_directories("${UT_EXECUTABLE_TARGET}" "${SOURCE_FILES}")
     add_test(NAME ${UT_EXECUTABLE_TARGET} COMMAND ${UT_EXECUTABLE_TARGET})
 
@@ -134,11 +134,11 @@ function(ut_add_module_target MODULE_NAME TARGET_NAME SOURCE_FILES DEPENDENCIES)
     # Add module level target dependencies to this UT
     if (FPRIME_ENABLE_UTIL_TARGETS)
         add_dependencies("${UT_MODULE_TARGET}" "${UT_EXECUTABLE_TARGET}")
-        add_dependencies("${FPRIME__INTERNAL_UT_TARGET}" "${UT_EXECUTABLE_TARGET}")
+        add_dependencies("${UT_TARGET}" "${UT_EXECUTABLE_TARGET}")
         set_property(TARGET "${FPRIME_CURRENT_MODULE}" APPEND PROPERTY FPRIME_UTS "${UT_MODULE_TARGET}")
     endif()
     # Link library list output on per-module basis
     if (CMAKE_DEBUG_OUTPUT)
-        introspect("${UT_EXECUTABLE_TARGET}")
+        introspect("${UT_MODULE_TARGET}")
     endif()
 endfunction(ut_add_module_target)

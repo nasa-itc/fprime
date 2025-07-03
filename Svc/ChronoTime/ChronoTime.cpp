@@ -6,7 +6,7 @@
 
 #include "Svc/ChronoTime/ChronoTime.hpp"
 #include <chrono>
-#include "Fw/FPrimeBasicTypes.hpp"
+#include "FpConfig.hpp"
 
 namespace Svc {
 

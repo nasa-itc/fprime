@@ -31,7 +31,7 @@ namespace Svc {
             const U8 *const buffAddr = opcodeAndArgument.getBuffAddr();
             const U32 size = opcodeAndArgument.getBuffLength();
             const U32 recSize = sizeof(FwPacketDescriptorType) + size;
-            const FwPacketDescriptorType cmdDescriptor = Fw::ComPacketType::FW_PACKET_COMMAND;
+            const FwPacketDescriptorType cmdDescriptor = Fw::ComPacket::FW_PACKET_COMMAND;
             const U32 seconds = time.getSeconds();
             const U32 uSeconds = time.getUSeconds();
             ASSERT_EQ(Fw::FW_SERIALIZE_OK, destBuffer.serialize(seconds));
@@ -40,7 +40,8 @@ namespace Svc {
             ASSERT_EQ(Fw::FW_SERIALIZE_OK, destBuffer.serialize(cmdDescriptor));
             ASSERT_EQ(
                 Fw::FW_SERIALIZE_OK,
-                destBuffer.serialize(buffAddr, size, Fw::Serialization::OMIT_LENGTH)
+                // true means "don't serialize the size"
+                destBuffer.serialize(buffAddr, size, true)
             );
           }
         }

@@ -3,7 +3,7 @@
 
 #include <Fw/Obj/ObjBase.hpp>
 #include <Fw/Types/Serializable.hpp>
-#include <Fw/FPrimeBasicTypes.hpp>
+#include <FpConfig.hpp>
 
 namespace Fw {
 
@@ -11,26 +11,26 @@ namespace Fw {
         public:
             //! Set the ID base
             void setIdBase(
-                const FwIdType //< The new ID base
+                const U32 //< The new ID base
             );
             //! Get the ID base
             //! \return The ID base
-            FwIdType getIdBase() const;
+            U32 getIdBase() const;
 
-        protected:
+        PROTECTED:
             PassiveComponentBase(const char* name); //!< Named constructor
             virtual ~PassiveComponentBase(); //!< Destructor
-            void init(FwEnumStoreType instance); //!< Initialization function
-            FwEnumStoreType getInstance() const;
+            void init(NATIVE_INT_TYPE instance); //!< Initialization function
+            NATIVE_INT_TYPE getInstance() const;
 
 
 #if FW_OBJECT_TO_STRING == 1
             virtual const char* getToStringFormatString(); //!< Return the format  for a generic component toString
-            void toString(char* str, FwSizeType size) override; //!< returns string description of component
+            void toString(char* str, NATIVE_INT_TYPE size) override; //!< returns string description of component
 #endif
-        private:
-            FwIdType m_idBase; //!< ID base for opcodes etc.
-            FwEnumStoreType m_instance; //!< instance of component object
+        PRIVATE:
+            U32 m_idBase; //!< ID base for opcodes etc.
+            NATIVE_INT_TYPE m_instance; //!< instance of component object
 
 
     };

@@ -28,7 +28,7 @@ namespace STest {
       U32 getFromTime() {
         struct timeval tv;
         (void) gettimeofday(&tv, nullptr);
-        return static_cast<U32>(tv.tv_usec);
+        return tv.tv_usec;
       }
 
       bool getFromFile(
@@ -105,8 +105,8 @@ namespace STest {
     }
 
     double inUnitInterval() {
-      const long randInt = bsd_random();
-      const F64 ratio = static_cast<F64>(randInt) / static_cast<F64>(MAX_VALUE);
+      const U32 randInt = bsd_random();
+      const F64 ratio = static_cast<F64>(randInt) / MAX_VALUE;
       return ratio;
     }
 

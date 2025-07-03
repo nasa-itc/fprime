@@ -15,7 +15,7 @@
 #define RATELIMITERTESTER_HPP
 
 #include "Utils/RateLimiter.hpp"
-#include <Fw/FPrimeBasicTypes.hpp>
+#include <FpConfig.hpp>
 #include "gtest/gtest.h"
 
 namespace Utils {

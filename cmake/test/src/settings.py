@@ -10,6 +10,7 @@ REF_APP_PATH = Path(__file__).parent.parent.parent.parent / "Ref"
 
 
 FRAMEWORK_MODULES = [
+    "Fw_Cfg",
     "Fw_Cmd",
     "Fw_Com",
     "Fw_Comp",
@@ -45,12 +46,12 @@ REF_MODULES = [
     "Svc_CmdDispatcher",
     "Svc_CmdSequencer",
     "Svc_Cycle",
+    "Svc_Deframer",
     "Svc_Fatal",
     "Svc_FatalHandler",
     "Svc_FileDownlink",
     "Svc_FileManager",
     "Svc_FileUplink",
-    "Svc_FprimeDeframer",
     "Svc_Framer",
     "Svc_FramingProtocol",
     "Svc_Health",
@@ -64,7 +65,7 @@ REF_MODULES = [
     "Svc_StaticMemory",
     "Svc_Time",
     "Svc_TlmChan",
-    "Ref_BlockDriver",
+    "Drv_BlockDriver",
     "Ref_PingReceiver",
     "Ref_RecvBuffApp",
     "Ref_SendBuffApp",

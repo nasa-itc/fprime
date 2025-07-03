@@ -25,7 +25,7 @@ namespace Fw {
 
         SerializeStatus stat;
 
-        stat = buffer.serialize(this->m_taskName, AMPCS_EVR_TASK_NAME_LEN, Fw::Serialization::OMIT_LENGTH);
+        stat = buffer.serialize(this->m_taskName, AMPCS_EVR_TASK_NAME_LEN, true);
         if (stat != FW_SERIALIZE_OK) {
             return stat;
         }
@@ -45,12 +45,12 @@ namespace Fw {
             return stat;
         }
 
-        return buffer.serialize(this->m_logBuffer.getBuffAddr(),m_logBuffer.getBuffLength(),Fw::Serialization::OMIT_LENGTH);
+        return buffer.serialize(this->m_logBuffer.getBuffAddr(),m_logBuffer.getBuffLength(),true);
 
     }
 
     SerializeStatus AmpcsEvrLogPacket::deserialize(SerializeBufferBase& buffer) {
-        FwSizeType len;
+        NATIVE_UINT_TYPE len;
 
         SerializeStatus stat;
 
@@ -75,12 +75,12 @@ namespace Fw {
             return stat;
         }
 
-        FwSizeType size = buffer.getBuffLeft();
+        NATIVE_UINT_TYPE size = buffer.getBuffLeft();
         stat = buffer.deserialize(this->m_logBuffer.getBuffAddr(),size,true);
         if (stat == FW_SERIALIZE_OK) {
             // Shouldn't fail
             stat = this->m_logBuffer.setBuffLen(size);
-            FW_ASSERT(stat == FW_SERIALIZE_OK,static_cast<FwAssertArgType>(stat));
+            FW_ASSERT(stat == FW_SERIALIZE_OK,static_cast<NATIVE_INT_TYPE>(stat));
         }
         return stat;
     }

@@ -10,7 +10,7 @@
 #define HACKSM_H_
                                 
 #include <Fw/Sm/SmSignalBuffer.hpp>
-#include <Fw/FPrimeBasicTypes.hpp>
+#include <config/FpConfig.hpp>
                                  
 namespace FppTest {
 
@@ -40,7 +40,7 @@ class HackSm {
                                  
   public:
                                  
-    HackSm(HackSm_Interface* a_parent) : parent(a_parent) {}
+    HackSm(HackSm_Interface* parent) : parent(parent) {}
   
     enum HackSm_States {
       OFF,

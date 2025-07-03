@@ -22,19 +22,6 @@ cmake_minimum_required(VERSION 3.16)
 cmake_policy(SET CMP0048 NEW)
 project(Ref VERSION 1.0.0 LANGUAGES C CXX)
 ##
-add_compile_options(
-    $<$<COMPILE_LANGUAGE:CXX>:-Wold-style-cast>
-    -Wall
-    -Wconversion
-    -Wdouble-promotion
-    -Werror
-    -Wextra
-    -Wno-unused-parameter
-    -Wno-vla
-    -Wshadow
-    -pedantic
-)
-
 # Section 2: F prime Core
 #
 # This includes all of the F prime core components, and imports the make-system. F prime core
@@ -56,20 +43,14 @@ add_fprime_subdirectory("${CMAKE_CURRENT_LIST_DIR}/RecvBuffApp/")
 add_fprime_subdirectory("${CMAKE_CURRENT_LIST_DIR}/SendBuffApp/")
 add_fprime_subdirectory("${CMAKE_CURRENT_LIST_DIR}/SignalGen/")
 add_fprime_subdirectory("${CMAKE_CURRENT_LIST_DIR}/TypeDemo/")
-add_fprime_subdirectory("${CMAKE_CURRENT_LIST_DIR}/BlockDriver/")
 
 # Add Topology subdirectory
 add_fprime_subdirectory("${CMAKE_CURRENT_LIST_DIR}/Top/")
 
-#set(SOURCE_FILES "${CMAKE_CURRENT_LIST_DIR}/Main.cpp")
-#set(MOD_DEPS ${PROJECT_NAME}/Top)
+set(SOURCE_FILES "${CMAKE_CURRENT_LIST_DIR}/Main.cpp")
+set(MOD_DEPS ${PROJECT_NAME}/Top)
 
-register_fprime_deployment(
-    SOURCES
-        "${CMAKE_CURRENT_LIST_DIR}/Main.cpp"
-    DEPENDS
-        ${PROJECT_NAME}_Top
-)
+register_fprime_deployment()
 # The following compile options will only apply to the deployment executable.
 # The extra warnings trigger in core F Prime so we don't apply them there.
 target_compile_options("${PROJECT_NAME}" PUBLIC -Wall)

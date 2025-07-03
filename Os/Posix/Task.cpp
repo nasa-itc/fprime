@@ -18,7 +18,7 @@ namespace Os {
 namespace Posix {
 namespace Task {
     std::atomic<bool> PosixTask::s_permissions_reported(false);
-    static const int SCHED_POLICY = SCHED_RR;
+    static const PlatformIntType SCHED_POLICY = SCHED_RR;
 
     typedef void* (*pthread_func_ptr)(void*);
 
@@ -29,8 +29,8 @@ namespace Task {
         return nullptr;
     }
 
-    int set_stack_size(pthread_attr_t& attributes, const Os::Task::Arguments& arguments) {
-        int status = PosixTaskHandle::SUCCESS;
+    PlatformIntType set_stack_size(pthread_attr_t& attributes, const Os::Task::Arguments& arguments) {
+        PlatformIntType status = PosixTaskHandle::SUCCESS;
         FwSizeType stack = arguments.m_stackSize;
 // Check for stack size multiple of page size or skip when the function
 // is unavailable.
@@ -73,10 +73,10 @@ namespace Task {
         return status;
     }
 
-    int set_priority_params(pthread_attr_t& attributes, const Os::Task::Arguments& arguments) {
+    PlatformIntType set_priority_params(pthread_attr_t& attributes, const Os::Task::Arguments& arguments) {
         const FwSizeType min_priority = static_cast<FwSizeType>(sched_get_priority_min(SCHED_POLICY));
         const FwSizeType max_priority = static_cast<FwSizeType>(sched_get_priority_max(SCHED_POLICY));
-        int status = PosixTaskHandle::SUCCESS;
+        PlatformIntType status = PosixTaskHandle::SUCCESS;
         FwSizeType priority = arguments.m_priority;
         // Clamp to minimum priority
         if (priority < min_priority) {
@@ -103,14 +103,14 @@ namespace Task {
         if (status == PosixTaskHandle::SUCCESS) {
             sched_param schedParam;
             memset(&schedParam, 0, sizeof(sched_param));
-            schedParam.sched_priority = static_cast<int>(priority);
+            schedParam.sched_priority = static_cast<PlatformIntType>(priority);
             status = pthread_attr_setschedparam(&attributes, &schedParam);
         }
         return status;
     }
 
-    int set_cpu_affinity(pthread_attr_t& attributes, const Os::Task::Arguments& arguments) {
-        int status = 0;
+    PlatformIntType set_cpu_affinity(pthread_attr_t& attributes, const Os::Task::Arguments& arguments) {
+        PlatformIntType status = 0;
 // pthread_attr_setaffinity_np is a non-POSIX function. Notably, it is not available on musl.
 // Limit its use to builds that involve glibc, on Linux, with _GNU_SOURCE defined.
 // That's the circumstance in which we expect this feature to work.
@@ -118,7 +118,7 @@ namespace Task {
         const FwSizeType affinity = arguments.m_cpuAffinity;
         cpu_set_t cpu_set;
         CPU_ZERO(&cpu_set);
-        CPU_SET(static_cast<int>(affinity), &cpu_set);
+        CPU_SET(static_cast<PlatformIntType>(affinity), &cpu_set);
 
         // According to the man-page this function sets errno rather than returning an error status like other functions
         status = pthread_attr_setaffinity_np(&attributes, sizeof(cpu_set_t), &cpu_set);
@@ -131,7 +131,7 @@ namespace Task {
     }
 
     Os::Task::Status PosixTask::create(const Os::Task::Arguments& arguments, const PosixTask::PermissionExpectation permissions) {
-        int pthread_status = PosixTaskHandle::SUCCESS;
+        PlatformIntType pthread_status = PosixTaskHandle::SUCCESS;
         PosixTaskHandle& handle = this->m_handle;
         const bool expect_permission = (permissions == EXPECT_PERMISSION);
         // Initialize and clear pthread attributes
@@ -141,7 +141,7 @@ namespace Task {
         if ((arguments.m_stackSize != Os::Task::TASK_DEFAULT) && (expect_permission) && (pthread_status == PosixTaskHandle::SUCCESS)) {
             pthread_status = set_stack_size(attributes, arguments);
         }
-        if ((arguments.m_priority != Os::Task::TASK_PRIORITY_DEFAULT) && (expect_permission) && (pthread_status == PosixTaskHandle::SUCCESS)) {
+        if ((arguments.m_priority != Os::Task::TASK_DEFAULT) && (expect_permission) && (pthread_status == PosixTaskHandle::SUCCESS)) {
             pthread_status = set_priority_params(attributes, arguments);
         }
         if ((arguments.m_cpuAffinity != Os::Task::TASK_DEFAULT) && (expect_permission) && (pthread_status == PosixTaskHandle::SUCCESS)) {
@@ -187,7 +187,7 @@ namespace Task {
             status = this->create(arguments, PermissionExpectation::EXPECT_NO_PERMISSION);
         } else if (status != Os::Task::Status::OP_OK) {
             Fw::Logger::log("[ERROR] Failed to create task with status: %d",
-                            static_cast<int>(status));
+                            static_cast<PlatformIntType>(status));
         }
         return status;
     }
@@ -197,7 +197,7 @@ namespace Task {
         if (not this->m_handle.m_is_valid) {
             status = Os::Task::Status::INVALID_HANDLE;
         } else {
-            int stat = ::pthread_join(this->m_handle.m_task_descriptor, nullptr);
+            PlatformIntType stat = ::pthread_join(this->m_handle.m_task_descriptor, nullptr);
             status = (stat == PosixTaskHandle::SUCCESS) ? Os::Task::Status::OP_OK : Os::Task::Status::JOIN_ERROR;
         }
         return status;
@@ -229,7 +229,7 @@ namespace Task {
         remaining_interval.tv_nsec = 0;
 
         while (true) {
-            int status = nanosleep(&sleep_interval, &remaining_interval);
+            PlatformIntType status = nanosleep(&sleep_interval, &remaining_interval);
             // Success, return ok
             if (0 == status) {
                 break;

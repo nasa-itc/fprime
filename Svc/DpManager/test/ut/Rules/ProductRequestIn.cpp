@@ -30,11 +30,11 @@ void TestState::action__ProductRequestIn__BufferValid() {
     // Clear history
     this->clearHistory();
     // Send the invocation
-    const auto portNum = static_cast<FwIndexType>(STest::Pick::startLength(0, DpManagerNumPorts));
-    const auto id = static_cast<FwDpIdType>(STest::Pick::lowerUpper(0, static_cast<U32>(std::numeric_limits<FwDpIdType>::max())));
+    const FwIndexType portNum = STest::Pick::startLength(0, DpManagerNumPorts);
+    const FwDpIdType id = STest::Pick::lowerUpper(0, std::numeric_limits<FwDpIdType>::max());
     const FwSizeType size = this->abstractState.getBufferSize();
     this->invoke_to_productRequestIn(portNum, id, size);
-    this->doDispatch();
+    this->component.doDispatch();
     // Check events
     ASSERT_EVENTS_SIZE(0);
     // Update test state
@@ -48,7 +48,7 @@ void TestState::action__ProductRequestIn__BufferValid() {
     // Check product response out
     ASSERT_from_productResponseOut_SIZE(1);
     const Fw::Success failure(Fw::Success::SUCCESS);
-    const Fw::Buffer buffer(this->abstractState.bufferData, static_cast<Fw::Buffer::SizeType>(size));
+    const Fw::Buffer buffer(this->abstractState.bufferData, size);
     ASSERT_from_productResponseOut(0, id, buffer, failure);
     ASSERT_EQ(this->abstractState.productResponseOutPortNumOpt.get(), portNum);
 }
@@ -61,14 +61,14 @@ void TestState ::action__ProductRequestIn__BufferInvalid() {
     // Clear history
     this->clearHistory();
     // Send the invocation
-    const auto portNum = static_cast<FwIndexType>(STest::Pick::startLength(0, DpManagerNumPorts));
-    const FwDpIdType id = static_cast<FwDpIdType>(STest::Pick::lowerUpper(0, static_cast<U32>(std::numeric_limits<FwDpIdType>::max())));
+    const FwIndexType portNum = STest::Pick::startLength(0, DpManagerNumPorts);
+    const FwDpIdType id = STest::Pick::lowerUpper(0, std::numeric_limits<FwDpIdType>::max());
     const FwSizeType size = this->abstractState.getBufferSize();
     this->invoke_to_productRequestIn(portNum, id, size);
-    this->doDispatch();
+    this->component.doDispatch();
     // Check events
     if (this->abstractState.bufferAllocationFailedEventCount <
-        Svc::DpManagerTester::getBufferAllocationFailedThrottle()) {
+        DpManagerComponentBase::EVENTID_BUFFERALLOCATIONFAILED_THROTTLE) {
         ASSERT_EVENTS_SIZE(1);
         ASSERT_EVENTS_BufferAllocationFailed(0, id);
         ++this->abstractState.bufferAllocationFailedEventCount;

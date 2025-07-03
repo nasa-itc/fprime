@@ -14,6 +14,11 @@
 #include <Fw/Test/UnitTest.hpp>
 
 namespace Svc {
+
+    void RateGroupDriverImplTester::init(NATIVE_INT_TYPE instance) {
+        RateGroupDriverGTestBase::init();
+    }
+
     RateGroupDriverImplTester::RateGroupDriverImplTester(Svc::RateGroupDriver& inst) :
         RateGroupDriverGTestBase("testerbase",100),
             m_impl(inst) {
@@ -28,11 +33,11 @@ namespace Svc {
     RateGroupDriverImplTester::~RateGroupDriverImplTester() {
     }
 
-    void RateGroupDriverImplTester::from_CycleOut_handler(FwIndexType portNum, Os::RawTime& cycleStart) {
+    void RateGroupDriverImplTester::from_CycleOut_handler(NATIVE_INT_TYPE portNum, Os::RawTime& cycleStart) {
         this->m_portCalls[portNum] = true;
     }
 
-    void RateGroupDriverImplTester::runSchedNominal(Svc::RateGroupDriver::DividerSet dividersSet, FwIndexType numDividers) {
+    void RateGroupDriverImplTester::runSchedNominal(Svc::RateGroupDriver::DividerSet dividersSet, NATIVE_INT_TYPE numDividers) {
 
         TEST_CASE(106.1.1,"Nominal Execution");
         COMMENT(
@@ -40,26 +45,26 @@ namespace Svc {
                 "Verify that the output ports are being called correctly.\n"
                 );
 
-        FwSizeType expected_rollover = 1;
+        NATIVE_INT_TYPE expected_rollover = 1;
 
-        for (FwIndexType div = 0; div < numDividers; div++) {
+        for (NATIVE_INT_TYPE div = 0; div < numDividers; div++) {
             expected_rollover *= dividersSet.dividers[div].divisor;
         }
 
         ASSERT_EQ(expected_rollover,this->m_impl.m_rollover);
 
-        FwSizeType iters = expected_rollover*10;
+        NATIVE_INT_TYPE iters = expected_rollover*10;
 
         REQUIREMENT("RGD-001");
 
-        for (FwSizeType cycle = 0; cycle < iters; cycle++) {
+        for (NATIVE_INT_TYPE cycle = 0; cycle < iters; cycle++) {
             this->clearPortCalls();
             Os::RawTime t;
             this->invoke_to_CycleIn(0,t);
             // make sure ticks are counting correctly
             ASSERT_EQ((cycle+1)%expected_rollover,this->m_impl.m_ticks);
             // check for various intervals
-            for (FwIndexType div = 0; div < numDividers; div++) {
+            for (NATIVE_INT_TYPE div = 0; div < numDividers; div++) {
                 if (cycle % dividersSet.dividers[div].divisor == dividersSet.dividers[div].offset) {
                     EXPECT_TRUE(this->m_portCalls[div]);
                 } else {

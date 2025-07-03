@@ -10,7 +10,7 @@
 // ======================================================================
 #ifndef FW_TYPES_FORMAT_HPP_
 #define FW_TYPES_FORMAT_HPP_
-#include <Fw/FPrimeBasicTypes.hpp>
+#include <FpConfig.h>
 #include <cstdarg>
 namespace Fw {
 
@@ -39,7 +39,7 @@ enum class FormatStatus {
 //! \param formatString: format string to fill
 //! \param ...: variable arguments inputs
 //! \return: SUCCESS on successful formatting, OVERFLOWED on overflow, and something else on any error
-FormatStatus stringFormat(char* destination, const FwSizeType maximumSize, const char* formatString, ...);
+    FormatStatus stringFormat(char* destination, const FwSizeType maximumSize, const char* formatString, ...);
 
 //! \brief format a c-string
 //!

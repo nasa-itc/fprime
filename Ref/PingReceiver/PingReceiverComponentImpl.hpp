@@ -17,7 +17,7 @@
 
 namespace Ref {
 
-  class PingReceiverComponentImpl final :
+  class PingReceiverComponentImpl :
     public PingReceiverComponentBase
   {
 
@@ -37,7 +37,7 @@ namespace Ref {
       //!
       ~PingReceiverComponentImpl();
 
-    private:
+    PRIVATE:
 
       // ----------------------------------------------------------------------
       // Handler implementations for user-defined typed input ports
@@ -46,7 +46,7 @@ namespace Ref {
       //! Handler implementation for PingIn
       //!
       void PingIn_handler(
-          const FwIndexType portNum, /*!< The port number*/
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
           U32 key /*!< Value to return to pinger*/
       );
 

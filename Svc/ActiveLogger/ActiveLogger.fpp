@@ -93,7 +93,7 @@ module Svc {
 
     @ Filter a particular ID
     async command SET_ID_FILTER(
-                                 ID: FwEventIdType
+                                 ID: U32
                                  idFilterEnabled: Enabled @< ID filter state
                                ) \
       opcode 2
@@ -117,7 +117,7 @@ module Svc {
 
     @ Indicate ID is filtered
     event ID_FILTER_ENABLED(
-                             ID: FwEventIdType @< The ID filtered
+                             ID: U32 @< The ID filtered
                            ) \
       severity activity high \
       id 1 \
@@ -125,7 +125,7 @@ module Svc {
 
     @ Attempted to add ID to full ID filter ID
     event ID_FILTER_LIST_FULL(
-                               ID: FwEventIdType @< The ID filtered
+                               ID: U32 @< The ID filtered
                              ) \
       severity warning low \
       id 2 \
@@ -133,7 +133,7 @@ module Svc {
 
     @ Removed an ID from the filter
     event ID_FILTER_REMOVED(
-                             ID: FwEventIdType @< The ID removed
+                             ID: U32 @< The ID removed
                            ) \
       severity activity high \
       id 3 \
@@ -141,7 +141,7 @@ module Svc {
 
     @ ID not in filter
     event ID_FILTER_NOT_FOUND(
-                               ID: FwEventIdType @< The ID removed
+                               ID: U32 @< The ID removed
                              ) \
       severity warning low \
       id 4 \

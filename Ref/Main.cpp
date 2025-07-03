@@ -40,7 +40,7 @@ void print_usage(const char* app) {
  * @param signum
  */
 static void signalHandler(int signum) {
-    Ref::stopRateGroups();
+    Ref::stopSimulatedCycle();
 }
 
 /**
@@ -55,7 +55,7 @@ static void signalHandler(int signum) {
  */
 int main(int argc, char* argv[]) {
     Os::init();
-    U16 port_number = 0;
+    U32 port_number = 0;
     I32 option = 0;
     char* hostname = nullptr;
 
@@ -68,7 +68,7 @@ int main(int argc, char* argv[]) {
                 break;
             // Handle the -p port number argument
             case 'p':
-                port_number = static_cast<U16>(atoi(optarg));
+                port_number = static_cast<U32>(atoi(optarg));
                 break;
             // Cascade intended: help output
             case 'h':
@@ -82,8 +82,8 @@ int main(int argc, char* argv[]) {
     }
     // Object for communicating state to the reference topology
     Ref::TopologyState inputs;
-    inputs.comCcsds.hostname = hostname;
-    inputs.comCcsds.port = port_number;
+    inputs.hostname = hostname;
+    inputs.port = port_number;
 
     // Setup program shutdown via Ctrl-C
     signal(SIGINT, signalHandler);
@@ -92,7 +92,7 @@ int main(int argc, char* argv[]) {
 
     // Setup, cycle, and teardown topology
     Ref::setupTopology(inputs);
-    Ref::startRateGroups(Fw::TimeInterval(1, 0));  // Program loop cycling rate groups at 1Hz
+    Ref::startSimulatedCycle(Fw::TimeInterval(1, 0));  // Program loop cycling rate groups at 1Hz
     Ref::teardownTopology(inputs);
     (void)printf("Exiting...\n");
     return 0;

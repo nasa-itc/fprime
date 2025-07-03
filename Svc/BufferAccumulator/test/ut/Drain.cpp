@@ -24,7 +24,7 @@ namespace Drain {
 // ----------------------------------------------------------------------
 
 void BufferAccumulatorTester ::OK() {
-  ASSERT_EQ(BufferAccumulator_OpState::DRAIN, this->component.m_mode.e);
+  ASSERT_EQ(BufferAccumulator_OpState::DRAIN, this->component.mode.e);
   Fw::Buffer buffers[MAX_NUM_BUFFERS];
   // Buffer needs a valid pointer
   U8* data = new U8[10];
@@ -35,11 +35,11 @@ void BufferAccumulatorTester ::OK() {
     Fw::Buffer b(data, size, bufferID);
     buffers[i] = b;
     this->invoke_to_bufferSendInFill(0, buffers[i]);
-    this->doDispatch();
+    this->component.doDispatch();
     ASSERT_from_bufferSendOutDrain_SIZE(i + 1);
     ASSERT_from_bufferSendOutDrain(i, buffers[i]);
     this->invoke_to_bufferSendInReturn(0, buffers[i]);
-    this->doDispatch();
+    this->component.doDispatch();
     ASSERT_from_bufferSendOutReturn(i, buffers[i]);
   }
 
@@ -48,11 +48,11 @@ void BufferAccumulatorTester ::OK() {
 
 void BufferAccumulatorTester ::PartialDrainOK() {
   this->sendCmd_BA_SetMode(0, 0, BufferAccumulator_OpState::ACCUMULATE);
-  this->doDispatch();
+  this->component.doDispatch();
   ASSERT_CMD_RESPONSE_SIZE(1);
   ASSERT_CMD_RESPONSE(0, BufferAccumulator::OPCODE_BA_SETMODE, 0,
                       Fw::CmdResponse::OK);
-  ASSERT_EQ(BufferAccumulator_OpState::ACCUMULATE, this->component.m_mode.e);
+  ASSERT_EQ(BufferAccumulator_OpState::ACCUMULATE, this->component.mode.e);
   ASSERT_FROM_PORT_HISTORY_SIZE(0);
 
   Fw::Buffer buffers[MAX_NUM_BUFFERS];
@@ -63,10 +63,10 @@ void BufferAccumulatorTester ::PartialDrainOK() {
     Fw::Buffer b(data, size, bufferID);
     buffers[i] = b;
     this->invoke_to_bufferSendInFill(0, buffers[i]);
-    this->doDispatch();
+    this->component.doDispatch();
 
     this->sendCmd_BA_DrainBuffers(0, 0, 1, BufferAccumulator_BlockMode::BLOCK);
-    this->doDispatch();
+    this->component.doDispatch();
     ASSERT_EVENTS_BA_PartialDrainDone_SIZE(i + 1);
     ASSERT_EVENTS_BA_PartialDrainDone(i, 1u);
     // + 1 for first BufferAccumulator_OpState::ACCUMULATE command; + 1 for
@@ -79,7 +79,7 @@ void BufferAccumulatorTester ::PartialDrainOK() {
     ASSERT_from_bufferSendOutDrain(i, buffers[i]);
 
     this->invoke_to_bufferSendInReturn(0, buffers[i]);
-    this->doDispatch();
+    this->component.doDispatch();
     ASSERT_from_bufferSendOutReturn(i, buffers[i]);
 
     ASSERT_EVENTS_BA_PartialDrainDone_SIZE(i + 1);
@@ -99,7 +99,7 @@ void BufferAccumulatorTester ::PartialDrainOK() {
     Fw::Buffer b(data, size, bufferID);
     buffers[i] = b;
     this->invoke_to_bufferSendInFill(0, buffers[i]);
-    this->doDispatch();
+    this->component.doDispatch();
     ASSERT_FROM_PORT_HISTORY_SIZE(0);
   }
 
@@ -108,7 +108,7 @@ void BufferAccumulatorTester ::PartialDrainOK() {
     ASSERT_from_bufferSendOutDrain_SIZE(i);
 
     this->sendCmd_BA_DrainBuffers(0, 0, 1, BufferAccumulator_BlockMode::BLOCK);
-    this->doDispatch();
+    this->component.doDispatch();
     ASSERT_CMD_RESPONSE_SIZE(i + 1);
     ASSERT_CMD_RESPONSE(i, BufferAccumulator::OPCODE_BA_DRAINBUFFERS, 0,
                         Fw::CmdResponse::OK);
@@ -121,7 +121,7 @@ void BufferAccumulatorTester ::PartialDrainOK() {
     ASSERT_from_bufferSendOutDrain_SIZE(i + 1);
     ASSERT_from_bufferSendOutDrain(i, buffers[i]);
     this->invoke_to_bufferSendInReturn(0, buffers[i]);
-    this->doDispatch();
+    this->component.doDispatch();
     ASSERT_from_bufferSendOutReturn(i, buffers[i]);
 
     ASSERT_EVENTS_BA_PartialDrainDone_SIZE(i + 1);
@@ -140,19 +140,19 @@ void BufferAccumulatorTester ::PartialDrainOK() {
     Fw::Buffer b(data, size, bufferID);
     buffers[i] = b;
     this->invoke_to_bufferSendInFill(0, buffers[i]);
-    this->doDispatch();
+    this->component.doDispatch();
     ASSERT_FROM_PORT_HISTORY_SIZE(0);
   }
 
-  ASSERT_EQ(BufferAccumulator_OpState::ACCUMULATE, this->component.m_mode.e);
+  ASSERT_EQ(BufferAccumulator_OpState::ACCUMULATE, this->component.mode.e);
   ASSERT_FROM_PORT_HISTORY_SIZE(0);
-  ASSERT_EQ(0u, this->component.m_numDrained);
-  ASSERT_EQ(0u, this->component.m_numToDrain);
+  ASSERT_EQ(0u, this->component.numDrained);
+  ASSERT_EQ(0u, this->component.numToDrain);
 
   ASSERT_EVENTS_BA_PartialDrainDone_SIZE(0);
   this->sendCmd_BA_DrainBuffers(0, 0, MAX_NUM_BUFFERS,
                                 BufferAccumulator_BlockMode::BLOCK);
-  this->doDispatch();
+  this->component.doDispatch();
   ASSERT_CMD_RESPONSE_SIZE(0);
 
   for (U32 i = 0; i < MAX_NUM_BUFFERS; ++i) {
@@ -161,8 +161,8 @@ void BufferAccumulatorTester ::PartialDrainOK() {
     buffers[i] = b;
 
     if (i + 1 < MAX_NUM_BUFFERS) {
-      ASSERT_EQ(i + 1, this->component.m_numDrained);
-      ASSERT_EQ(MAX_NUM_BUFFERS, this->component.m_numToDrain);
+      ASSERT_EQ(i + 1, this->component.numDrained);
+      ASSERT_EQ(MAX_NUM_BUFFERS, this->component.numToDrain);
       ASSERT_EVENTS_BA_PartialDrainDone_SIZE(0);
     }
 
@@ -170,7 +170,7 @@ void BufferAccumulatorTester ::PartialDrainOK() {
     ASSERT_from_bufferSendOutDrain_SIZE(i + 1);
     ASSERT_from_bufferSendOutDrain(i, buffers[i]);
     this->invoke_to_bufferSendInReturn(0, buffers[i]);
-    this->doDispatch();
+    this->component.doDispatch();
     ASSERT_from_bufferSendOutReturn(i, buffers[i]);
   }
 

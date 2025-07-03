@@ -80,16 +80,16 @@ namespace Svc {
     getFileSize(const Fw::StringBase& seqFileName)
   {
     bool status = true;
-    FwSizeType fileSize;
+    FwSignedSizeType fileSize;
     this->setFileName(seqFileName);
     const Os::FileSystem::Status fileStatus =
       Os::FileSystem::getFileSize(this->m_fileName.toChar(), fileSize);
     if (
         fileStatus == Os::FileSystem::OP_OK and
-        fileSize >= static_cast<FwSizeType>(sizeof(this->m_sequenceHeader))
+        fileSize >= static_cast<FwSignedSizeType>(sizeof(this->m_sequenceHeader))
     ) {
       this->m_header.m_fileSize =
-        static_cast<U32>(fileSize - static_cast<FwSizeType>(sizeof(this->m_sequenceHeader)));
+        static_cast<U32>(fileSize - static_cast<FwSignedSizeType>(sizeof(this->m_sequenceHeader)));
     }
     else {
       this->m_events.fileInvalid(
@@ -148,7 +148,7 @@ namespace Svc {
     Sequence::Record record;
 
     // Deserialize all records and count the records
-    const U32 loopBound = static_cast<U32>(buffer.getBuffLeft());
+    const NATIVE_UINT_TYPE loopBound = buffer.getBuffLeft();
     U32 numRecords = 0;
     for ( ; numRecords < loopBound; ++numRecords) {
       if (not this->hasMoreRecords()) {
@@ -202,7 +202,9 @@ namespace Svc {
     bool status = true;
     Fw::SerializeStatus ser_status;
 
-    FwSizeType readLen = static_cast<FwSizeType>(sizeof(U32));
+    FwSignedSizeType readLen = sizeof(U32);
+    FW_ASSERT(readLen >= 0, static_cast<FwAssertArgType>(readLen));
+
     ser_status = buffer.setBuffLen(static_cast<Fw::Serializable::SizeType>(readLen));
     FW_ASSERT(ser_status == Fw::FW_SERIALIZE_OK, ser_status);
 
@@ -252,7 +254,7 @@ namespace Svc {
     }
     if (status) {
       U8 *const buffAddr = this->m_buffer.getBuffAddr();
-      const FwSizeType buffLen = this->m_buffer.getBuffLength();
+      const NATIVE_UINT_TYPE buffLen = this->m_buffer.getBuffLength();
       FW_ASSERT(
           buffLen == this->m_header.m_fileSize,
           static_cast<FwAssertArgType>(buffLen),
@@ -272,7 +274,7 @@ namespace Svc {
 
     bool status = true;
 
-    FwSizeType readLen = sizeof this->m_sequenceHeader;
+    FwSignedSizeType readLen = sizeof this->m_sequenceHeader;
     const Os::File::Status fileStatus = file.read(
         this->m_sequenceHeader,
         readLen
@@ -303,17 +305,17 @@ namespace Svc {
     readRecords()
   {
     Os::File& file = this->m_sequenceFile;
-    const FwSizeType size = this->m_header.m_fileSize;
+    const NATIVE_UINT_TYPE size = this->m_header.m_fileSize;
     Fw::SerializeBufferBase& buffer = this->m_buffer;
     U8 *const addr = buffer.getBuffAddr();
 
     // Check file size
     if (size > this->m_buffer.getBuffCapacity()) {
-      this->m_events.fileSizeError(static_cast<U32>(size));
+      this->m_events.fileSizeError(size);
       return false;
     }
 
-    FwSizeType readLen = size;
+    FwSignedSizeType readLen = size;
     const Os::File::Status fileStatus = file.read(addr, readLen);
     // Check read status
     if (fileStatus != Os::File::OP_OK) {
@@ -324,7 +326,7 @@ namespace Svc {
       return false;
     }
     // Check read size
-    const FwSizeType readLenUint = static_cast<FwSizeType>(readLen);
+    const NATIVE_UINT_TYPE readLenUint = static_cast<NATIVE_UINT_TYPE>(readLen);
     if (readLenUint != size) {
       this->m_events.fileInvalid(
           CmdSequencer_FileReadStage::READ_SEQ_DATA_SIZE,
@@ -423,34 +425,28 @@ namespace Svc {
     Fw::SerializeBufferBase& buffer = this->m_buffer;
     comBuffer.resetSer();
     // Serialize the command packet descriptor
-    const FwPacketDescriptorType cmdDescriptor = Fw::ComPacketType::FW_PACKET_COMMAND;
+    const FwPacketDescriptorType cmdDescriptor = Fw::ComPacket::FW_PACKET_COMMAND;
     Fw::SerializeStatus status = comBuffer.serialize(cmdDescriptor);
     FW_ASSERT(status == Fw::FW_SERIALIZE_OK, status);
-    // Zero-extend the two-byte AMPCS opcode by (sizeof(FwOpcodeType) - 2) bytes
-    FW_ASSERT(sizeof(FwOpcodeType) >= 2);
-    U32 sizeOfZeros = 0;
-    const FwIndexType bytesToExtend = sizeof(FwOpcodeType) - 2;
-    const U8 zeros = 0;
-    for(FwIndexType i = 0; i < bytesToExtend; i++){
-      status = comBuffer.serialize(zeros);
-      FW_ASSERT(status == Fw::FW_SERIALIZE_OK, status);
-      sizeOfZeros += static_cast<U32>(sizeof(zeros));
-    }
+    // Zero-extend the two-byte AMPCS opcode by two bytes
+    const U16 zeros = 0;
+    status = comBuffer.serialize(zeros);
+    FW_ASSERT(status == Fw::FW_SERIALIZE_OK, status);
     // Set the buffer length
-    const U32 fixedBuffLen = static_cast<U32>(comBuffer.getBuffLength());
+    const U32 fixedBuffLen = comBuffer.getBuffLength();
     FW_ASSERT(
-        fixedBuffLen == sizeof(cmdDescriptor) + sizeOfZeros,
+        fixedBuffLen == sizeof(cmdDescriptor) + sizeof(zeros),
         static_cast<FwAssertArgType>(fixedBuffLen)
     );
     const U32 totalBuffLen = fixedBuffLen + cmdLength;
     status = comBuffer.setBuffLen(totalBuffLen);
     FW_ASSERT(status == Fw::FW_SERIALIZE_OK, status);
     // Copy the opcode and argument bytes
-    FwSizeType size = cmdLength;
+    NATIVE_UINT_TYPE size = cmdLength;
     U8 *const addr = comBuffer.getBuffAddr();
     FW_ASSERT(addr != nullptr);
     // true means "don't serialize the length"
-    status = buffer.deserialize(&addr[fixedBuffLen], size, Fw::Serialization::OMIT_LENGTH);
+    status = buffer.deserialize(&addr[fixedBuffLen], size, true);
     return status;
   }
 

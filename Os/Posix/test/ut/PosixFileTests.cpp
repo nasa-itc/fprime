@@ -13,7 +13,7 @@
 #include <csignal>
 namespace Os {
 namespace Test {
-namespace FileTest {
+namespace File {
 
 std::vector<std::shared_ptr<const std::string> > FILES;
 
@@ -129,8 +129,8 @@ class PosixTester : public Tester {
 
 };
 
-std::unique_ptr<Os::Test::FileTest::Tester> get_tester_implementation() {
-    return std::unique_ptr<Os::Test::FileTest::Tester>(new Os::Test::FileTest::PosixTester());
+std::unique_ptr<Os::Test::File::Tester> get_tester_implementation() {
+    return std::unique_ptr<Os::Test::File::Tester>(new Os::Test::File::PosixTester());
 }
 
 }  // namespace File

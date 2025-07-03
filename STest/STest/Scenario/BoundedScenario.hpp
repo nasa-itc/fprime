@@ -29,13 +29,13 @@ namespace STest {
 
       //! Construct a BoundedScenario object
       BoundedScenario(
-          const char *const a_name, //!< The name of the bounded scenario
-          Scenario<State>& a_scenario, //!< The scenario to run
-          const U32 a_bound //!< The bound
+          const char *const name, //!< The name of the bounded scenario
+          Scenario<State>& scenario, //!< The scenario to run
+          const U32 bound //!< The bound
       ) :
-        ConditionalScenario<State>(a_name, a_scenario),
+        ConditionalScenario<State>(name, scenario),
         numSteps(0),
-        bound(a_bound)
+        bound(bound)
       {
 
       }

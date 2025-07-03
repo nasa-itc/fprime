@@ -45,7 +45,7 @@ PosixFileSystem::Status PosixFileSystem::_rename(const char* originPath, const c
 
 PosixFileSystem::Status PosixFileSystem::_getWorkingDirectory(char* path, FwSizeType bufferSize) {
     Status status = OP_OK;
-    if (::getcwd(path, static_cast<size_t>(bufferSize)) == nullptr) {
+    if (::getcwd(path, bufferSize) == nullptr) {
         status = errno_to_filesystem_status(errno);
     }
     return status;
@@ -95,24 +95,6 @@ PosixFileSystem::Status PosixFileSystem::_getFreeSpace(const char* path,
 
 FileSystemHandle* PosixFileSystem::getHandle() {
     return &this->m_handle;
-}
-
-PosixFileSystem::Status PosixFileSystem::_getPathType(const char* path, PathType& pathType) {
-    FW_ASSERT(path != nullptr);
-    struct stat path_stat;
-    const I32 status = lstat(path, &path_stat);
-    if (status == 0) {
-        if (S_ISDIR(path_stat.st_mode)) {
-            pathType = PathType::DIRECTORY;
-        } else if (S_ISREG(path_stat.st_mode)) {
-            pathType = PathType::FILE;
-        } else {
-            pathType = PathType::OTHER;
-        }
-        return Status::OP_OK;
-    } else {
-        return errno_to_filesystem_status(errno);
-    }
 }
 
 }  // namespace FileSystem

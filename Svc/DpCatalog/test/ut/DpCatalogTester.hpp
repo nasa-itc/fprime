@@ -23,13 +23,13 @@ namespace Svc {
         // ----------------------------------------------------------------------
 
         // Maximum size of histories storing events, telemetry, and port outputs
-        static const U32 MAX_HISTORY_SIZE = 100;
+        static const NATIVE_INT_TYPE MAX_HISTORY_SIZE = 100;
 
         // Instance ID supplied to the component instance under test
-        static const FwEnumStoreType TEST_INSTANCE_ID = 0;
+        static const NATIVE_INT_TYPE TEST_INSTANCE_ID = 0;
 
         // Queue depth supplied to the component instance under test
-        static const FwSizeType TEST_INSTANCE_QUEUE_DEPTH = 10;
+        static const NATIVE_INT_TYPE TEST_INSTANCE_QUEUE_DEPTH = 10;
 
     public:
 
@@ -54,9 +54,9 @@ namespace Svc {
 
         //! Test tree construction
         void testTree(
-            DpCatalog::DpStateEntry* list,
+            DpCatalog::DpStateEntry* list, 
             DpCatalog::DpStateEntry* output,
-            FwIndexType numEntries);
+            NATIVE_INT_TYPE numEntries);
 
         struct DpSet {
             FwDpIdType id;
@@ -105,7 +105,7 @@ namespace Svc {
 
         //! Handler implementation for fileOut
         Svc::SendFileResponse from_fileOut_handler(
-            FwIndexType portNum, //!< The port number
+            NATIVE_INT_TYPE portNum, //!< The port number
             const Fw::StringBase& sourceFileName, //!< Path of file to downlink
             const Fw::StringBase& destFileName, //!< Path to store downlinked file at
             U32 offset, //!< Amount of data in bytes to downlink from file. 0 to read until end of file
@@ -114,7 +114,7 @@ namespace Svc {
 
         //! Handler implementation for pingOut
         void from_pingOut_handler(
-            FwIndexType portNum, //!< The port number
+            NATIVE_INT_TYPE portNum, //!< The port number
             U32 key //!< Value to return to pinger
         ) override;
 
@@ -146,23 +146,6 @@ namespace Svc {
 
         //! The component under test
         DpCatalog component;
-
-    public:
-        // ----------------------------------------------------------------------
-        // Moved Tests due to private/protected access
-        // ----------------------------------------------------------------------
-        static bool EntryCompare(const Svc::DpCatalog::DpStateEntry& a, const Svc::DpCatalog::DpStateEntry& b);
-        void test_NominalManual_DISABLED_TreeTestRandomTransmitted();
-        void test_TreeTestManual1();
-        void test_TreeTestManual2();
-        void test_TreeTestManual3();
-        void test_TreeTestManual5();
-        void test_TreeTestManual1_Transmitted();
-        void test_TreeTestManual_All_Transmitted();
-        void test_TreeTestRandomPriority();
-        void test_TreeTestRandomTime();
-        void test_TreeTestRandomId();
-        void test_TreeTestRandomPrioIdTime();
 
     };
 

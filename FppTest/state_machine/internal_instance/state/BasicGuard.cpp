@@ -77,13 +77,13 @@ void BasicGuard::testTrue() {
 // Helper functions
 // ----------------------------------------------------------------------
 
-void BasicGuard::checkActionsAndGuards(FwIndexType expectedActionSize, FwIndexType expectedGuardSize) {
+void BasicGuard::checkActionsAndGuards(FwSizeType expectedActionSize, FwSizeType expectedGuardSize) {
     ASSERT_EQ(this->m_smStateBasicGuard_action_a_history.getSize(), expectedActionSize);
-    for (FwIndexType i = 0; i < expectedActionSize; i++) {
+    for (FwSizeType i = 0; i < expectedActionSize; i++) {
         ASSERT_EQ(this->m_smStateBasicGuard_action_a_history.getItemAt(i), SmState_BasicGuard::Signal::s);
     }
     ASSERT_EQ(this->m_smStateBasicGuard_guard_g.getCallHistory().getSize(), expectedGuardSize);
-    for (FwIndexType i = 0; i < expectedGuardSize; i++) {
+    for (FwSizeType i = 0; i < expectedGuardSize; i++) {
         ASSERT_EQ(this->m_smStateBasicGuard_guard_g.getCallHistory().getItemAt(i), SmState_BasicGuard::Signal::s);
     }
 }

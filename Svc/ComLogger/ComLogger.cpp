@@ -5,15 +5,14 @@
 // ----------------------------------------------------------------------
 
 #include <Svc/ComLogger/ComLogger.hpp>
-#include <Fw/FPrimeBasicTypes.hpp>
+#include <FpConfig.hpp>
 #include <Fw/Types/SerialBuffer.hpp>
 #include <Fw/Types/StringUtils.hpp>
 #include <Os/ValidateFile.hpp>
 #include <cstdio>
 
 namespace Svc {
-  static_assert(std::numeric_limits<U16>::max() <= std::numeric_limits<FwSizeType>::max(),
-      "U16 must fit in the positive range of FwSizeType");
+
   // ----------------------------------------------------------------------
   // Construction, initialization, and destruction
   // ----------------------------------------------------------------------
@@ -95,7 +94,7 @@ namespace Svc {
 
   void ComLogger ::
     comIn_handler(
-        FwIndexType portNum,
+        NATIVE_INT_TYPE portNum,
         Fw::ComBuffer &data,
         U32 context
     )
@@ -103,11 +102,11 @@ namespace Svc {
     FW_ASSERT(portNum == 0);
 
     // Get length of buffer:
-    FwSizeType sizeNative = data.getBuffLength();
+    U32 size32 = data.getBuffLength();
     // ComLogger only writes 16-bit sizes to save space
     // on disk:
-    FW_ASSERT(sizeNative < 65536, static_cast<FwAssertArgType>(sizeNative));
-    U16 size = sizeNative & 0xFFFF;
+    FW_ASSERT(size32 < 65536, static_cast<FwAssertArgType>(size32));
+    U16 size = size32 & 0xFFFF;
 
     // Close the file if it will be too big:
     if( OPEN == this->m_fileMode ) {
@@ -143,7 +142,7 @@ namespace Svc {
 
   void ComLogger ::
     pingIn_handler(
-        const FwIndexType portNum,
+        const NATIVE_INT_TYPE portNum,
         U32 key
     )
   {
@@ -224,7 +223,7 @@ namespace Svc {
       serialLength.serialize(size);
       if(this->writeToFile(serialLength.getBuffAddr(),
               static_cast<U16>(serialLength.getBuffLength()))) {
-        this->m_byteCount += static_cast<U32>(serialLength.getBuffLength());
+        this->m_byteCount += serialLength.getBuffLength();
       }
       else {
         return;
@@ -243,9 +242,9 @@ namespace Svc {
       U16 length
     )
   {
-    FwSizeType size = length;
+    FwSignedSizeType size = length;
     Os::File::Status ret = m_file.write(reinterpret_cast<const U8*>(data), size);
-    if((Os::File::OP_OK != ret) || (size != length)) {
+    if( Os::File::OP_OK != ret || size != static_cast<NATIVE_INT_TYPE>(length) ) {
       if( !this->m_writeErrorOccurred ) { // throttle this event, otherwise a positive
                                         // feedback event loop can occur!
         this->log_WARNING_HI_FileWriteError(ret, static_cast<U32>(size), length, this->m_fileName);

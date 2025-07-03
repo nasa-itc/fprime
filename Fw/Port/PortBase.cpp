@@ -1,5 +1,5 @@
 #include <Fw/Port/PortBase.hpp>
-#include <Fw/FPrimeBasicTypes.hpp>
+#include <FpConfig.hpp>
 #include <Fw/Logger/Logger.hpp>
 #include <cstdio>
 #include "Fw/Types/Assert.hpp"
@@ -81,7 +81,7 @@ namespace Fw {
         return "Port: %s %s->(%s)";
     }
 
-    void PortBase::toString(char* buffer, FwSizeType size) {
+    void PortBase::toString(char* buffer, NATIVE_INT_TYPE size) {
         FW_ASSERT(size > 0);
         // Get the port-custom format string
         const char* formatString = this->getToStringFormatString();

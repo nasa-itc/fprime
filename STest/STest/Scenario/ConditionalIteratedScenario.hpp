@@ -61,16 +61,16 @@ namespace STest {
       Scenario<State>* nextScenario_IteratedScenario(
           State& state //!< The system state
       ) {
-        Scenario<State>* localScenario = nullptr;
+        Scenario<State>* scenario = nullptr;
         if (!this->condition_ConditionalIteratedScenario(state)) {
           this->done = true;
         }
         if (!this->isDone()) {
-          localScenario = this->scenario.nextScenario(state);
+          scenario = this->scenario.nextScenario(state);
           this->done = this->scenario.isDone();
         }
-        this->nextScenario_ConditionalIteratedScenario(localScenario);
-        return localScenario;
+        this->nextScenario_ConditionalIteratedScenario(scenario);
+        return scenario;
       }
 
       //! The virtual implementation of isDone required by IteratedScenario

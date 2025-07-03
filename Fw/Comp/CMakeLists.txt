@@ -10,6 +10,7 @@ set(SOURCE_FILES
 )
 # Note: no autocoding files, so basic includes must be hard-coded
 set(MOD_DEPS
+  Fw/Cfg
   Fw/Types
   Fw/Obj
   Fw/Port

@@ -23,10 +23,10 @@ namespace Svc {
   // ----------------------------------------------------------------------
 
   CmdSequencerTester ::
-    CmdSequencerTester(const SequenceFiles::File::Format::t a_format) :
+    CmdSequencerTester(const SequenceFiles::File::Format::t format) :
       CmdSequencerGTestBase("Tester", MAX_HISTORY_SIZE),
       component("CmdSequencer"),
-      format(a_format),
+      format(format),
       sequences(this->component)
   {
     this->initComponents();
@@ -54,7 +54,7 @@ namespace Svc {
 
   void CmdSequencerTester ::
     from_seqDone_handler(
-      const FwIndexType portNum,
+      const NATIVE_INT_TYPE portNum,
       FwOpcodeType opCode,
       U32 cmdSeq,
       const Fw::CmdResponse& response
@@ -65,7 +65,7 @@ namespace Svc {
 
   void CmdSequencerTester ::
     from_comCmdOut_handler(
-        const FwIndexType portNum,
+        const NATIVE_INT_TYPE portNum,
         Fw::ComBuffer &data,
         U32 context
     )
@@ -75,7 +75,7 @@ namespace Svc {
 
   void CmdSequencerTester ::
     from_pingOut_handler(
-      const FwIndexType portNum,
+      const NATIVE_INT_TYPE portNum,
       U32 key
     )
   {

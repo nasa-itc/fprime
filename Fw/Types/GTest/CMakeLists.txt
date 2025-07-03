@@ -12,6 +12,7 @@ if(BUILD_TESTING)
     )
     set(MOD_DEPS
       gtest
+      Fw/Cfg
       Fw/Types
       Fw/Comp
       Fw/Port

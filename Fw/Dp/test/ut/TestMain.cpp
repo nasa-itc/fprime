@@ -12,7 +12,6 @@
 #include "Fw/Test/UnitTest.hpp"
 #include "STest/Pick/Pick.hpp"
 #include "STest/Random/Random.hpp"
-#include "Fw/Dp/test/ut/DpContainerTester.hpp"
 
 using namespace Fw;
 
@@ -35,8 +34,7 @@ void checkHeader(FwDpIdType id, Fw::Buffer& buffer, DpContainer& container) {
     container.setTimeTag(timeTag);
     // Set the processing types
     const FwSizeType numProcTypeStates = 1 << DpCfg::ProcType::NUM_CONSTANTS;
-    const auto procTypes =
-      static_cast<DpCfg::ProcType::SerialType>(STest::Pick::startLength(0, numProcTypeStates));
+    const DpCfg::ProcType::SerialType procTypes = STest::Pick::startLength(0, numProcTypeStates);
     container.setProcTypes(procTypes);
     // Set the user data
     for (U8& data : userData) {
@@ -84,13 +82,13 @@ void checkHeader(FwDpIdType id, Fw::Buffer& buffer, DpContainer& container) {
 
 void checkBuffers(DpContainer& container, FwSizeType bufferSize) {
     // Check the packet buffer
-    ASSERT_TRUE(Fw::DpContainerTester::verifyBufferSize(container, bufferSize));
+    ASSERT_EQ(container.m_buffer.getSize(), bufferSize);
     // Check the data buffer
-    U8* const buffPtr = Fw::DpContainerTester::getBufferPointers(container);
+    U8* const buffPtr = container.m_buffer.getData();
     U8* const dataPtr = &buffPtr[Fw::DpContainer::DATA_OFFSET];
-    const FwSizeType dataCapacity = bufferSize - Fw::DpContainer::MIN_PACKET_SIZE;
-    ASSERT_TRUE(Fw::DpContainerTester::verifyDataBufferAddress(container, dataPtr));
-    ASSERT_TRUE(Fw::DpContainerTester::verifyDataBufferCapacity(container, dataCapacity));
+    const FwSizeType dataCapacity = container.m_buffer.getSize() - Fw::DpContainer::MIN_PACKET_SIZE;
+    ASSERT_EQ(container.m_dataBuffer.getBuffAddr(), dataPtr);
+    ASSERT_EQ(container.m_dataBuffer.getBuffCapacity(), dataCapacity);
 }
 
 void fillWithData(Fw::Buffer& buffer) {
@@ -108,7 +106,7 @@ TEST(Header, BufferInConstructor) {
     // Fill with data
     fillWithData(buffer);
     // Use the buffer to create a container
-    const FwDpIdType id = static_cast<FwDpIdType>(STest::Pick::lowerUpper(0, static_cast<U32>(std::numeric_limits<FwDpIdType>::max())));
+    const FwDpIdType id = STest::Pick::lowerUpper(0, std::numeric_limits<FwDpIdType>::max());
     DpContainer container(id, buffer);
     // Check the header
     checkHeader(id, buffer, container);
@@ -145,7 +143,7 @@ TEST(Header, BufferSet) {
     // Fill with data
     fillWithData(buffer);
     // Use the buffer to create a container
-    const FwDpIdType id = static_cast<FwDpIdType>(STest::Pick::lowerUpper(0, static_cast<U32>(std::numeric_limits<FwDpIdType>::max())));
+    const FwDpIdType id = STest::Pick::lowerUpper(0, std::numeric_limits<FwDpIdType>::max());
     DpContainer container;
     container.setId(id);
     container.setBuffer(buffer);
@@ -166,9 +164,9 @@ TEST(Header, BadPacketDescriptor) {
     // Create a buffer
     Fw::Buffer buffer(bufferData, sizeof bufferData);
     // Set the packet descriptor to a bad value
-    auto serializer = buffer.getSerializer();
-    const FwPacketDescriptorType badPacketDescriptor = Fw::ComPacketType::FW_PACKET_DP + 1;
-    Fw::SerializeStatus status = serializer.serialize(badPacketDescriptor);
+    Fw::SerializeBufferBase& serialRepr = buffer.getSerializeRepr();
+    const FwPacketDescriptorType badPacketDescriptor = Fw::ComPacket::FW_PACKET_DP + 1;
+    Fw::SerializeStatus status = serialRepr.serialize(badPacketDescriptor);
     ASSERT_EQ(status, Fw::FW_SERIALIZE_OK);
     // Use the buffer to create a container
     DpContainer container;

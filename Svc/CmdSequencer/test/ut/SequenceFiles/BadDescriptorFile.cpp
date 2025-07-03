@@ -21,12 +21,12 @@ namespace Svc {
   namespace SequenceFiles {
 
     BadDescriptorFile ::
-      BadDescriptorFile(const U32 a_n, const Format::t a_format) :
-        File(a_format),
-        n(a_n)
+      BadDescriptorFile(const U32 n, const Format::t format) :
+        File(format),
+        n(n)
     {
       Fw::String baseName;
-      baseName.format("bad_descriptor_%u", a_n);
+      baseName.format("bad_descriptor_%u", n);
       this->setName(baseName.toChar());
     }
 

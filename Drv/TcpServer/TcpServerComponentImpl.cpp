@@ -12,7 +12,7 @@
 
 #include <limits>
 #include <Drv/TcpServer/TcpServerComponentImpl.hpp>
-#include <Fw/FPrimeBasicTypes.hpp>
+#include <FpConfig.hpp>
 #include "Fw/Types/Assert.hpp"
 #include "Fw/Logger/Logger.hpp"
 
@@ -59,15 +59,15 @@ Fw::Buffer TcpServerComponentImpl::getBuffer() {
 }
 
 void TcpServerComponentImpl::sendBuffer(Fw::Buffer buffer, SocketIpStatus status) {
-    Drv::ByteStreamStatus recvStatus = ByteStreamStatus::OTHER_ERROR;
+    Drv::RecvStatus recvStatus = RecvStatus::RECV_ERROR;
     if (status == SOCK_SUCCESS) {
-        recvStatus = ByteStreamStatus::OP_OK;
+        recvStatus = RecvStatus::RECV_OK;
     }
     else if (status == SOCK_NO_DATA_AVAILABLE) {
-        recvStatus = ByteStreamStatus::RECV_NO_DATA;
+        recvStatus = RecvStatus::RECV_NO_DATA;
     }
     else {
-        recvStatus = ByteStreamStatus::OTHER_ERROR;
+        recvStatus = RecvStatus::RECV_ERROR;
     }
     this->recv_out(0, buffer, recvStatus);
 }
@@ -124,27 +124,17 @@ void TcpServerComponentImpl::readLoop() {
 // Handler implementations for user-defined typed input ports
 // ----------------------------------------------------------------------
 
-void TcpServerComponentImpl::send_handler(const FwIndexType portNum, Fw::Buffer& fwBuffer) {
-    FW_ASSERT_NO_OVERFLOW(fwBuffer.getSize(), U32);
-    Drv::SocketIpStatus status = this->send(fwBuffer.getData(), static_cast<U32>(fwBuffer.getSize()));
-    Drv::ByteStreamStatus returnStatus;
-    switch (status) {
-        case SOCK_INTERRUPTED_TRY_AGAIN:
-            returnStatus = ByteStreamStatus::SEND_RETRY;
-            break;
-        case SOCK_SUCCESS:
-            returnStatus = ByteStreamStatus::OP_OK;
-            break;
-        default:
-            returnStatus = ByteStreamStatus::OTHER_ERROR;
-            break;
+Drv::SendStatus TcpServerComponentImpl::send_handler(const NATIVE_INT_TYPE portNum, Fw::Buffer& fwBuffer) {
+    Drv::SocketIpStatus status = this->send(fwBuffer.getData(), fwBuffer.getSize());
+    // Only deallocate buffer when the caller is not asked to retry
+    if (status == SOCK_INTERRUPTED_TRY_AGAIN) {
+        return SendStatus::SEND_RETRY;
+    } else if (status != SOCK_SUCCESS) {
+        deallocate_out(0, fwBuffer);
+        return SendStatus::SEND_ERROR;
     }
-    // Return the buffer and status to the caller
-    this->sendReturnOut_out(0, fwBuffer, returnStatus);
-}
-
-void TcpServerComponentImpl::recvReturnIn_handler(FwIndexType portNum, Fw::Buffer& fwBuffer) {
-    this->deallocate_out(0, fwBuffer);
+    deallocate_out(0, fwBuffer);
+    return SendStatus::SEND_OK;
 }
 
 }  // end namespace Drv

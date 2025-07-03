@@ -15,7 +15,6 @@ namespace Os {
 namespace Test {
 namespace Queue {
 FwSizeType Tester::QueueState::queues = 0;
-U64 Tester::QueueMessage::order_counter = 0;
 
 PriorityCompare const Tester::QueueMessageComparer::HELPER = PriorityCompare();
 
@@ -39,11 +38,7 @@ Os::QueueInterface::Status Tester::shadow_send(const U8* buffer,
     QueueMessage qm;
     qm.priority = priority;
     qm.size = size;
-    qm.order = QueueMessage::order_counter++;
-    // Overflow imminent, fail now!
-    assert(QueueMessage::order_counter != std::numeric_limits<U64>::max());
-
-    std::memcpy(qm.data, buffer, static_cast<size_t>(size));
+    std::memcpy(qm.data, buffer, size);
     if (size > this->shadow.messageSize) {
         return QueueInterface::Status::SIZE_MISMATCH;
     } else if ((this->shadow.queue.size() == this->shadow.depth) &&
@@ -83,7 +78,7 @@ Os::QueueInterface::Status Tester::shadow_receive(U8* destination,
         return QueueInterface::Status::EMPTY;
     } else {
         const QueueMessage& qm = shadow.queue.top();
-        std::memcpy(destination, qm.data, static_cast<size_t>(qm.size));
+        std::memcpy(destination, qm.data, qm.size);
         actualSize = qm.size;
         priority = qm.priority;
         shadow.queue.pop();
@@ -99,7 +94,7 @@ void Tester::shadow_receive_unblock() {
 
     // Fill the outputs stored in the shadow receive buffer
     const QueueMessage& qm = shadow.queue.top();
-    std::memcpy(this->shadow.receive_block.destination, qm.data, static_cast<size_t>(qm.size));
+    std::memcpy(this->shadow.receive_block.destination, qm.data, qm.size);
     *this->shadow.receive_block.size = qm.size;
     *this->shadow.receive_block.priority = qm.priority;
     shadow.queue.pop();
@@ -118,7 +113,7 @@ TEST(InterfaceUninitialized, SendPointer) {
     Os::Queue queue;
     Fw::String name = "My queue";
     const FwSizeType messageSize = 200;
-    const FwQueuePriorityType priority = 127;
+    const FwQueuePriorityType priority = 300;
     U8 buffer[messageSize];
 
     Os::QueueInterface::Status status =
@@ -130,7 +125,7 @@ TEST(InterfaceUninitialized, SendBuffer) {
     Os::Queue queue;
     Fw::String name = "My queue";
     const FwSizeType messageSize = 200;
-    const FwQueuePriorityType priority = 127;
+    const FwQueuePriorityType priority = 300;
     U8 storage[messageSize];
     Fw::ExternalSerializeBuffer buffer(storage, sizeof storage);
 
@@ -178,7 +173,7 @@ TEST(InterfaceInvalid, SendPointerNull) {
     Os::Queue queue;
     Fw::String name = "My queue";
     const FwSizeType messageSize = 200;
-    const FwQueuePriorityType priority = 127;
+    const FwQueuePriorityType priority = 300;
     ASSERT_DEATH_IF_SUPPORTED(queue.send(nullptr, messageSize, priority, Os::QueueInterface::BlockingType::BLOCKING),
                               "Assert:.*Queue\\.cpp");
 }
@@ -187,7 +182,7 @@ TEST(InterfaceInvalid, SendInvalidEnum) {
     Os::Queue queue;
     Fw::String name = "My queue";
     const FwSizeType messageSize = 200;
-    const FwQueuePriorityType priority = 127;
+    const FwQueuePriorityType priority = 300;
     Os::QueueInterface::BlockingType blockingType =
         static_cast<Os::QueueInterface::BlockingType>(Os::QueueInterface::BlockingType::BLOCKING + 1);
     ASSERT_DEATH_IF_SUPPORTED(queue.send(nullptr, messageSize, priority, blockingType), "Assert:.*Queue\\.cpp");

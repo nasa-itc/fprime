@@ -22,7 +22,7 @@ SocketComponentHelper::SocketComponentHelper() {}
 SocketComponentHelper::~SocketComponentHelper() {}
 
 void SocketComponentHelper::start(const Fw::StringBase &name,
-                                  const FwTaskPriorityType priority,
+                                  const Os::Task::ParamType priority,
                                   const Os::Task::ParamType stack,
                                   const Os::Task::ParamType cpuAffinity) {
     FW_ASSERT(m_task.getState() == Os::Task::State::NOT_STARTED);  // It is a coding error to start this task multiple times
@@ -195,8 +195,7 @@ void SocketComponentHelper::readLoop() {
             Fw::Buffer buffer = this->getBuffer();
             U8* data = buffer.getData();
             FW_ASSERT(data);
-            FW_ASSERT_NO_OVERFLOW(buffer.getSize(), U32);
-            U32 size = static_cast<U32>(buffer.getSize());
+            U32 size = buffer.getSize();
             // recv blocks, so it may have been a while since its done an isOpened check
             status = this->recv(data, size);
             if ((status != SOCK_SUCCESS) && (status != SOCK_INTERRUPTED_TRY_AGAIN) && (status != SOCK_NO_DATA_AVAILABLE)) {

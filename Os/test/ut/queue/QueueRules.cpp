@@ -6,7 +6,6 @@
 #include "CommonTests.hpp"
 #include "Fw/Types/String.hpp"
 
-
 struct PickedMessage {
     FwSizeType size;
     FwQueuePriorityType priority;
@@ -18,8 +17,7 @@ PickedMessage pick_message(FwSizeType max_size) {
     PickedMessage message;
 
     message.size = STest::Random::lowerUpper(1, max_size);
-    // Force priority to be in a smaller range to produce more same-priority messages
-    message.priority = STest::Random::lowerUpper(0, std::numeric_limits<I8>::max());
+    message.priority = STest::Random::lowerUpper(0, std::numeric_limits<U32>::max());
 
     message.sent = new U8[message.size];
     for (FwSizeType i = 0; i < message.size; i++) {

@@ -1,7 +1,7 @@
 //
 // Created by mstarch on 12/10/20.
 //
-#include <Fw/FPrimeBasicTypes.hpp>
+#include <FpConfig.hpp>
 #include <Fw//Buffer/Buffer.hpp>
 #include <Drv/Ip/IpSocket.hpp>
 
@@ -19,7 +19,7 @@ static constexpr U16 MAX_ITER = 10;
  * @param fd: socket file descriptor
  * @param socket: socket to make timeout
  */
-void force_recv_timeout(int fd, Drv::IpSocket &socket);
+void force_recv_timeout(NATIVE_INT_TYPE fd, Drv::IpSocket &socket);
 
 /**
  * Validate random data from data against truth
@@ -27,14 +27,14 @@ void force_recv_timeout(int fd, Drv::IpSocket &socket);
  * @param truth: truth data to validate
  * @param size: size to validate
  */
-void validate_random_data(U8 *data, U8 *truth, FwSizeType size);
+void validate_random_data(U8 *data, U8 *truth, U32 size);
 
 /**
  * Fills in the given data buffer with randomly picked data.
  * @param data: data to file
  * @param size: size of fill
  */
-void fill_random_data(U8 *data, FwSizeType size);
+void fill_random_data(U8 *data, U32 size);
 
 /**
  * Validates a given buffer against the data provided.
@@ -90,6 +90,6 @@ bool wait_on_started(Drv::IpSocket &socket, bool open, U32 iterations);
  */
 U64 get_configured_delay_ms();
 
-}
-}
+};
+};
 #endif

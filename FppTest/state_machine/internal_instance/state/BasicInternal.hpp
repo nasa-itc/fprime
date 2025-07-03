@@ -49,7 +49,7 @@ class BasicInternal : public BasicInternalComponentBase {
     //! Destroy BasicInternal object
     ~BasicInternal();
 
-  private:
+  PRIVATE:
     // ----------------------------------------------------------------------
     // Implementations for internal state machine actions
     // ----------------------------------------------------------------------

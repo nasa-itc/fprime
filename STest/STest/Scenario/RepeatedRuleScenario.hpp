@@ -29,10 +29,10 @@ namespace STest {
 
       //! Construct object RepeatedRuleScenario
       RepeatedRuleScenario(
-          Rule<State>& a_rule //!< The rule
+          Rule<State>& rule //!< The rule
       ) :
-        Scenario<State>(a_rule.getName()),
-        rule(a_rule)
+        Scenario<State>(rule.getName()),
+        rule(rule)
       {
 
       }
@@ -53,11 +53,11 @@ namespace STest {
       Rule<State>* nextRule_Scenario(
           State& state //!< The system state
       ) {
-        Rule<State> *localRule = nullptr;
+        Rule<State> *rule = nullptr;
         if (this->rule.precondition(state)) {
-          localRule = &this->rule;
+          rule = &this->rule;
         }
-        return localRule;
+        return rule;
       }
 
       //! The virtual implementation of isDone required by Scenario

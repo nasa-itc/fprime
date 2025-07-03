@@ -22,8 +22,8 @@ namespace Svc {
     // ----------------------------------------------------------------------
 
     CmdSequencerTester ::
-      CmdSequencerTester(const SequenceFiles::File::Format::t a_format) :
-        Svc::CmdSequencerTester(a_format)
+      CmdSequencerTester(const SequenceFiles::File::Format::t format) :
+        Svc::CmdSequencerTester(format)
     {
 
     }
@@ -121,7 +121,7 @@ namespace Svc {
       ASSERT_CMD_RESPONSE_SIZE(1);
       ASSERT_CMD_RESPONSE(
           0,
-          this->getStartOpcode(),
+          CmdSequencerComponentBase::OPCODE_CS_START,
           startCmdSeq,
           Fw::CmdResponse::EXECUTION_ERROR
       );
@@ -154,7 +154,7 @@ namespace Svc {
       ASSERT_CMD_RESPONSE_SIZE(1);
       ASSERT_CMD_RESPONSE(
           0,
-          this->getStartOpcode(),
+          CmdSequencerComponentBase::OPCODE_CS_START,
           startCmdSeq,
           Fw::CmdResponse::EXECUTION_ERROR
       );
@@ -169,7 +169,7 @@ namespace Svc {
       ASSERT_CMD_RESPONSE_SIZE(1);
       ASSERT_CMD_RESPONSE(
           0,
-          this->getAutoOpcode(),
+          CmdSequencerComponentBase::OPCODE_CS_AUTO,
           autoCmdSeq,
           Fw::CmdResponse::EXECUTION_ERROR
       );
@@ -184,7 +184,7 @@ namespace Svc {
       ASSERT_CMD_RESPONSE_SIZE(1);
       ASSERT_CMD_RESPONSE(
           0,
-          this->getManualOpcode(),
+          CmdSequencerComponentBase::OPCODE_CS_MANUAL,
           manualCmdSeq,
           Fw::CmdResponse::EXECUTION_ERROR
       );
@@ -269,7 +269,7 @@ namespace Svc {
       ASSERT_CMD_RESPONSE_SIZE(1);
       ASSERT_CMD_RESPONSE(
           0,
-          this->getStepOpcode(),
+          CmdSequencerComponentBase::OPCODE_CS_STEP,
           stepCmdSeq,
           Fw::CmdResponse::EXECUTION_ERROR
       );

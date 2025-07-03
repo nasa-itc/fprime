@@ -1,9 +1,0 @@
-register_fprime_config(
-    SOURCES
-        "${CMAKE_CURRENT_LIST_DIR}/ComFprimeSubtopologyConfig.cpp"
-    HEADERS
-        "${CMAKE_CURRENT_LIST_DIR}/ComFprimeSubtopologyConfig.hpp"
-    AUTOCODER_INPUTS
-        "${CMAKE_CURRENT_LIST_DIR}/ComFprimeConfig.fpp"
-        "${CMAKE_CURRENT_LIST_DIR}/ComFprimeComDriverConfig.fpp"
-)

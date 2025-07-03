@@ -4,7 +4,7 @@
 // \brief  cpp file for DpCatalog component implementation class
 // ======================================================================
 
-#include "Fw/FPrimeBasicTypes.hpp"
+#include "FpConfig.hpp"
 #include "Fw/Dp/DpContainer.hpp"
 #include "Svc/DpCatalog/DpCatalog.hpp"
 
@@ -14,8 +14,7 @@
 #include <new> // placement new
 
 namespace Svc {
-    static_assert(DP_MAX_DIRECTORIES > 0, "Configuration DP_MAX_DIRECTORIES must be positive");
-    static_assert(DP_MAX_FILES > 0, "Configuration DP_MAX_FILES must be positive");
+
     // ----------------------------------------------------------------------
     // Component construction and destruction
     // ----------------------------------------------------------------------
@@ -56,7 +55,7 @@ namespace Svc {
         Fw::FileNameString directories[DP_MAX_DIRECTORIES],
         FwSizeType numDirs,
         Fw::FileNameString& stateFile,
-        FwEnumStoreType memId,
+        NATIVE_UINT_TYPE memId,
         Fw::MemAllocator& allocator
     ) {
 
@@ -186,13 +185,13 @@ namespace Svc {
             return Fw::CmdResponse::EXECUTION_ERROR;
         }
 
-        FwSizeType fileLoc = 0;
+        FwSignedSizeType fileLoc = 0;
         this->m_stateFileEntries = 0;
 
         // read entries from the state file
         for (FwSizeType entry = 0; entry < this->m_numDpSlots; entry++) {
 
-            FwSizeType size = static_cast<FwSizeType>(sizeof(buffer));
+            FwSignedSizeType size = sizeof(buffer);
             // read the directory index
             stat = stateFile.read(buffer, size);
             if (stat != Os::File::OP_OK) {
@@ -303,8 +302,7 @@ namespace Svc {
                 // Should always fit
                 FW_ASSERT(Fw::FW_SERIALIZE_OK == serStat,serStat);
                 // write the entry
-                FwSizeType size = entryBuffer.getBuffLength();
-                // Protect against overflow
+                FwSignedSizeType size = entryBuffer.getBuffLength();
                 stat = stateFile.write(buffer, size);
                 if (stat != Os::File::OP_OK) {
                     this->log_WARNING_HI_StateFileWriteError(this->m_stateFile, stat);
@@ -320,7 +318,7 @@ namespace Svc {
     void DpCatalog::appendFileState(const DpStateEntry& entry) {
         FW_ASSERT(this->m_stateFileData);
         FW_ASSERT(entry.dir < static_cast<FwIndexType>(this->m_numDirectories),
-            static_cast<FwAssertArgType>(entry.dir),
+            entry.dir,
             static_cast<FwAssertArgType>(this->m_numDirectories)
         );
 
@@ -350,7 +348,7 @@ namespace Svc {
         // should fit
         FW_ASSERT(serStat == Fw::FW_SERIALIZE_OK,serStat);
         // write the entry
-        FwSizeType size = entryBuffer.getBuffLength();
+        FwSignedSizeType size = entryBuffer.getBuffLength();
         stat = stateFile.write(buffer, size);
         if (stat != Os::File::OP_OK) {
             this->log_WARNING_HI_StateFileWriteError(this->m_stateFile, stat);
@@ -455,7 +453,7 @@ namespace Svc {
                 static_cast<FwAssertArgType>(this->m_numDpSlots - totalFiles));
 
             // extract metadata for each file
-            for (FwSizeType file = 0; file < filesRead; file++) {
+            for (FwNativeUIntType file = 0; file < filesRead; file++) {
 
                 // only consider files with the DP extension
             
@@ -479,7 +477,7 @@ namespace Svc {
                 this->log_ACTIVITY_LO_ProcessingFile(fullFile);
 
                 // get file size
-                FwSizeType fileSize = 0;
+                FwSignedSizeType fileSize = 0;
                 Os::FileSystem::Status sizeStat =
                     Os::FileSystem::getFileSize(fullFile.toChar(),fileSize);
                 if (sizeStat != Os::FileSystem::OP_OK) {
@@ -494,7 +492,7 @@ namespace Svc {
                 }
 
                 // Read DP header
-                FwSizeType size = Fw::DpContainer::Header::SIZE;
+                FwSignedSizeType size = Fw::DpContainer::Header::SIZE;
 
                 stat = dpFile.read(dpBuff, size);
                 if (stat != Os::File::OP_OK) {
@@ -829,7 +827,7 @@ namespace Svc {
 
     void DpCatalog ::
         fileDone_handler(
-            FwIndexType portNum,
+            NATIVE_INT_TYPE portNum,
             const Svc::SendFileResponse& resp
         )
     {
@@ -858,7 +856,7 @@ namespace Svc {
 
     void DpCatalog ::
         pingIn_handler(
-            FwIndexType portNum,
+            NATIVE_INT_TYPE portNum,
             U32 key
         )
     {

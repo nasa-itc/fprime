@@ -4,11 +4,6 @@
 
 #include "TcpServerTester.hpp"
 
-TEST(Nominal, TcpServerBufferDeallocation) {
-    Drv::TcpServerTester tester;
-    tester.test_buffer_deallocation();
-}
-
 TEST(Nominal, TcpServerBasicMessaging) {
     Drv::TcpServerTester tester;
     tester.test_basic_messaging();

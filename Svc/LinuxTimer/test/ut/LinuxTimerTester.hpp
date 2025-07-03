@@ -14,7 +14,7 @@
 #define TESTER_HPP
 
 #include "LinuxTimerGTestBase.hpp"
-#include "Svc/LinuxTimer/LinuxTimer.hpp"
+#include "Svc/LinuxTimer/LinuxTimerComponentImpl.hpp"
 
 namespace Svc {
 
@@ -55,7 +55,7 @@ namespace Svc {
       //! Handler for from_CycleOut
       //!
       void from_CycleOut_handler(
-          const FwIndexType portNum, /*!< The port number*/
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
           Os::RawTime &cycleStart /*!< Cycle start timer value*/
       );
 
@@ -81,9 +81,9 @@ namespace Svc {
 
       //! The component under test
       //!
-      LinuxTimer component;
+      LinuxTimerComponentImpl component;
 
-      U32 m_numCalls;
+      NATIVE_INT_TYPE m_numCalls;
 
   };
 

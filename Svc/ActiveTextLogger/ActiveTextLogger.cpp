@@ -30,7 +30,7 @@ namespace Svc {
     // Handlers to implement for typed input ports
     // ----------------------------------------------------------------------
 
-    void ActiveTextLogger::TextLogger_handler(FwIndexType portNum,
+    void ActiveTextLogger::TextLogger_handler(NATIVE_INT_TYPE portNum,
                                                   FwEventIdType id,
                                                   Fw::Time &timeTag,
                                                   const Fw::LogSeverity& severity,

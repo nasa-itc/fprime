@@ -11,13 +11,13 @@
 #ifndef FW_TLM_BUFFER_HPP
 #define FW_TLM_BUFFER_HPP
 
-#include <Fw/FPrimeBasicTypes.hpp>
+#include <FpConfig.hpp>
 #include <Fw/Types/Serializable.hpp>
-#include <Fw/Types/SerIds.hpp>
+#include <Fw/Cfg/SerIds.hpp>
 
 namespace Fw {
 
-    class TlmBuffer final : public SerializeBufferBase {
+    class TlmBuffer : public SerializeBufferBase {
         public:
 
             enum {
@@ -25,17 +25,17 @@ namespace Fw {
                 SERIALIZED_SIZE = FW_TLM_BUFFER_MAX_SIZE + sizeof(FwBuffSizeType)
             };
 
-            TlmBuffer(const U8 *args, FwSizeType size);
+            TlmBuffer(const U8 *args, NATIVE_UINT_TYPE size);
             TlmBuffer();
             TlmBuffer(const TlmBuffer& other);
             virtual ~TlmBuffer();
             TlmBuffer& operator=(const TlmBuffer& other);
 
-            FwSizeType getBuffCapacity() const; // !< returns capacity, not current size, of buffer
+            NATIVE_UINT_TYPE getBuffCapacity() const; // !< returns capacity, not current size, of buffer
             U8* getBuffAddr();
             const U8* getBuffAddr() const;
 
-        private:
+        PRIVATE:
             U8 m_bufferData[FW_TLM_BUFFER_MAX_SIZE]; // command argument buffer
     };
 

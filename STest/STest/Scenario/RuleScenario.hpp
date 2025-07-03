@@ -31,7 +31,7 @@ namespace STest {
       RuleScenario(
           Rule<State>& rule //!< The rule
       ) :
-        Scenario<State>(rule.getName()),
+        Scenario<State>(rule.name),
         rule(rule),
         done(false)
       {
@@ -54,12 +54,12 @@ namespace STest {
       Rule<State>* nextRule_Scenario(
           State& state //!< The system state
       ) {
-        Rule<State> *localRule = nullptr;
+        Rule<State> *rule = nullptr;
         if (!this->isDone() && this->rule.precondition(state)) {
-          localRule = &this->rule;
+          rule = &this->rule;
           this->done = true;
         }
-        return localRule;
+        return rule;
       }
 
       //! The virtual implementation of isDone required by Scenario

@@ -10,7 +10,7 @@
 #define DEVICESM_H_
                                 
 #include <Fw/Sm/SmSignalBuffer.hpp>
-#include <Fw/FPrimeBasicTypes.hpp>
+#include <config/FpConfig.hpp>
                                  
 namespace FppTest {
 
@@ -54,7 +54,7 @@ class DeviceSm {
                                  
   public:
                                  
-    DeviceSm(DeviceSm_Interface* a_parent) : parent(a_parent) {}
+    DeviceSm(DeviceSm_Interface* parent) : parent(parent) {}
   
     enum DeviceSm_States {
       OFF,

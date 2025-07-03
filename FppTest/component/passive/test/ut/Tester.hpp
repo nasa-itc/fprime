@@ -13,7 +13,6 @@
 #include "FppTest/component/tests/CmdTests.hpp"
 #include "FppTest/component/tests/EventTests.hpp"
 #include "FppTest/component/tests/ParamTests.hpp"
-#include "FppTest/component/tests/ExternalParamTests.hpp"
 #include "FppTest/component/tests/PortTests.hpp"
 #include "FppTest/component/tests/TlmTests.hpp"
 #include "FppTest/component/types/FormalParamTypes.hpp"
@@ -26,11 +25,11 @@ class Tester : public PassiveTestGTestBase {
 
   public:
     // Maximum size of histories storing events, telemetry, and port outputs
-    static const U32 MAX_HISTORY_SIZE = 100;
+    static const NATIVE_INT_TYPE MAX_HISTORY_SIZE = 100;
     // Instance ID supplied to the component instance under test
-    static const FwEnumStoreType TEST_INSTANCE_ID = 0;
+    static const NATIVE_INT_TYPE TEST_INSTANCE_ID = 0;
     // Queue depth supplied to component instance under test
-    static const FwSizeType TEST_INSTANCE_QUEUE_DEPTH = 10;
+    static const NATIVE_INT_TYPE TEST_INSTANCE_QUEUE_DEPTH = 10;
 
     //! Construct object Tester
     //!
@@ -54,26 +53,143 @@ class Tester : public PassiveTestGTestBase {
     TLM_TEST_DECLS
 
     void testParam();
-    PARAM_CMD_TEST_DECLS
 
-    void testExternalParam();
-    EXTERNAL_PARAM_CMD_TEST_DECLS
+    PARAM_CMD_TEST_DECLS
 
     void testTime();
 
-  private:
+  PRIVATE:
+    // ----------------------------------------------------------------------
+    // Handlers for typed from ports
+    // ----------------------------------------------------------------------
 
-    #include "FppTest/component/common/tester.hpp"
+    //! Handler for from_arrayArgsOut
+    //!
+    void from_arrayArgsOut_handler(const NATIVE_INT_TYPE portNum, /*!< The port number*/
+                                   const FormalParamArray& a,     /*!<
+                                   An array
+                                   */
+                                   FormalParamArray& aRef         /*!<
+                                       An array ref
+                                       */
+    );
 
-  private:
+    //! Handler for from_arrayReturnOut
+    //!
+    FormalParamArray from_arrayReturnOut_handler(const NATIVE_INT_TYPE portNum, /*!< The port number*/
+                                                 const FormalParamArray& a,     /*!<
+                                                 An array
+                                                 */
+                                                 FormalParamArray& aRef         /*!<
+                                                     An array ref
+                                                     */
+    );
+
+    //! Handler for from_enumArgsOut
+    //!
+    void from_enumArgsOut_handler(const NATIVE_INT_TYPE portNum, /*!< The port number*/
+                                  const FormalParamEnum& en,     /*!<
+                                  An enum
+                                  */
+                                  FormalParamEnum& enRef         /*!<
+                                      An enum ref
+                                      */
+    );
+
+    //! Handler for from_enumReturnOut
+    //!
+    FormalParamEnum from_enumReturnOut_handler(const NATIVE_INT_TYPE portNum, /*!< The port number*/
+                                               const FormalParamEnum& en,     /*!<
+                                               An enum
+                                               */
+                                               FormalParamEnum& enRef         /*!<
+                                                   An enum ref
+                                                   */
+    );
+
+    //! Handler for from_noArgsOut
+    //!
+    void from_noArgsOut_handler(const NATIVE_INT_TYPE portNum /*!< The port number*/
+    );
+
+    //! Handler for from_noArgsReturnOut
+    //!
+    bool from_noArgsReturnOut_handler(const NATIVE_INT_TYPE portNum /*!< The port number*/
+    );
+
+    //! Handler for from_primitiveArgsOut
+    //!
+    void from_primitiveArgsOut_handler(const NATIVE_INT_TYPE portNum, /*!< The port number*/
+                                       U32 u32,
+                                       U32& u32Ref,
+                                       F32 f32,
+                                       F32& f32Ref,
+                                       bool b,
+                                       bool& bRef);
+
+    //! Handler for from_primitiveReturnOut
+    //!
+    U32 from_primitiveReturnOut_handler(const NATIVE_INT_TYPE portNum, /*!< The port number*/
+                                        U32 u32,
+                                        U32& u32Ref,
+                                        F32 f32,
+                                        F32& f32Ref,
+                                        bool b,
+                                        bool& bRef);
+
+    //! Handler for from_prmGetIn
+    //!
+    Fw::ParamValid from_prmGetIn_handler(const NATIVE_INT_TYPE portNum, /*!< The port number*/
+                                         FwPrmIdType id,                /*!<
+                                                    Parameter ID
+                                                    */
+                                         Fw::ParamBuffer& val           /*!<
+                                               Buffer containing serialized parameter value
+                                               */
+    );
+
+    //! Handler for from_prmGetIn
+    //!
+    void from_prmSetIn_handler(const NATIVE_INT_TYPE portNum, /*!< The port number*/
+                               FwPrmIdType id,                /*!<
+                                          Parameter ID
+                                          */
+                               Fw::ParamBuffer& val           /*!<
+                                     Buffer containing serialized parameter value
+                                     */
+    );
+
+    //! Handler for from_structArgsOut
+    //!
+    void from_structArgsOut_handler(const NATIVE_INT_TYPE portNum, /*!< The port number*/
+                                    const FormalParamStruct& s,    /*!<
+                                   A struct
+                                   */
+                                    FormalParamStruct& sRef        /*!<
+                                       A struct ref
+                                       */
+    );
+
+    //! Handler for from_structReturnOut
+    //!
+    FormalParamStruct from_structReturnOut_handler(const NATIVE_INT_TYPE portNum, /*!< The port number*/
+                                                   const FormalParamStruct& s,    /*!<
+                                                  A struct
+                                                  */
+                                                   FormalParamStruct& sRef        /*!<
+                                                      A struct ref
+                                                      */
+    );
+
+  PRIVATE:
     // ----------------------------------------------------------------------
     // Handlers for serial from ports
     // ----------------------------------------------------------------------
 
     //! Handler for from_serialOut
     //!
-    void from_serialOut_handler(FwIndexType portNum,        //!< The port number
-                                Fw::SerializeBufferBase& Buffer //!< The serialization buffer
+    void from_serialOut_handler(NATIVE_INT_TYPE portNum,        /*!< The port number*/
+                                Fw::SerializeBufferBase& Buffer /*!< The serialization buffer*/
     );
 
   public:
@@ -107,7 +223,7 @@ class Tester : public PassiveTestGTestBase {
     //! Check unsuccessful status of a serial port invocation
     void checkSerializeStatusBufferEmpty();
 
-  private:
+  PRIVATE:
     // ----------------------------------------------------------------------
     // Variables
     // ----------------------------------------------------------------------
@@ -122,9 +238,6 @@ class Tester : public PassiveTestGTestBase {
     FppTest::Types::EnumType enumReturnVal;
     FppTest::Types::ArrayType arrayReturnVal;
     FppTest::Types::StructType structReturnVal;
-    FppTest::Types::StringType stringReturnVal;
-    FppTest::Types::StringType stringAliasReturnVal;
-    FppTest::Types::AliasStringArrayType arrayStringAliasReturnVal;
 
     // Buffers from serial output ports;
     U8 primitiveData[InputPrimitiveArgsPort::SERIALIZED_SIZE];
@@ -152,89 +265,6 @@ class Tester : public PassiveTestGTestBase {
 
     // Time test values
     Fw::Time time;
-
-    //! External Parameter Delegate
-    class PassiveTestComponentBaseParamExternalDelegate :
-    public Fw::ParamExternalDelegate
-    {
-
-    public:
-
-        // ----------------------------------------------------------------------
-        // Parameter validity flags
-        // ----------------------------------------------------------------------
-
-        //! True if ParamBoolExternal was successfully received
-        Fw::ParamValid m_param_ParamBoolExternal_valid;
-
-        //! True if ParamI32External was successfully received
-        Fw::ParamValid m_param_ParamI32External_valid;
-
-        //! True if ParamStringExternal was successfully received
-        Fw::ParamValid m_param_ParamStringExternal_valid;
-
-        //! True if ParamEnumExternal was successfully received
-        Fw::ParamValid m_param_ParamEnumExternal_valid;
-
-        //! True if ParamArrayExternal was successfully received
-        Fw::ParamValid m_param_ParamArrayExternal_valid;
-
-        //! True if ParamStructExternal was successfully received
-        Fw::ParamValid m_param_ParamStructExternal_valid;
-
-    public:
-
-        // ----------------------------------------------------------------------
-        // Parameter variables
-        // ----------------------------------------------------------------------
-
-        //! Parameter ParamBoolExternal
-        bool m_param_ParamBoolExternal;
-
-        //! Parameter ParamI32External
-        I32 m_param_ParamI32External;
-
-        //! Parameter ParamStringExternal
-        Fw::ParamString m_param_ParamStringExternal;
-
-        //! Parameter ParamEnumExternal
-        FormalParamEnum m_param_ParamEnumExternal;
-
-        //! Parameter ParamArrayExternal
-        FormalParamArray m_param_ParamArrayExternal;
-
-        //! Parameter ParamStructExternal
-        FormalParamStruct m_param_ParamStructExternal;
-
-    public:
-
-        // ----------------------------------------------------------------------
-        // Unit test implementation of external parameter delegate serialization/deserialization
-        // ----------------------------------------------------------------------
-
-        //! Parameter deserialization function for external parameter unit testing
-        Fw::SerializeStatus deserializeParam(
-            const FwPrmIdType base_id, //!< The component base parameter ID to deserialize
-            const FwPrmIdType local_id, //!< The parameter local ID to deserialize
-            const Fw::ParamValid prmStat, //!< The parameter validity status
-            Fw::SerializeBufferBase& buff //!< The buffer containing the parameter to deserialize
-        ) override;
-
-        //! Parameter serialization function for external parameter unit testing
-        Fw::SerializeStatus serializeParam(
-            const FwPrmIdType base_id, //!< The component base parameter ID to serialize
-            const FwPrmIdType local_id, //!< The parameter local ID to serialize
-            Fw::SerializeBufferBase& buff //!< The buffer to serialize the parameter into
-        ) const override;
-
-    };
-
-    // ----------------------------------------------------------------------
-    // Parameter delegates
-    // ----------------------------------------------------------------------
-
-    //! Delegate to serialize/deserialize an externally stored parameter
-    PassiveTestComponentBaseParamExternalDelegate paramTesterDelegate;
 };
 
 #endif

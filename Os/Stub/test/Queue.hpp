@@ -4,8 +4,7 @@
 #include "Os/Queue.hpp"
 #include <queue>
 #include <deque>
-#include <cassert>
-#include <limits>
+
 
 namespace Os {
 namespace Stub {
@@ -63,19 +62,10 @@ struct InjectableStlQueueHandle : public QueueHandle {
         U8 data[STUB_QUEUE_TEST_MESSAGE_MAX_SIZE];
         FwQueuePriorityType priority;
         FwSizeType size;
-        U64 order;
-        static U64 order_counter;
         //! \brief comparison utility for messages
         struct LessMessage {
             bool operator()(const Message& a, const Message& b) {
-                // Compare priority for unequal priority
-                if (a.priority != b.priority) {
-                    return std::greater<FwQueuePriorityType>()(a.priority, b.priority);
-                }
-                // Cannot have like ordered items
-                assert(a.order != b.order);
-                // Compare received order for unequal received orders
-                return a.order > b.order;
+                return std::greater<FwQueuePriorityType>()(a.priority, b.priority);
             }
         };
     };

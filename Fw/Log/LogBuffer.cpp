@@ -3,7 +3,7 @@
 
 namespace Fw {
 
-    LogBuffer::LogBuffer(const U8 *args, FwSizeType size) {
+    LogBuffer::LogBuffer(const U8 *args, NATIVE_UINT_TYPE size) {
         SerializeStatus stat = SerializeBufferBase::setBuff(args,size);
         FW_ASSERT(FW_SERIALIZE_OK == stat, static_cast<FwAssertArgType>(stat));
     }
@@ -29,7 +29,7 @@ namespace Fw {
         return *this;
     }
 
-    FwSizeType LogBuffer::getBuffCapacity() const {
+    NATIVE_UINT_TYPE LogBuffer::getBuffCapacity() const {
         return sizeof(this->m_bufferData);
     }
 

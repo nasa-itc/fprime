@@ -1,15 +1,12 @@
 #ifndef FW_TIME_HPP
 #define FW_TIME_HPP
 
-#include <Fw/FPrimeBasicTypes.hpp>
+#include <FpConfig.hpp>
 #include <Fw/Types/Assert.hpp>
 #include <Fw/Types/Serializable.hpp>
 
 namespace Fw {
     class Time: public Serializable {
-
-        friend class TimeTester;
-
         public:
 
             enum {
@@ -82,7 +79,7 @@ namespace Fw {
 #ifdef BUILD_UT // Stream operators to support Googletest
             friend std::ostream& operator<<(std::ostream& os,  const Time& val);
 #endif
-        private:
+        PRIVATE:
             U32 m_seconds; // !< seconds portion
             U32 m_useconds; // !< microseconds portion
             TimeBase m_timeBase; // !< basis of time (defined by system)

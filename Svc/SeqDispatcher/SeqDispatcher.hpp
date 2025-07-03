@@ -9,13 +9,13 @@
 
 #include "Svc/SeqDispatcher/SeqDispatcherComponentAc.hpp"
 #include "Svc/SeqDispatcher/SeqDispatcher_CmdSequencerStateEnumAc.hpp"
-#include "config/FppConstantsAc.hpp"
+#include "FppConstantsAc.hpp"
 #include "Fw/Types/WaitEnumAc.hpp"
 #include "Fw/Types/StringBase.hpp"
 
 namespace Svc {
 
-class SeqDispatcher final : public SeqDispatcherComponentBase {
+class SeqDispatcher : public SeqDispatcherComponentBase {
   public:
     // ----------------------------------------------------------------------
     // Construction, initialization, and destruction
@@ -30,27 +30,27 @@ class SeqDispatcher final : public SeqDispatcherComponentBase {
     //!
     ~SeqDispatcher();
 
-  protected:
+  PROTECTED:
 
     //! Handler for input port seqDoneIn
     void
-    seqDoneIn_handler(FwIndexType portNum,         //!< The port number
+    seqDoneIn_handler(NATIVE_INT_TYPE portNum,         //!< The port number
                       FwOpcodeType opCode,             //!< Command Op Code
                       U32 cmdSeq,                      //!< Command Sequence
                       const Fw::CmdResponse& response  //!< The command response argument
     );
 
     //! Handler for input port seqStartIn
-    void seqStartIn_handler(FwIndexType portNum, //!< The port number
+    void seqStartIn_handler(NATIVE_INT_TYPE portNum, //!< The port number
                             const Fw::StringBase& fileName //!< The sequence file
     );
 
     //! Handler for input port seqRunIn
-    void seqRunIn_handler(FwIndexType portNum, //!< The port number
+    void seqRunIn_handler(NATIVE_INT_TYPE portNum, //!< The port number
                           const Fw::StringBase& fileName //!< The sequence file
     );
 
-  private:
+  PRIVATE:
 
     // number of sequences dispatched (successful or otherwise)
     U32 m_dispatchedCount = 0;
@@ -71,8 +71,8 @@ class SeqDispatcher final : public SeqDispatcherComponentBase {
 
     FwIndexType getNextAvailableSequencerIdx();
 
-    void runSequence(FwIndexType sequencerIdx,
-                     const Fw::StringBase& fileName,
+    void runSequence(FwIndexType sequencerIdx, 
+                     const Fw::StringBase& fileName, 
                      Fw::Wait block);
 
     // ----------------------------------------------------------------------

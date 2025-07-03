@@ -5,7 +5,7 @@
 #include <iostream>
 #endif
 
-#include <Fw/FPrimeBasicTypes.hpp>
+#include <FpConfig.hpp>
 #include "Fw/Deprecate.hpp"
 
 namespace Fw {
@@ -25,7 +25,7 @@ class SerializeBufferBase;  //!< forward declaration
 class Serializable {
   public:
     // Size type for backwards compatibility
-    using SizeType = FwSizeType;
+    using SizeType = NATIVE_UINT_TYPE;
 
   public:
     virtual SerializeStatus serialize(SerializeBufferBase& buffer) const = 0;  //!< serialize contents
@@ -52,9 +52,6 @@ class Serialization {
 };
 
 class SerializeBufferBase {
-
-  friend class SerializeBufferBaseTester;
-
   protected:
     SerializeBufferBase& operator=(const SerializeBufferBase& src);  //!< copy assignment operator
 
@@ -79,17 +76,18 @@ class SerializeBufferBase {
     SerializeStatus serialize(I64 val);  //!< serialize 64-bit signed int
 #endif
     SerializeStatus serialize(F32 val);  //!< serialize 32-bit floating point
+#if FW_HAS_F64
     SerializeStatus serialize(F64 val);  //!< serialize 64-bit floating point
+#endif
     SerializeStatus serialize(bool val);  //!< serialize boolean
 
     SerializeStatus serialize(
         const void* val);  //!< serialize pointer (careful, only pointer value, not contents are serialized)
 
     //! serialize data buffer
-    DEPRECATED(SerializeStatus serialize(const U8* buff, Serializable::SizeType length, bool noLength),
-               "Use serialize(const U8* buff, FwSizeType length, Serialization::t mode) instead");
+    SerializeStatus serialize(const U8* buff, NATIVE_UINT_TYPE length, bool noLength);
     //! serialize data buffer
-    SerializeStatus serialize(const U8* buff, FwSizeType length);
+    SerializeStatus serialize(const U8* buff, NATIVE_UINT_TYPE length);
 
     //! \brief serialize a byte buffer of a given length
     //!
@@ -127,17 +125,18 @@ class SerializeBufferBase {
     SerializeStatus deserialize(I64& val);  //!< deserialize 64-bit signed int
 #endif
     SerializeStatus deserialize(F32& val);  //!< deserialize 32-bit floating point
+#if FW_HAS_F64
     SerializeStatus deserialize(F64& val);  //!< deserialize 64-bit floating point
+#endif
     SerializeStatus deserialize(bool& val);  //!< deserialize boolean
 
     SerializeStatus deserialize(void*& val);  //!< deserialize point value (careful, pointer value only, not contents)
 
     //! deserialize data buffer
-    DEPRECATED(SerializeStatus deserialize(U8* buff, Serializable::SizeType& length, bool noLength),
-    "Use deserialize(U8* buff, FwSizeType& length, Serialization::t mode) instead");
+    SerializeStatus deserialize(U8* buff, NATIVE_UINT_TYPE& length, bool noLength);
 
     //! deserialize data buffer
-    SerializeStatus deserialize(U8* buff, FwSizeType& length);
+    SerializeStatus deserialize(U8* buff, NATIVE_UINT_TYPE& length);
     //! \brief deserialize a byte buffer of a given length
     //!
     //! Deserialize bytes into `buff` of `length` bytes.  If `serializationMode` is set to `INCLUDE_LENGTH` then
@@ -191,16 +190,16 @@ class SerializeBufferBase {
     friend std::ostream& operator<<(std::ostream& os, const SerializeBufferBase& buff);
 #endif
 
-  protected:
+  PROTECTED:
     SerializeBufferBase();  //!< default constructor
-    Serializable::SizeType m_serLoc;                //!< current offset in buffer of serialized data
-    Serializable::SizeType m_deserLoc;              //!< current offset for deserialization
 
-  private:
+  PRIVATE:
     // Copy constructor can be used only by the implementation
     SerializeBufferBase(const SerializeBufferBase& src);  //!< constructor with buffer as source
 
     void copyFrom(const SerializeBufferBase& src);  //!< copy data from source buffer
+    Serializable::SizeType m_serLoc;                //!< current offset in buffer of serialized data
+    Serializable::SizeType m_deserLoc;              //!< current offset for deserialization
 };
 
 // Helper classes for building buffers with external storage
@@ -225,7 +224,7 @@ class ExternalSerializeBuffer : public SerializeBufferBase {
     //! deleted copy assignment operator
     ExternalSerializeBuffer& operator=(const SerializeBufferBase& src) = delete;
 
-  protected:
+  PROTECTED:
     // data members
     U8* m_buff;                         //!< pointer to external buffer
     Serializable::SizeType m_buffSize;  //!< size of external buffer
@@ -259,17 +258,12 @@ class ExternalSerializeBufferWithMemberCopy final : public ExternalSerializeBuff
         : ExternalSerializeBuffer(buffPtr, size) {}
     ExternalSerializeBufferWithMemberCopy() : ExternalSerializeBuffer() {}
     ~ExternalSerializeBufferWithMemberCopy() {}
-    ExternalSerializeBufferWithMemberCopy(const ExternalSerializeBufferWithMemberCopy& src)
-        : ExternalSerializeBuffer(src.m_buff, src.m_buffSize) {
-        this->m_serLoc = src.m_serLoc;
-        this->m_deserLoc = src.m_deserLoc;
-    }
+    explicit ExternalSerializeBufferWithMemberCopy(const ExternalSerializeBufferWithMemberCopy& src)
+        : ExternalSerializeBuffer(src.m_buff, src.m_buffSize) {}
     ExternalSerializeBufferWithMemberCopy& operator=(const ExternalSerializeBufferWithMemberCopy& src) {
         // Ward against self-assignment
         if (this != &src) {
             this->setExtBuffer(src.m_buff, src.m_buffSize);
-            this->m_serLoc = src.m_serLoc;
-            this->m_deserLoc = src.m_deserLoc;
         }
         return *this;
     }

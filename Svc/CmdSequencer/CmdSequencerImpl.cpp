@@ -44,7 +44,7 @@ namespace Svc {
 
     }
 
-    void CmdSequencerComponentImpl::setTimeout(const U32 timeout) {
+    void CmdSequencerComponentImpl::setTimeout(const NATIVE_UINT_TYPE timeout) {
         this->m_timeout = timeout;
     }
 
@@ -56,9 +56,9 @@ namespace Svc {
 
     void CmdSequencerComponentImpl ::
       allocateBuffer(
-          const FwEnumStoreType identifier,
+          const NATIVE_INT_TYPE identifier,
           Fw::MemAllocator& allocator,
-          const FwSizeType bytes
+          const NATIVE_UINT_TYPE bytes
       )
     {
         this->m_sequence->allocateBuffer(identifier, allocator, bytes);
@@ -156,7 +156,7 @@ namespace Svc {
 
     //! Handler for input port seqRunIn
     void CmdSequencerComponentImpl::seqRunIn_handler(
-           FwIndexType portNum,
+           NATIVE_INT_TYPE portNum,
            const Fw::StringBase& filename
        ) {
 
@@ -199,7 +199,7 @@ namespace Svc {
 
     void CmdSequencerComponentImpl ::
       seqCancelIn_handler(
-          const FwIndexType portNum
+          const NATIVE_INT_TYPE portNum
       ) {
         if (RUNNING == this->m_runMode) {
             this->performCmd_Cancel();
@@ -285,7 +285,7 @@ namespace Svc {
 
     void CmdSequencerComponentImpl ::
       cmdResponseIn_handler(
-          FwIndexType portNum,
+          NATIVE_INT_TYPE portNum,
           FwOpcodeType opcode,
           U32 cmdSeq,
           const Fw::CmdResponse& response
@@ -322,7 +322,7 @@ namespace Svc {
     }
 
     void CmdSequencerComponentImpl ::
-      schedIn_handler(FwIndexType portNum, U32 order)
+      schedIn_handler(NATIVE_INT_TYPE portNum, NATIVE_UINT_TYPE order)
     {
 
         Fw::Time currTime = this->getTime();
@@ -424,7 +424,7 @@ namespace Svc {
     void CmdSequencerComponentImpl ::
       commandError(
           const U32 number,
-          const FwOpcodeType opCode,
+          const U32 opCode,
           const U32 error
       )
     {
@@ -483,7 +483,7 @@ namespace Svc {
 
     }
 
-    void CmdSequencerComponentImpl::commandComplete(const FwOpcodeType opcode) {
+    void CmdSequencerComponentImpl::commandComplete(const U32 opcode) {
         this->log_ACTIVITY_LO_CS_CommandComplete(
             this->m_sequence->getLogFileName(),
             this->m_executedCount,
@@ -514,7 +514,7 @@ namespace Svc {
 
     void CmdSequencerComponentImpl ::
       pingIn_handler(
-          FwIndexType portNum, /*!< The port number*/
+          NATIVE_INT_TYPE portNum, /*!< The port number*/
           U32 key /*!< Value to return to pinger*/
       )
     {

@@ -122,7 +122,7 @@ namespace Svc {
       //! After calling this, hasMoreRecords should return false.
       void clear();
 
-    private:
+    PRIVATE:
 
       //! Read a CRC file
       //! \return Success or failure
@@ -202,7 +202,7 @@ namespace Svc {
       //! \return Success or failure
       bool validateRecords();
 
-    private:
+    PRIVATE:
 
       //! The sequence header
       SequenceHeader::t m_sequenceHeader;

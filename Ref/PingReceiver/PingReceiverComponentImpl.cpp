@@ -12,7 +12,7 @@
 
 
 #include <Ref/PingReceiver/PingReceiverComponentImpl.hpp>
-#include <Fw/FPrimeBasicTypes.hpp>
+#include <FpConfig.hpp>
 
 namespace Ref {
 
@@ -40,7 +40,7 @@ namespace Ref {
 
   void PingReceiverComponentImpl ::
     PingIn_handler(
-        const FwIndexType portNum,
+        const NATIVE_INT_TYPE portNum,
         U32 key
     )
   {

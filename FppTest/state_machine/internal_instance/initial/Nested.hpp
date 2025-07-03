@@ -52,7 +52,7 @@ class Nested : public NestedComponentBase {
     //! Destroy Nested object
     ~Nested();
 
-  private:
+  PRIVATE:
     // ----------------------------------------------------------------------
     // Implementations for internal state machine actions
     // ----------------------------------------------------------------------
@@ -72,7 +72,7 @@ class Nested : public NestedComponentBase {
         FppTest_SmInstanceInitial_Nested_Nested::Signal signal  //!< The signal
         ) override;
 
-  private:
+  PRIVATE:
     // ----------------------------------------------------------------------
     // Overflow hook implementations for internal state machines
     // ----------------------------------------------------------------------

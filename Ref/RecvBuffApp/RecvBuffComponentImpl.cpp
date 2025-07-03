@@ -1,5 +1,5 @@
 #include <Ref/RecvBuffApp/RecvBuffComponentImpl.hpp>
-#include <Fw/FPrimeBasicTypes.hpp>
+#include <FpConfig.hpp>
 #include <Os/Console.hpp>
 #include <Fw/Types/Assert.hpp>
 
@@ -23,7 +23,7 @@ namespace Ref {
 
     }
 
-    void RecvBuffImpl::Data_handler(FwIndexType portNum, Drv::DataBuffer &buff) {
+    void RecvBuffImpl::Data_handler(NATIVE_INT_TYPE portNum, Drv::DataBuffer &buff) {
 
         this->m_stats.setBuffRecv(++this->m_buffsReceived);
         // reset deserialization of buffer
@@ -31,16 +31,16 @@ namespace Ref {
         // deserialize packet ID
         U32 id = 0;
         Fw::SerializeStatus stat = buff.deserialize(id);
-        FW_ASSERT(stat == Fw::FW_SERIALIZE_OK,static_cast<FwAssertArgType>(stat));
+        FW_ASSERT(stat == Fw::FW_SERIALIZE_OK,static_cast<NATIVE_INT_TYPE>(stat));
         // deserialize data
         U8 testData[24] = {0};
-        FwSizeType size = sizeof(testData);
+        NATIVE_UINT_TYPE size = sizeof(testData);
         stat = buff.deserialize(testData,size);
-        FW_ASSERT(stat == Fw::FW_SERIALIZE_OK,static_cast<FwAssertArgType>(stat));
+        FW_ASSERT(stat == Fw::FW_SERIALIZE_OK,static_cast<NATIVE_INT_TYPE>(stat));
         // deserialize checksum
         U32 csum = 0;
         stat = buff.deserialize(csum);
-        FW_ASSERT(stat == Fw::FW_SERIALIZE_OK,static_cast<FwAssertArgType>(stat));
+        FW_ASSERT(stat == Fw::FW_SERIALIZE_OK,static_cast<NATIVE_INT_TYPE>(stat));
         // if first packet, send event
         if (not this->m_firstBuffReceived) {
             this->log_ACTIVITY_LO_FirstPacketReceived(id);

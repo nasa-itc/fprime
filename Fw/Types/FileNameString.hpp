@@ -7,9 +7,9 @@
 #ifndef FW_FILE_NAME_STRING_HPP
 #define FW_FILE_NAME_STRING_HPP
 
-#include <Fw/FPrimeBasicTypes.hpp>
+#include <FpConfig.hpp>
 
-#include "Fw/Types/SerIds.hpp"
+#include "Fw/Cfg/SerIds.hpp"
 #include "Fw/Types/StringBase.hpp"
 #include "config/FppConstantsAc.hpp"
 
@@ -25,9 +25,9 @@ class FileNameString final : public StringBase {
 
     FileNameString() : StringBase() { *this = ""; }
 
-    FileNameString(const FileNameString& src) : StringBase() { *this = src; }
+    explicit FileNameString(const FileNameString& src) : StringBase() { *this = src; }
 
-    FileNameString(const StringBase& src) : StringBase() { *this = src; }
+    explicit FileNameString(const StringBase& src) : StringBase() { *this = src; }
 
     explicit FileNameString(const char* src) : StringBase() { *this = src; }
 

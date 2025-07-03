@@ -1,8 +1,8 @@
 #ifndef FW_POLY_TYPE_HPP
 #define FW_POLY_TYPE_HPP
 
-#include <Fw/FPrimeBasicTypes.hpp>
-#include <Fw/Types/SerIds.hpp>
+#include <FpConfig.hpp>
+#include <Fw/Cfg/SerIds.hpp>
 #include <Fw/Types/Serializable.hpp>
 #include <Fw/Types/StringType.hpp>
 
@@ -62,12 +62,13 @@ class PolyType : public Serializable {
     PolyType& operator=(I64 val);  //!< I64 operator=
 #endif
 
+#if FW_HAS_F64
     PolyType(F64 val);             //!< F64 constructor
     operator F64();                //!< F64 cast operator
     void get(F64& val);            //!< F64 accessor
     bool isF64();                  //!< F64 checker
     PolyType& operator=(F64 val);  //!< F64 operator=
-
+#endif
     PolyType(F32 val);             //!< F32 constructor
     operator F32();                //!< F32 cast operator
     void get(F32& val);            //!< F32 accessor
@@ -105,7 +106,7 @@ class PolyType : public Serializable {
     SerializeStatus serialize(SerializeBufferBase& buffer) const;  //!< Serialize function
     SerializeStatus deserialize(SerializeBufferBase& buffer);      //!< Deserialize function
 
-  private:
+  PRIVATE:
     typedef enum {
         TYPE_NOTYPE,  // !< No type stored yet
         TYPE_U8,      // !< U8 type stored
@@ -123,7 +124,9 @@ class PolyType : public Serializable {
         TYPE_I64,  // !< I64 type stored
 #endif
         TYPE_F32,  // !< F32 type stored
+#if FW_HAS_F64
         TYPE_F64,  // !< F64 type stored
+#endif
         TYPE_BOOL,  // !< bool type stored
         TYPE_PTR    // !< pointer type stored
     } Type;
@@ -145,7 +148,9 @@ class PolyType : public Serializable {
         U64 u64Val;  //!< U64 data storage
         I64 i64Val;  //!< I64 data storage
 #endif
+#if FW_HAS_F64
         F64 f64Val;  //!< F64 data storage
+#endif
         F32 f32Val;    // !< F32 data storage
         void* ptrVal;  // !< pointer data storage
         bool boolVal;  // !< bool data storage

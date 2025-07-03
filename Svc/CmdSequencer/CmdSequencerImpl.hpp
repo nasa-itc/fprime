@@ -19,30 +19,11 @@
 
 namespace Svc {
 
-  // Forward declaration for UTs
-  namespace ImmediateBase{ class CmdSequencerTester; }
-  namespace Immediate{ class CmdSequencerTester; }
-  namespace ImmediateEOS{ class CmdSequencerTester; }
-  namespace Mixed{ class CmdSequencerTester; }
-  namespace MixedRelativeBase{ class CmdSequencerTester; }
-  namespace Relative{ class CmdSequencerTester; }
-  namespace JoinWait{ class CmdSequencerTester; }
-
-  class CmdSequencerComponentImpl final :
+  class CmdSequencerComponentImpl :
     public CmdSequencerComponentBase
   {
 
-
-    friend class CmdSequencerTester;
-    friend class Svc::ImmediateBase::CmdSequencerTester;
-    friend class Svc::Immediate::CmdSequencerTester;
-    friend class Svc::ImmediateEOS::CmdSequencerTester;
-    friend class Svc::Mixed::CmdSequencerTester;
-    friend class Svc::MixedRelativeBase::CmdSequencerTester;
-    friend class Svc::Relative::CmdSequencerTester;
-    friend class Svc::JoinWait::CmdSequencerTester;
-
-    private:
+    PRIVATE:
 
       // ----------------------------------------------------------------------
       // Private enumerations
@@ -130,10 +111,10 @@ namespace Svc {
                   const FwTimeContextStoreType seqTimeContext //!< The sequence file time context
               );
 
-              // No Records
+              // No Records 
               void noRecords();
 
-            private:
+            PRIVATE:
 
               //! The enclosing component
               Sequence& m_sequence;
@@ -236,9 +217,9 @@ namespace Svc {
 
           //! Give the sequence representation a memory buffer
           void allocateBuffer(
-              FwEnumStoreType identifier, //!< The identifier
+              NATIVE_INT_TYPE identifier, //!< The identifier
               Fw::MemAllocator& allocator, //!< The allocator
-              FwSizeType bytes //!< The number of bytes
+              NATIVE_UINT_TYPE bytes //!< The number of bytes
           );
 
           //! Deallocate the buffer
@@ -289,7 +270,7 @@ namespace Svc {
           //! After calling this, hasMoreRecords should return false
           virtual void clear() = 0;
 
-        protected:
+        PROTECTED:
 
           //! The enclosing component
           CmdSequencerComponentImpl& m_component;
@@ -310,7 +291,7 @@ namespace Svc {
           Fw::ExternalSerializeBuffer m_buffer;
 
           //! The allocator ID
-          FwEnumStoreType m_allocatorId;
+          NATIVE_INT_TYPE m_allocatorId;
 
           //! The sequence header
           Header m_header;
@@ -323,7 +304,7 @@ namespace Svc {
         public Sequence
       {
 
-        private:
+        PRIVATE:
 
           enum Constants {
             INITIAL_COMPUTED_VALUE = 0xFFFFFFFFU
@@ -344,7 +325,7 @@ namespace Svc {
             //! Update computed CRC
             void update(
                 const BYTE* buffer, //!< The buffer
-                FwSizeType bufferSize //!< The buffer size
+                NATIVE_UINT_TYPE bufferSize //!< The buffer size
             );
 
             //! Finalize computed CRC
@@ -392,7 +373,7 @@ namespace Svc {
           //! After calling this, hasMoreRecords should return false.
           void clear();
 
-        private:
+        PRIVATE:
 
           //! Read a sequence file
           //! \return Success or failure
@@ -458,7 +439,7 @@ namespace Svc {
           //! \return Success or failure
           bool validateRecords();
 
-        private:
+        PRIVATE:
 
           //! The CRC values
           CRC m_crc;
@@ -468,7 +449,7 @@ namespace Svc {
 
       };
 
-    private:
+    PRIVATE:
 
       // ----------------------------------------------------------------------
       // Private classes
@@ -478,17 +459,7 @@ namespace Svc {
       //! \brief A class representing a timer
       class Timer {
 
-        friend class CmdSequencerTester;
-        friend class Svc::ImmediateBase::CmdSequencerTester;
-        friend class Svc::Immediate::CmdSequencerTester;
-        friend class Svc::ImmediateEOS::CmdSequencerTester;
-        friend class Svc::Mixed::CmdSequencerTester;
-        friend class Svc::MixedRelativeBase::CmdSequencerTester;
-        friend class Svc::Relative::CmdSequencerTester;
-        friend class Svc::JoinWait::CmdSequencerTester;
-
-
-        private:
+        PRIVATE:
 
           //! The timer state
           typedef enum {
@@ -532,7 +503,7 @@ namespace Svc {
             return true;
           }
 
-        private:
+        PRIVATE:
 
           //! The timer state
           State m_state;
@@ -558,7 +529,7 @@ namespace Svc {
       //! Sequence will quit if a command takes longer than the number of
       //! seconds in the timeout value.
       void setTimeout(
-          const U32 seconds //!< The number of seconds
+          const NATIVE_UINT_TYPE seconds //!< The number of seconds
       );
 
       //! (Optional) Set the sequence format.
@@ -573,9 +544,9 @@ namespace Svc {
       //! Call this after constructor and init, and after setting
       //! the sequence format, but before task is spawned.
       void allocateBuffer(
-          const FwEnumStoreType identifier, //!< The identifier
+          const NATIVE_INT_TYPE identifier, //!< The identifier
           Fw::MemAllocator& allocator, //!< The allocator
-          const FwSizeType bytes //!< The number of bytes
+          const NATIVE_UINT_TYPE bytes //!< The number of bytes
       );
 
       //! (Optional) Load a sequence to run later.
@@ -592,7 +563,7 @@ namespace Svc {
       //! Destroy a CmdDispatcherComponentBase
       ~CmdSequencerComponentImpl();
 
-    private:
+    PRIVATE:
 
       // ----------------------------------------------------------------------
       // Handler implementations for input ports
@@ -600,7 +571,7 @@ namespace Svc {
 
       //! Handler for input port cmdResponseIn
       void cmdResponseIn_handler(
-          FwIndexType portNum, //!< The port number
+          NATIVE_INT_TYPE portNum, //!< The port number
           FwOpcodeType opcode, //!< The command opcode
           U32 cmdSeq, //!< The command sequence number
           const Fw::CmdResponse& response //!< The command response
@@ -608,29 +579,29 @@ namespace Svc {
 
       //! Handler for input port schedIn
       void schedIn_handler(
-          FwIndexType portNum, //!< The port number
-          U32 order //!< The call order
+          NATIVE_INT_TYPE portNum, //!< The port number
+          NATIVE_UINT_TYPE order //!< The call order
       );
 
       //! Handler for input port seqRunIn
       void seqRunIn_handler(
-          FwIndexType portNum, //!< The port number
+          NATIVE_INT_TYPE portNum, //!< The port number
           const Fw::StringBase& filename //!< The sequence file
       );
 
       //! Handler for ping port
       void pingIn_handler(
-          FwIndexType portNum, //!< The port number
+          NATIVE_INT_TYPE portNum, //!< The port number
           U32 key //!< Value to return to pinger
       );
 
       //! Handler implementation for seqCancelIn
       //!
       void seqCancelIn_handler(
-          const FwIndexType portNum /*!< The port number*/
+          const NATIVE_INT_TYPE portNum /*!< The port number*/
       );
 
-    private:
+    PRIVATE:
 
       // ----------------------------------------------------------------------
       // Command handler implementations
@@ -697,7 +668,7 @@ namespace Svc {
           const U32 cmdSeq /*!< The command sequence number*/
       );
 
-    private:
+    PRIVATE:
 
       // ----------------------------------------------------------------------
       // Private helper methods
@@ -727,7 +698,7 @@ namespace Svc {
 
       //! Record a completed command
       void commandComplete(
-          const FwOpcodeType opCode //!< The opcode
+          const U32 opCode //!< The opcode
       );
 
       //! Record a sequence complete event
@@ -739,7 +710,7 @@ namespace Svc {
       //! Record an error in executing a sequence command
       void commandError(
           const U32 number, //!< The command number
-          const FwOpcodeType opCode, //!< The command opcode
+          const U32 opCode, //!< The command opcode
           const U32 error //!< The error code
       );
 
@@ -754,7 +725,7 @@ namespace Svc {
           const Fw::Time &currentTime //!< The current time
       );
 
-    private:
+    PRIVATE:
 
       // ----------------------------------------------------------------------
       // Private member variables
@@ -797,7 +768,7 @@ namespace Svc {
       U32 m_sequencesCompletedCount;
 
       //! timeout value
-      U32 m_timeout;
+      NATIVE_UINT_TYPE m_timeout;
 
       //! timeout timer
       Timer m_cmdTimeoutTimer;

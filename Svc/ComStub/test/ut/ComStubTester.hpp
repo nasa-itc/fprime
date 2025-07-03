@@ -13,12 +13,6 @@
 namespace Svc {
 
 class ComStubTester : public ComStubGTestBase {
-
-  // Maximum size of histories storing events, telemetry, and port outputs
-  static const FwSizeType MAX_HISTORY_SIZE = 30;
-
-  // Instance ID supplied to the component instance under test
-  static const FwEnumStoreType TEST_INSTANCE_ID = 0;
     // ----------------------------------------------------------------------
     // Construction and destruction
     // ----------------------------------------------------------------------
@@ -56,35 +50,27 @@ class ComStubTester : public ComStubGTestBase {
     //!
     void test_retry();
 
-    //! Tests the retry -> reset -> retry again
-    //!
-    void test_retry_reset();
-
-    //! Tests buffer is returned
-    //!
-    void test_buffer_return();
   private:
     // ----------------------------------------------------------------------
     // Handlers for typed from ports
     // ----------------------------------------------------------------------
 
-    //! Handler for from_dataOut
+    //! Handler for from_comDataOut
     //!
-    void from_dataOut_handler(const FwIndexType portNum, //!< The port number
+    void from_comDataOut_handler(const NATIVE_INT_TYPE portNum, //!< The port number
                                  Fw::Buffer& recvBuffer,
-                                 const ComCfg::FrameContext& context //!< The context
-                                 );
+                                 const Drv::RecvStatus& recvStatus);
 
-    //! Handler for from_comStatusOut
+    //! Handler for from_comStatus
     //!
-    void from_comStatusOut_handler(const FwIndexType portNum, //!< The port number
+    void from_comStatus_handler(const NATIVE_INT_TYPE portNum, //!< The port number
                                 Fw::Success& condition         //!< Status of communication state
     );
 
-    //! Handler for from_drvSendOut
+    //! Handler for from_drvDataOut
     //!
-    void from_drvSendOut_handler(const FwIndexType portNum, //!< The port number
-                                Fw::Buffer& sendBuffer);
+    Drv::SendStatus from_drvDataOut_handler(const NATIVE_INT_TYPE portNum, //!< The port number
+                                            Fw::Buffer& sendBuffer);
 
   private:
     // ----------------------------------------------------------------------
@@ -106,8 +92,8 @@ class ComStubTester : public ComStubGTestBase {
 
     //! The component under test
     //!
-    ComStub component;
-    Drv::ByteStreamStatus m_send_mode;  //! Send mode
+    ComStub m_component;
+    Drv::SendStatus m_send_mode;  //! Send mode
     U32 m_retries; //! Number of retries to test
 };
 

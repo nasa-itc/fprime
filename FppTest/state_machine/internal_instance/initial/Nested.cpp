@@ -56,10 +56,10 @@ void Nested::test() {
     this->init(queueDepth, instanceId);
     ASSERT_EQ(this->nested_getState(), Nested_Nested::State::S_T);
     ASSERT_EQ(this->smInitialNested_getState(), SmInitial_Nested::State::S_T);
-    const FwIndexType expectedActionSize = 6;
+    const FwSizeType expectedActionSize = 6;
     ASSERT_EQ(this->m_nested_action_a_history.getSize(), expectedActionSize);
     ASSERT_EQ(this->m_smInitialNested_action_a_history.getSize(), expectedActionSize);
-    for (FwIndexType i = 0; i < expectedActionSize; i++) {
+    for (FwSizeType i = 0; i < expectedActionSize; i++) {
         ASSERT_EQ(this->m_nested_action_a_history.getItemAt(i), Nested_Nested::Signal::__FPRIME_AC_INITIAL_TRANSITION);
         ASSERT_EQ(this->m_smInitialNested_action_a_history.getItemAt(i),
                   SmInitial_Nested::Signal::__FPRIME_AC_INITIAL_TRANSITION);

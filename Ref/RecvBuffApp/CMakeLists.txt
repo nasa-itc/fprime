@@ -5,10 +5,6 @@
 # MOD_DEPS: (optional) module dependencies
 #
 ####
-add_compile_options(
-    -Wno-conversion
-    -Wno-double-promotion
-)
 set(SOURCE_FILES
   "${CMAKE_CURRENT_LIST_DIR}/RecvBuffApp.fpp"
   "${CMAKE_CURRENT_LIST_DIR}/RecvBuffComponentImpl.cpp"

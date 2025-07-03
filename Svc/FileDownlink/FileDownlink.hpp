@@ -12,7 +12,7 @@
 #ifndef Svc_FileDownlink_HPP
 #define Svc_FileDownlink_HPP
 
-#include <config/FileDownlinkCfg.hpp>
+#include <FileDownlinkCfg.hpp>
 #include <Svc/FileDownlink/FileDownlinkComponentAc.hpp>
 #include <Fw/FilePacket/FilePacket.hpp>
 #include <Os/File.hpp>
@@ -22,13 +22,11 @@
 
 namespace Svc {
 
-  class FileDownlink final :
+  class FileDownlink :
     public FileDownlinkComponentBase
   {
 
-    friend class FileDownlinkTester;
-
-    private:
+    PRIVATE:
 
       // ----------------------------------------------------------------------
       // Types
@@ -36,8 +34,6 @@ namespace Svc {
 
       //! The Mode class
       class Mode {
-
-        friend class FileDownlinkTester;
 
         public:
 
@@ -78,14 +74,12 @@ namespace Svc {
       //! Class representing an outgoing file
       class File {
 
-        friend class FileDownlinkTester;
-
         public:
 
           //! Constructor
           File() : m_size(0) { }
 
-        private:
+        PRIVATE:
 
           //! The source file name
           Fw::LogStringArg m_sourceName;
@@ -146,8 +140,6 @@ namespace Svc {
       //! Class to record files sent
       class FilesSent {
 
-        friend class FileDownlinkTester;
-
         public:
 
           //! Construct a FilesSent object
@@ -164,7 +156,7 @@ namespace Svc {
             this->m_fileDownlink->tlmWrite_FilesSent(m_sent_file_count);
           }
 
-        private:
+        PRIVATE:
 
           //! The total number of file sent
           U32 m_sent_file_count;
@@ -176,8 +168,6 @@ namespace Svc {
 
       //! Class to record packets sent
       class PacketsSent {
-
-        friend class FileDownlinkTester;
 
         public:
 
@@ -195,7 +185,7 @@ namespace Svc {
             this->m_fileDownlink->tlmWrite_PacketsSent(m_sent_packet_count);
           }
 
-        private:
+        PRIVATE:
 
           //! The total number of downlinked packets
           U32 m_sent_packet_count;
@@ -207,8 +197,6 @@ namespace Svc {
 
       //! Class to record warnings
       class Warnings {
-
-        friend class FileDownlinkTester;
 
         public:
 
@@ -226,7 +214,7 @@ namespace Svc {
           //! Issue a File Read Error warning
           void fileRead(const Os::File::Status status);
 
-        private:
+        PRIVATE:
 
           //! Record a warning
           void warning() {
@@ -234,7 +222,7 @@ namespace Svc {
             this->m_fileDownlink->tlmWrite_Warnings(m_warning_count);
           }
 
-        private:
+        PRIVATE:
 
           //! The total number of warnings
           U32 m_warning_count;
@@ -299,7 +287,7 @@ namespace Svc {
       //!
       ~FileDownlink();
 
-    private:
+    PRIVATE:
 
       // ----------------------------------------------------------------------
       // Handler implementations for user-defined typed input ports
@@ -308,7 +296,7 @@ namespace Svc {
       //! Handler implementation for Run
       //!
       void Run_handler(
-          const FwIndexType portNum, //!< The port number
+          const NATIVE_INT_TYPE portNum, //!< The port number
           U32 context //!< The call order
       );
 
@@ -316,7 +304,7 @@ namespace Svc {
       //! Handler implementation for SendFile
       //!
       Svc::SendFileResponse SendFile_handler(
-          const FwIndexType portNum, /*!< The port number*/
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
           const Fw::StringBase& sourceFilename, /*!< Path of file to downlink*/
           const Fw::StringBase& destFilename, /*!< Path to store downlinked file at*/
           U32 offset, /*!< Amount of data in bytes to downlink from file. 0 to read until end of file*/
@@ -326,20 +314,20 @@ namespace Svc {
       //! Handler implementation for bufferReturn
       //!
       void bufferReturn_handler(
-          const FwIndexType portNum, //!< The port number
+          const NATIVE_INT_TYPE portNum, //!< The port number
           Fw::Buffer &fwBuffer
       );
 
       //! Handler implementation for pingIn
       //!
       void pingIn_handler(
-          const FwIndexType portNum, /*!< The port number*/
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
           U32 key /*!< Value to return to pinger*/
       );
 
 
 
-    private:
+    PRIVATE:
 
       // ----------------------------------------------------------------------
       // Command handler implementations
@@ -373,7 +361,7 @@ namespace Svc {
       );
 
 
-    private:
+    PRIVATE:
 
       // ----------------------------------------------------------------------
       // Private helper methods
@@ -409,7 +397,7 @@ namespace Svc {
       //Send response after completing file downlink
       void sendResponse(SendFileStatus resp);
 
-    private:
+    PRIVATE:
 
       // ----------------------------------------------------------------------
       // Member variables

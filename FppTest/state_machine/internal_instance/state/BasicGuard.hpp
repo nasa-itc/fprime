@@ -49,7 +49,7 @@ class BasicGuard : public BasicGuardComponentBase {
     //! Destroy BasicGuard object
     ~BasicGuard();
 
-  private:
+  PRIVATE:
     // ----------------------------------------------------------------------
     // Implementations for internal state machine actions
     // ----------------------------------------------------------------------
@@ -61,7 +61,7 @@ class BasicGuard : public BasicGuardComponentBase {
                                              FppTest_SmState_BasicGuard::Signal signal  //!< The signal
                                              ) override;
 
-  private:
+  PRIVATE:
     // ----------------------------------------------------------------------
     // Implementations for internal state machine guards
     // ----------------------------------------------------------------------
@@ -90,8 +90,8 @@ class BasicGuard : public BasicGuardComponentBase {
     // ----------------------------------------------------------------------
 
     //! Helper function for checking actions and guards
-    void checkActionsAndGuards(FwIndexType expectedActionSize,  //!< The expected action size
-                               FwIndexType expectedGuardSize    //!< The expected guard size
+    void checkActionsAndGuards(FwSizeType expectedActionSize,  //!< The expected action size
+                               FwSizeType expectedGuardSize    //!< The expected guard size
     );
 
   private:

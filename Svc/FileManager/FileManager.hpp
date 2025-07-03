@@ -18,7 +18,7 @@
 
 namespace Svc {
 
-  class FileManager final :
+  class FileManager :
     public FileManagerComponentBase
   {
 
@@ -38,7 +38,7 @@ namespace Svc {
       //!
       ~FileManager();
 
-    private:
+    PRIVATE:
 
       // ----------------------------------------------------------------------
       // Command handler implementations
@@ -107,11 +107,11 @@ namespace Svc {
       //! Handler implementation for pingIn
       //!
       void pingIn_handler(
-          const FwIndexType portNum, /*!< The port number*/
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
           U32 key /*!< Value to return to pinger*/
       );
 
-    private:
+    PRIVATE:
 
       // ----------------------------------------------------------------------
       // Helper methods
@@ -119,7 +119,7 @@ namespace Svc {
 
       //! A system command with no arguments
       //!
-      int systemCall(
+      NATIVE_INT_TYPE systemCall(
           const Fw::CmdStringArg& command, //!< The command
           const Fw::CmdStringArg& logFileName //!< The log file name
       ) const;
@@ -138,7 +138,7 @@ namespace Svc {
           const Os::FileSystem::Status status //!< The status
       );
 
-    private:
+    PRIVATE:
 
       // ----------------------------------------------------------------------
       // Variables

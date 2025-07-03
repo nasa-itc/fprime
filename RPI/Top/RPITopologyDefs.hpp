@@ -4,8 +4,8 @@
 #include "Fw/Types/MallocAllocator.hpp"
 #include "Os/Console.hpp"
 #include "RPI/Top/FppConstantsAc.hpp"
+#include "Svc/FramingProtocol/FprimeProtocol.hpp"
 #include "Svc/LinuxTimer/LinuxTimer.hpp"
-#include <Svc/FrameAccumulator/FrameDetector/FprimeFrameDetector.hpp>
 
 namespace RPI {
 
@@ -32,16 +32,16 @@ namespace RPI {
 
     }
     TopologyState(
-        const char *a_hostName,
-        U16 a_portNumber
+        const char *hostName,
+        U32 portNumber
     ) :
-      hostName(a_hostName),
-      portNumber(a_portNumber)
+      hostName(hostName),
+      portNumber(portNumber)
     {
 
     }
     const char* hostName;
-    U16 portNumber;
+    U32 portNumber;
   };
 
   // Health ping entries

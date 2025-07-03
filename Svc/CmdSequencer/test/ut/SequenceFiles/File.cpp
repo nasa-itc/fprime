@@ -23,15 +23,15 @@ namespace Svc {
   namespace SequenceFiles {
 
     File ::
-      File(const Format::t a_format) :
-        format(a_format)
+      File(const Format::t format) :
+        format(format)
     {
 
     }
 
     File ::
-      File (const char* const baseName, const Format::t a_format) :
-        format(a_format)
+      File (const char* const baseName, const Format::t format) :
+        format(format)
     {
       this->setName(baseName);
     }

@@ -13,7 +13,7 @@
 #ifndef CFDP_Checksum_HPP
 #define CFDP_Checksum_HPP
 
-#include <Fw/FPrimeBasicTypes.hpp>
+#include <FpConfig.hpp>
 
 namespace CFDP {
 
@@ -106,7 +106,7 @@ namespace CFDP {
       //! Get the checksum value
       U32 getValue() const;
 
-    private:
+    PRIVATE:
 
       // ----------------------------------------------------------------------
       // Private instance methods
@@ -130,7 +130,7 @@ namespace CFDP {
           const U8 offset //! The offset
       );
 
-    private:
+    PRIVATE:
 
       // ----------------------------------------------------------------------
       // Private member variables

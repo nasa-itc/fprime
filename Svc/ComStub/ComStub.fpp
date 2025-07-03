@@ -1,7 +1,7 @@
 module Svc {
     @ Communication adapter interface implementing communication adapter interface via a Drv.ByteStreamDriverModel.
     passive component ComStub {
-        import Com
+        include "../Interfaces/ComInterface.fppi"
 
         # ----------------------------------------------------------------------
         # Byte stream model
@@ -10,17 +10,10 @@ module Svc {
         @ Ready signal when driver is connected
         sync input port drvConnected: Drv.ByteStreamReady
 
-        @ Receive (read) data from driver. This gets forwarded to dataOut
-        sync input port drvReceiveIn: Drv.ByteStreamData
+        @ Data received from driver
+        sync input port drvDataIn: Drv.ByteStreamRecv
 
-        @ Send (write) data to the driver. This gets invoked on dataIn invocation
-        output port drvSendOut: Fw.BufferSend
-
-        @ Callback from drvSendOut (retrieving status and ownership of sent buffer)
-        sync input port drvSendReturnIn: Drv.ByteStreamData
-
-        @ Returning ownership of buffer that came in on drvReceiveIn
-        output port drvReceiveReturnOut: Fw.BufferSend
-
+        @ Data going to the underlying driver
+        output port drvDataOut: Drv.ByteStreamSend
     }
 }

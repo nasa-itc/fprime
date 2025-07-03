@@ -12,17 +12,15 @@
 
 #include <Fw/Types/MemAllocator.hpp>
 
-#include <config/DpCfg.hpp>
-#include <config/DpCatalogCfg.hpp>
+#include <DpCfg.hpp>
+#include <DpCatalogCfg.hpp>
 #include <Fw/Types/FileNameString.hpp>
 
 namespace Svc {
 
-    class DpCatalog final :
+    class DpCatalog :
         public DpCatalogComponentBase
     {
-
-    friend class DpCatalogTester;
 
     public:
 
@@ -45,21 +43,21 @@ namespace Svc {
         /// @param numDirs number of supplied directories
         /// @param stateFile file to store transmit state. Provide a zero-length string if no state tracking
         /// @param memId  memory ID for allocator
-        /// @param allocator Allocator to supply memory for catalog.
+        /// @param allocator Allocator to supply memory for catalog. 
         ///        Instance must survive for shutdown to use for reclaiming memory
         void configure(
             Fw::FileNameString directories[DP_MAX_DIRECTORIES],
             FwSizeType numDirs,
             Fw::FileNameString& stateFile,
-            FwEnumStoreType memId,
+            NATIVE_UINT_TYPE memId,
             Fw::MemAllocator& allocator
         );
 
-        // @brief clean up component.
-        // Deallocates memory.
+        // @brief clean up component. 
+        // Deallocates memory.       
         void shutdown();
 
-    private:
+    PRIVATE:
 
         // ----------------------------------------------------------------------
         // Handler implementations for user-defined typed input ports
@@ -69,7 +67,7 @@ namespace Svc {
         //!
         //! File Downlink send complete port
         void fileDone_handler(
-            FwIndexType portNum, //!< The port number
+            NATIVE_INT_TYPE portNum, //!< The port number
             const Svc::SendFileResponse& resp
         ) override;
 
@@ -77,11 +75,11 @@ namespace Svc {
         //!
         //! Ping input port
         void pingIn_handler(
-            FwIndexType portNum, //!< The port number
+            NATIVE_INT_TYPE portNum, //!< The port number
             U32 key //!< Value to return to pinger
         ) override;
 
-    private:
+    PRIVATE:
 
         // ----------------------------------------------------------------------
         // Handler implementations for commands
@@ -126,7 +124,6 @@ namespace Svc {
         // ----------------------------------
 
         struct DpStateEntry {
-            friend class DpCatalogTester;
             FwIndexType dir; //!< index to m_directories entry that has directory name where DP exists
             DpRecord record; //!< data product metadata
         };
@@ -139,7 +136,7 @@ namespace Svc {
 
         /// @brief A list sorted in priority order for downlink
         struct DpBtreeNode {
-            DpStateEntry entry; //!< pointer to DP record
+            DpStateEntry entry; //!< pointer to DP record          
             DpBtreeNode* left; //!< left child. Also used for free list
             DpBtreeNode* right; //!< right child
         };
@@ -197,7 +194,7 @@ namespace Svc {
         /// @param entry entry to add
         /// @return true if a node could be allocated
         bool allocateNode(
-            DpBtreeNode* &newNode,
+            DpBtreeNode* &newNode, 
             const DpStateEntry& newEntry);
 
         /// @brief send the next entry to file downlink
@@ -243,9 +240,9 @@ namespace Svc {
         DpDstateFileEntry* m_stateFileData; //!< DP state loaded from file
         FwSizeType m_stateFileEntries; //!< size of state file data
 
-        FwSizeType m_memSize; //!< size of allocated buffer
+        NATIVE_UINT_TYPE m_memSize; //!< size of allocated buffer
         void* m_memPtr; //!< stored for shutdown
-        FwEnumStoreType m_allocatorId; //!< stored for shutdown
+        NATIVE_UINT_TYPE m_allocatorId; //!< stored for shutdown
         Fw::MemAllocator* m_allocator; //!< stored for shutdown
 
         bool m_xmitInProgress; //!< set if DP files are in the process of being sent

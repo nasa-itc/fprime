@@ -12,9 +12,9 @@
 #ifndef DRV_TCPSERVER_TCPHELPER_HPP_
 #define DRV_TCPSERVER_TCPHELPER_HPP_
 
-#include <Fw/FPrimeBasicTypes.hpp>
+#include <FpConfig.hpp>
 #include <Drv/Ip/IpSocket.hpp>
-#include <config/IpCfg.hpp>
+#include <IpCfg.hpp>
 
 namespace Drv {
 
@@ -62,7 +62,7 @@ class TcpServerSocket : public IpSocket {
      */
     U16 getListenPort();
 
-  protected:
+  PROTECTED:
     /**
      * \brief Tcp specific implementation for opening a client socket connected to this server.
      * \param socketDescriptor: (output) descriptor opened. Only valid on SOCK_SUCCESS. Otherwise will be invalid

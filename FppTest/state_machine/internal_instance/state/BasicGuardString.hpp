@@ -49,7 +49,7 @@ class BasicGuardString : public BasicGuardStringComponentBase {
     //! Destroy BasicGuardString object
     ~BasicGuardString();
 
-  private:
+  PRIVATE:
     // ----------------------------------------------------------------------
     // Implementations for internal state machine actions
     // ----------------------------------------------------------------------
@@ -62,7 +62,7 @@ class BasicGuardString : public BasicGuardStringComponentBase {
                                                    const Fw::StringBase& value                       //!< The value
                                                    ) override;
 
-  private:
+  PRIVATE:
     // ----------------------------------------------------------------------
     // Implementations for internal state machine guards
     // ----------------------------------------------------------------------

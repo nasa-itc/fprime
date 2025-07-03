@@ -8,7 +8,6 @@
 #include "Os/test/ut/rawtime/RulesHeaders.hpp"
 #include "Os/Stub/test/RawTime.hpp"
 #include "Fw/Buffer/Buffer.hpp"
-#include "Fw/Types/Serializable.hpp"
 
 using namespace Os::Stub::RawTime::Test;
 
@@ -66,8 +65,7 @@ TEST_F(Interface, GetTimeInterval) {
 TEST_F(Interface, Serialize) {
     Os::RawTime rawtime;
     Fw::Buffer buffer;
-    auto esb = buffer.getSerializer();
-    ASSERT_EQ(rawtime.serialize(esb), Fw::FW_SERIALIZE_OK);
+    ASSERT_EQ(rawtime.serialize(buffer.getSerializeRepr()), Fw::FW_SERIALIZE_OK);
     ASSERT_EQ(StaticData::data.lastCalled, StaticData::LastFn::SERIALIZE_FN);
 }
 
@@ -75,8 +73,7 @@ TEST_F(Interface, Serialize) {
 TEST_F(Interface, Deserialize) {
     Os::RawTime rawtime;
     Fw::Buffer buffer;
-    auto esb = buffer.getDeserializer();
-    ASSERT_EQ(rawtime.deserialize(esb), Fw::FW_SERIALIZE_OK);
+    ASSERT_EQ(rawtime.deserialize(buffer.getSerializeRepr()), Fw::FW_SERIALIZE_OK);
     ASSERT_EQ(StaticData::data.lastCalled, StaticData::LastFn::DESERIALIZE_FN);
 }
 

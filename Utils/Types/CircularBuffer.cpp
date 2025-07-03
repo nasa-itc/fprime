@@ -12,7 +12,7 @@
  *  Revised March 2022
  *      Author: bocchino
  */
-#include <Fw/FPrimeBasicTypes.hpp>
+#include <FpConfig.hpp>
 #include <Fw/Types/Assert.hpp>
 #include <Utils/Types/CircularBuffer.hpp>
 
@@ -28,7 +28,7 @@ CircularBuffer :: CircularBuffer() :
 
 }
 
-CircularBuffer :: CircularBuffer(U8* const buffer, const FwSizeType size) :
+CircularBuffer :: CircularBuffer(U8* const buffer, const NATIVE_UINT_TYPE size) :
     m_store(nullptr),
     m_store_size(0),
     m_head_idx(0),
@@ -38,7 +38,7 @@ CircularBuffer :: CircularBuffer(U8* const buffer, const FwSizeType size) :
     setup(buffer, size);
 }
 
-void CircularBuffer :: setup(U8* const buffer, const FwSizeType size) {
+void CircularBuffer :: setup(U8* const buffer, const NATIVE_UINT_TYPE size) {
     FW_ASSERT(size > 0);
     FW_ASSERT(buffer != nullptr);
     FW_ASSERT(m_store == nullptr && m_store_size == 0); // Not already setup
@@ -51,22 +51,22 @@ void CircularBuffer :: setup(U8* const buffer, const FwSizeType size) {
     m_high_water_mark = 0;
 }
 
-FwSizeType CircularBuffer :: get_allocated_size() const {
+NATIVE_UINT_TYPE CircularBuffer :: get_allocated_size() const {
     return m_allocated_size;
 }
 
-FwSizeType CircularBuffer :: get_free_size() const {
+NATIVE_UINT_TYPE CircularBuffer :: get_free_size() const {
     FW_ASSERT(m_store != nullptr && m_store_size != 0); // setup method was called
     FW_ASSERT(m_allocated_size <= m_store_size, static_cast<FwAssertArgType>(m_allocated_size));
     return m_store_size - m_allocated_size;
 }
 
-FwSizeType CircularBuffer :: advance_idx(FwSizeType idx, FwSizeType amount) const {
+NATIVE_UINT_TYPE CircularBuffer :: advance_idx(NATIVE_UINT_TYPE idx, NATIVE_UINT_TYPE amount) const {
     FW_ASSERT(idx < m_store_size, static_cast<FwAssertArgType>(idx));
     return (idx + amount) % m_store_size;
 }
 
-Fw::SerializeStatus CircularBuffer :: serialize(const U8* const buffer, const FwSizeType size) {
+Fw::SerializeStatus CircularBuffer :: serialize(const U8* const buffer, const NATIVE_UINT_TYPE size) {
     FW_ASSERT(m_store != nullptr && m_store_size != 0); // setup method was called
     FW_ASSERT(buffer != nullptr);
     // Check there is sufficient space
@@ -74,7 +74,7 @@ Fw::SerializeStatus CircularBuffer :: serialize(const U8* const buffer, const Fw
         return Fw::FW_SERIALIZE_NO_ROOM_LEFT;
     }
     // Copy in all the supplied data
-    FwSizeType idx = advance_idx(m_head_idx, m_allocated_size);
+    NATIVE_UINT_TYPE idx = advance_idx(m_head_idx, m_allocated_size);
     for (U32 i = 0; i < size; i++) {
         FW_ASSERT(idx < m_store_size, static_cast<FwAssertArgType>(idx));
         m_store[idx] = buffer[i];
@@ -86,34 +86,34 @@ Fw::SerializeStatus CircularBuffer :: serialize(const U8* const buffer, const Fw
     return Fw::FW_SERIALIZE_OK;
 }
 
-Fw::SerializeStatus CircularBuffer :: peek(char& value, FwSizeType offset) const {
+Fw::SerializeStatus CircularBuffer :: peek(char& value, NATIVE_UINT_TYPE offset) const {
     FW_ASSERT(m_store != nullptr && m_store_size != 0); // setup method was called
     return peek(reinterpret_cast<U8&>(value), offset);
 }
 
-Fw::SerializeStatus CircularBuffer :: peek(U8& value, FwSizeType offset) const {
+Fw::SerializeStatus CircularBuffer :: peek(U8& value, NATIVE_UINT_TYPE offset) const {
     FW_ASSERT(m_store != nullptr && m_store_size != 0); // setup method was called
     // Check there is sufficient data
     if ((sizeof(U8) + offset) > m_allocated_size) {
         return Fw::FW_DESERIALIZE_BUFFER_EMPTY;
     }
-    const FwSizeType idx = advance_idx(m_head_idx, offset);
+    const NATIVE_UINT_TYPE idx = advance_idx(m_head_idx, offset);
     FW_ASSERT(idx < m_store_size, static_cast<FwAssertArgType>(idx));
     value = m_store[idx];
     return Fw::FW_SERIALIZE_OK;
 }
 
-Fw::SerializeStatus CircularBuffer :: peek(U32& value, FwSizeType offset) const {
+Fw::SerializeStatus CircularBuffer :: peek(U32& value, NATIVE_UINT_TYPE offset) const {
     FW_ASSERT(m_store != nullptr && m_store_size != 0); // setup method was called
     // Check there is sufficient data
     if ((sizeof(U32) + offset) > m_allocated_size) {
         return Fw::FW_DESERIALIZE_BUFFER_EMPTY;
     }
     value = 0;
-    FwSizeType idx = advance_idx(m_head_idx, offset);
+    NATIVE_UINT_TYPE idx = advance_idx(m_head_idx, offset);
 
     // Deserialize all the bytes from network format
-    for (FwSizeType i = 0; i < sizeof(U32); i++) {
+    for (NATIVE_UINT_TYPE i = 0; i < sizeof(U32); i++) {
         FW_ASSERT(idx < m_store_size, static_cast<FwAssertArgType>(idx));
         value = (value << 8) | static_cast<U32>(m_store[idx]);
         idx = advance_idx(idx);
@@ -121,16 +121,16 @@ Fw::SerializeStatus CircularBuffer :: peek(U32& value, FwSizeType offset) const 
     return Fw::FW_SERIALIZE_OK;
 }
 
-Fw::SerializeStatus CircularBuffer :: peek(U8* buffer, FwSizeType size, FwSizeType offset) const {
+Fw::SerializeStatus CircularBuffer :: peek(U8* buffer, NATIVE_UINT_TYPE size, NATIVE_UINT_TYPE offset) const {
     FW_ASSERT(m_store != nullptr && m_store_size != 0); // setup method was called
     FW_ASSERT(buffer != nullptr);
     // Check there is sufficient data
     if ((size + offset) > m_allocated_size) {
         return Fw::FW_DESERIALIZE_BUFFER_EMPTY;
     }
-    FwSizeType idx = advance_idx(m_head_idx, offset);
+    NATIVE_UINT_TYPE idx = advance_idx(m_head_idx, offset);
     // Deserialize all the bytes from network format
-    for (FwSizeType i = 0; i < size; i++) {
+    for (NATIVE_UINT_TYPE i = 0; i < size; i++) {
         FW_ASSERT(idx < m_store_size, static_cast<FwAssertArgType>(idx));
         buffer[i] = m_store[idx];
         idx = advance_idx(idx);
@@ -138,7 +138,7 @@ Fw::SerializeStatus CircularBuffer :: peek(U8* buffer, FwSizeType size, FwSizeTy
     return Fw::FW_SERIALIZE_OK;
 }
 
-Fw::SerializeStatus CircularBuffer :: rotate(FwSizeType amount) {
+Fw::SerializeStatus CircularBuffer :: rotate(NATIVE_UINT_TYPE amount) {
     FW_ASSERT(m_store != nullptr && m_store_size != 0); // setup method was called
     // Check there is sufficient data
     if (amount > m_allocated_size) {
@@ -149,12 +149,12 @@ Fw::SerializeStatus CircularBuffer :: rotate(FwSizeType amount) {
     return Fw::FW_SERIALIZE_OK;
 }
 
-FwSizeType CircularBuffer ::get_capacity() const {
+NATIVE_UINT_TYPE CircularBuffer ::get_capacity() const {
     FW_ASSERT(m_store != nullptr && m_store_size != 0); // setup method was called
     return m_store_size;
 }
 
-FwSizeType CircularBuffer ::get_high_water_mark() const {
+NATIVE_UINT_TYPE CircularBuffer ::get_high_water_mark() const {
     return m_high_water_mark;
 }
 

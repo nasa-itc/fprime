@@ -20,13 +20,13 @@ class DpWriterTester : public DpWriterGTestBase {
     // ----------------------------------------------------------------------
 
     // Maximum size of histories storing events, telemetry, and port outputs
-    static const U32 MAX_HISTORY_SIZE = 10;
+    static const NATIVE_INT_TYPE MAX_HISTORY_SIZE = 10;
 
     // Instance ID supplied to the component instance under test
-    static const FwEnumStoreType TEST_INSTANCE_ID = 0;
+    static const NATIVE_INT_TYPE TEST_INSTANCE_ID = 0;
 
     // Queue depth supplied to the component instance under test
-    static const FwSizeType TEST_INSTANCE_QUEUE_DEPTH = 10;
+    static const NATIVE_INT_TYPE TEST_INSTANCE_QUEUE_DEPTH = 10;
 
   public:
     // ----------------------------------------------------------------------
@@ -45,7 +45,7 @@ class DpWriterTester : public DpWriterGTestBase {
     // ----------------------------------------------------------------------
 
     //! Handler implementation for procBufferSendOut
-    void from_procBufferSendOut_handler(FwIndexType portNum,  //!< The port number
+    void from_procBufferSendOut_handler(NATIVE_INT_TYPE portNum,  //!< The port number
                                         Fw::Buffer& fwBuffer      //!< The buffer
     ) final;
 
@@ -100,71 +100,6 @@ class DpWriterTester : public DpWriterGTestBase {
 
     //! The component under test
     DpWriter component;
-
-  public:
-    // ----------------------------------------------------------------------
-    // Accessor methods for protected/private members
-    // ----------------------------------------------------------------------
-
-    //! Dispatch a message
-    void doDispatch();
-
-    //! Get the EVENTID_INVALIDBUFFER_THROTTLE value
-    static FwSizeType getInvalidBufferThrottle() {
-      return DpWriterComponentBase::EVENTID_INVALIDBUFFER_THROTTLE;
-    }
-
-    //! Get the EVENTID_BUFFERTOOSMALLFORPACKET_THROTTLE value
-    static FwSizeType getBufferTooSmallForPacketThrottle() {
-      return DpWriterComponentBase::EVENTID_BUFFERTOOSMALLFORPACKET_THROTTLE;
-    }
-
-    //! Get the EVENTID_INVALIDHEADERHASH_THROTTLE value
-    static FwSizeType getInvalidHeaderHashThrottle() {
-      return DpWriterComponentBase::EVENTID_INVALIDHEADERHASH_THROTTLE;
-    }
-
-    //! Get the EVENTID_INVALIDHEADER_THROTTLE value
-    static FwSizeType getInvalidHeaderThrottle() {
-      return DpWriterComponentBase::EVENTID_INVALIDHEADER_THROTTLE;
-    }
-
-    //! Get the EVENTID_FILEOPENERROR_THROTTLE value
-    static FwSizeType getFileOpenErrorThrottle() {
-      return DpWriterComponentBase::EVENTID_FILEOPENERROR_THROTTLE;
-    }
-
-    //! Get the EVENTID_FILEWRITEERROR_THROTTLE value
-    static FwSizeType getFileWriteErrorThrottle() {
-      return DpWriterComponentBase::EVENTID_FILEWRITEERROR_THROTTLE;
-    }
-
-    //! Get the OPCODE_CLEAR_EVENT_THROTTLE value
-    static FwOpcodeType getOpCodeClearEventThrottle() {
-      return DpWriterComponentBase::OPCODE_CLEAR_EVENT_THROTTLE;
-    }
-
-    //! Get the m_BufferTooSmallForDataThrottle value
-    FwIndexType getBufferTooSmallForDataThrottleCount();
-
-    //! Get the m_BufferTooSmallForPacketThrottle value
-    FwIndexType getBufferTooSmallForPacketThrottleCount();
-
-    //! Get the m_FileOpenErrorThrottle value
-    FwIndexType getFileOpenErrorThrottleCount();
-
-    //! Get the m_FileWriteErrorThrottle value
-    FwIndexType getFileWriteErrorThrottleCount();
-
-    //! Get the m_InvalidBufferThrottle value
-    FwIndexType getInvalidBufferThrottleCount();
-
-    //! Get the m_InvalidHeaderHashThrottle value
-    FwIndexType getInvalidHeaderHashThrottleCount();
-
-    //! Get the m_InvalidHeaderThrottle value
-    FwIndexType getInvalidHeaderThrottleCount();
-
 };
 
 }  // namespace Svc

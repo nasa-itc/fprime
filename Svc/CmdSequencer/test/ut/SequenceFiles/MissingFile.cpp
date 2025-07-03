@@ -17,8 +17,8 @@ namespace Svc {
   namespace SequenceFiles {
 
     MissingFile ::
-      MissingFile(const Format::t a_format) :
-        File("missing", a_format)
+      MissingFile(const Format::t format) :
+        File("missing", format)
     {
 
     }

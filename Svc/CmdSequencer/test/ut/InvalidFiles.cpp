@@ -22,8 +22,8 @@ namespace Svc {
     // ----------------------------------------------------------------------
 
     CmdSequencerTester ::
-      CmdSequencerTester(const SequenceFiles::File::Format::t a_format) :
-        Svc::CmdSequencerTester(a_format)
+      CmdSequencerTester(const SequenceFiles::File::Format::t format) :
+        Svc::CmdSequencerTester(format)
     {
 
     }
@@ -51,7 +51,7 @@ namespace Svc {
       ASSERT_CMD_RESPONSE_SIZE(1);
       ASSERT_CMD_RESPONSE(
           0,
-          this->getRunOpcode(),
+          CmdSequencerComponentBase::OPCODE_CS_RUN,
           0,
           Fw::CmdResponse::EXECUTION_ERROR
       );
@@ -77,7 +77,7 @@ namespace Svc {
       Fw::Time testTime(TB_WORKSTATION_TIME, 1, 1);
       this->setTestTime(testTime);
       // Write the file
-      FwSizeType numRecords = 1;
+      NATIVE_INT_TYPE numRecords = 1;
       SequenceFiles::BadDescriptorFile file(numRecords, this->format);
       file.write();
       // Validate the file
@@ -87,7 +87,7 @@ namespace Svc {
       ASSERT_CMD_RESPONSE_SIZE(1);
       ASSERT_CMD_RESPONSE(
           0,
-          this->getValidateOpcode(),
+          CmdSequencerComponentBase::OPCODE_CS_VALIDATE,
           0,
           Fw::CmdResponse::EXECUTION_ERROR
       );
@@ -106,7 +106,7 @@ namespace Svc {
       ASSERT_CMD_RESPONSE_SIZE(1);
       ASSERT_CMD_RESPONSE(
           0,
-          this->getRunOpcode(),
+          CmdSequencerComponentBase::OPCODE_CS_RUN,
           0,
           Fw::CmdResponse::EXECUTION_ERROR
       );
@@ -127,7 +127,7 @@ namespace Svc {
       Fw::Time testTime(TB_WORKSTATION_TIME, 1, 1);
       this->setTestTime(testTime);
       // Write the file
-      const FwSizeType numRecords = 5;
+      const NATIVE_INT_TYPE numRecords = 5;
       SequenceFiles::BadTimeBaseFile file(numRecords, this->format);
       file.write();
       // Validate the file
@@ -137,7 +137,7 @@ namespace Svc {
       ASSERT_CMD_RESPONSE_SIZE(1);
       ASSERT_CMD_RESPONSE(
           0,
-          this->getValidateOpcode(),
+          CmdSequencerComponentBase::OPCODE_CS_VALIDATE,
           0,
           Fw::CmdResponse::EXECUTION_ERROR
       );
@@ -169,7 +169,7 @@ namespace Svc {
       ASSERT_CMD_RESPONSE_SIZE(1);
       ASSERT_CMD_RESPONSE(
           0,
-          this->getValidateOpcode(),
+          CmdSequencerComponentBase::OPCODE_CS_VALIDATE,
           0,
           Fw::CmdResponse::EXECUTION_ERROR
       );
@@ -192,7 +192,7 @@ namespace Svc {
       ASSERT_CMD_RESPONSE_SIZE(1);
       ASSERT_CMD_RESPONSE(
           0,
-          this->getRunOpcode(),
+          CmdSequencerComponentBase::OPCODE_CS_RUN,
           0,
           Fw::CmdResponse::EXECUTION_ERROR
       );
@@ -229,7 +229,7 @@ namespace Svc {
       ASSERT_CMD_RESPONSE_SIZE(1);
       ASSERT_CMD_RESPONSE(
           0,
-          this->getValidateOpcode(),
+          CmdSequencerComponentBase::OPCODE_CS_VALIDATE,
           0,
           Fw::CmdResponse::EXECUTION_ERROR
       );
@@ -256,7 +256,7 @@ namespace Svc {
       ASSERT_CMD_RESPONSE_SIZE(1);
       ASSERT_CMD_RESPONSE(
           0,
-          this->getRunOpcode(),
+          CmdSequencerComponentBase::OPCODE_CS_RUN,
           0,
           Fw::CmdResponse::EXECUTION_ERROR
       );
@@ -284,7 +284,7 @@ namespace Svc {
       ASSERT_CMD_RESPONSE_SIZE(1);
       ASSERT_CMD_RESPONSE(
           0,
-          this->getRunOpcode(),
+          CmdSequencerComponentBase::OPCODE_CS_RUN,
           0,
           Fw::CmdResponse::EXECUTION_ERROR
       );
@@ -308,7 +308,7 @@ namespace Svc {
       ASSERT_CMD_RESPONSE_SIZE(1);
       ASSERT_CMD_RESPONSE(
           0,
-          this->getValidateOpcode(),
+          CmdSequencerComponentBase::OPCODE_CS_VALIDATE,
           0,
           Fw::CmdResponse::EXECUTION_ERROR
       );
@@ -356,7 +356,7 @@ namespace Svc {
       ASSERT_CMD_RESPONSE_SIZE(1);
       ASSERT_CMD_RESPONSE(
           0,
-          this->getRunOpcode(),
+          CmdSequencerComponentBase::OPCODE_CS_RUN,
           0,
           Fw::CmdResponse(Fw::CmdResponse::EXECUTION_ERROR)
       );
@@ -384,7 +384,7 @@ namespace Svc {
       ASSERT_CMD_RESPONSE_SIZE(1);
       ASSERT_CMD_RESPONSE(
           0,
-          this->getValidateOpcode(),
+          CmdSequencerComponentBase::OPCODE_CS_VALIDATE,
           0,
           Fw::CmdResponse::EXECUTION_ERROR
       );
@@ -403,7 +403,7 @@ namespace Svc {
       ASSERT_CMD_RESPONSE_SIZE(1);
       ASSERT_CMD_RESPONSE(
           0,
-          this->getRunOpcode(),
+          CmdSequencerComponentBase::OPCODE_CS_RUN,
           0,
           Fw::CmdResponse::EXECUTION_ERROR
       );
@@ -433,7 +433,7 @@ namespace Svc {
       ASSERT_CMD_RESPONSE_SIZE(1);
       ASSERT_CMD_RESPONSE(
           0,
-          this->getValidateOpcode(),
+          CmdSequencerComponentBase::OPCODE_CS_VALIDATE,
           0,
           Fw::CmdResponse::EXECUTION_ERROR
       );
@@ -453,7 +453,7 @@ namespace Svc {
       ASSERT_CMD_RESPONSE_SIZE(1);
       ASSERT_CMD_RESPONSE(
           0,
-          this->getRunOpcode(),
+          CmdSequencerComponentBase::OPCODE_CS_RUN,
           0,
           Fw::CmdResponse::EXECUTION_ERROR
       );
@@ -484,7 +484,7 @@ namespace Svc {
       ASSERT_CMD_RESPONSE_SIZE(1);
       ASSERT_CMD_RESPONSE(
           0,
-          this->getValidateOpcode(),
+          CmdSequencerComponentBase::OPCODE_CS_VALIDATE,
           0,
           Fw::CmdResponse::EXECUTION_ERROR
       );
@@ -503,7 +503,7 @@ namespace Svc {
       ASSERT_CMD_RESPONSE_SIZE(1);
       ASSERT_CMD_RESPONSE(
           0,
-          this->getRunOpcode(),
+          CmdSequencerComponentBase::OPCODE_CS_RUN,
           0,
           Fw::CmdResponse::EXECUTION_ERROR
       );

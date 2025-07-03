@@ -13,7 +13,7 @@ namespace Posix {
 namespace RawTime {
 
 PosixRawTime::Status PosixRawTime::now() {
-    int status = clock_gettime(CLOCK_REALTIME, &this->m_handle.m_timespec);
+    PlatformIntType status = clock_gettime(CLOCK_REALTIME, &this->m_handle.m_timespec);
     if (status != 0) {
         return errno_to_rawtime_status(errno);
     }

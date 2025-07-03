@@ -39,36 +39,7 @@ namespace Svc {
       // Constants
       // ----------------------------------------------------------------------
 
-      static const FwSizeType TEST_SEQ_BUFFER_SIZE = 255;
-
-    protected:
-      // ----------------------------------------------------------------------
-      // Accessor methods for opcodes
-      // ----------------------------------------------------------------------
-
-      static FwOpcodeType getRunOpcode() {
-          return CmdSequencerComponentBase::OPCODE_CS_RUN;
-      }
-
-      static FwOpcodeType getStartOpcode() {
-          return CmdSequencerComponentBase::OPCODE_CS_START;
-      }
-
-      static FwOpcodeType getAutoOpcode() {
-          return CmdSequencerComponentBase::OPCODE_CS_AUTO;
-      }
-
-      static FwOpcodeType getManualOpcode() {
-          return CmdSequencerComponentBase::OPCODE_CS_MANUAL;
-      }
-
-      static FwOpcodeType getStepOpcode() {
-          return CmdSequencerComponentBase::OPCODE_CS_STEP;
-      }
-
-      static FwOpcodeType getValidateOpcode() {
-          return CmdSequencerComponentBase::OPCODE_CS_VALIDATE;
-      }
+      static const NATIVE_UINT_TYPE TEST_SEQ_BUFFER_SIZE = 255;
 
     protected:
 
@@ -164,7 +135,7 @@ namespace Svc {
 
                 Os::FileInterface::Status open(const char *path, Mode mode, OverwriteType overwrite) override;
 
-                Status read(U8 *buffer, FwSizeType &size, WaitType wait) override;
+                Status read(U8 *buffer, FwSignedSizeType &size, WaitType wait) override;
 
                 //! Current interceptor
                 static Interceptor* s_current_interceptor;
@@ -201,7 +172,7 @@ namespace Svc {
 
       //! Construct object CmdSequencerTester
       CmdSequencerTester(
-          const SequenceFiles::File::Format::t a_format =
+          const SequenceFiles::File::Format::t format =
           SequenceFiles::File::Format::F_PRIME //!< The file format to use
       );
 
@@ -217,7 +188,7 @@ namespace Svc {
       //! Handler for from_seqDone
       //!
       void from_seqDone_handler(
-          const FwIndexType portNum, //!< The port number
+          const NATIVE_INT_TYPE portNum, //!< The port number
           FwOpcodeType opCode, //!< Command Op Code
           U32 cmdSeq, //!< Command Sequence
           const Fw::CmdResponse& response //!< The command response argument
@@ -226,7 +197,7 @@ namespace Svc {
       //! Handler for from_comCmdOut
       //!
       void from_comCmdOut_handler(
-          const FwIndexType portNum, //!< The port number
+          const NATIVE_INT_TYPE portNum, //!< The port number
           Fw::ComBuffer &data, //!< Buffer containing packet data
           U32 context //!< Call context value; meaning chosen by user
       );
@@ -234,7 +205,7 @@ namespace Svc {
       //! Handler for from_pingOut
       //!
       void from_pingOut_handler(
-          const FwIndexType portNum, //!< The port number
+          const NATIVE_INT_TYPE portNum, //!< The port number
           U32 key //!< Value to return to pinger
       );
 

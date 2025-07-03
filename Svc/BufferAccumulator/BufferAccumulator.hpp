@@ -20,19 +20,8 @@
 
 namespace Svc {
 
-    // Forward declaration for UTs
-    namespace Accumulate { class BufferAccumulatorTester; }
-    namespace Drain { class BufferAccumulatorTester; }
-    namespace Errors { class BufferAccumulatorTester; }
-
-    class BufferAccumulator final : public BufferAccumulatorComponentBase {
-
-      friend class BufferAccumulatorTester;
-      friend class Svc::Accumulate::BufferAccumulatorTester;
-      friend class Svc::Drain::BufferAccumulatorTester;
-      friend class Svc::Errors::BufferAccumulatorTester;
-
-      private:
+    class BufferAccumulator : public BufferAccumulatorComponentBase {
+      PRIVATE:
 
         // ----------------------------------------------------------------------
         // Types
@@ -48,7 +37,7 @@ namespace Svc {
                 ~ArrayFIFOBuffer();
 
                 void init(Fw::Buffer* const elements,  //!< The array elements
-                          FwSizeType capacity    //!< The capacity
+                          NATIVE_UINT_TYPE capacity    //!< The capacity
                         );
 
                 //! Enqueue an index.
@@ -64,13 +53,13 @@ namespace Svc {
 
                 //! Get the size of the queue
                 //! \return The size
-                FwSizeType getSize() const;
+                U32 getSize() const;
 
                 //! Get the capacity of the queue
                 //! \return The capacity
-                FwSizeType getCapacity() const;
+                U32 getCapacity() const;
 
-      private:
+      PRIVATE:
 
                 // ----------------------------------------------------------------------
                 // Private member variables
@@ -80,16 +69,16 @@ namespace Svc {
                 Fw::Buffer* m_elements;
 
                 //! The capacity of the queue
-                FwSizeType m_capacity;
+                NATIVE_UINT_TYPE m_capacity;
 
                 //! The enqueue index
-                FwSizeType m_enqueueIndex;
+                NATIVE_UINT_TYPE m_enqueueIndex;
 
                 //! The dequeue index
-                FwSizeType m_dequeueIndex;
+                NATIVE_UINT_TYPE m_dequeueIndex;
 
                 //! The size of the queue
-                FwSizeType m_size;
+                NATIVE_UINT_TYPE m_size;
         };  // class ArrayFIFOBuffer
 
         public:
@@ -114,14 +103,14 @@ namespace Svc {
         //! Give the class a memory buffer. Should be called after constructor
         //! and init, but before task is spawned.
         void allocateQueue(
-                FwEnumStoreType identifier, Fw::MemAllocator& allocator,
-                FwSizeType maxNumBuffers  //!< The maximum number of buffers
+                NATIVE_INT_TYPE identifier, Fw::MemAllocator& allocator,
+                NATIVE_UINT_TYPE maxNumBuffers  //!< The maximum number of buffers
                 );
 
         //! Return allocated queue. Should be done during shutdown
         void deallocateQueue(Fw::MemAllocator& allocator);
 
-      private:
+      PRIVATE:
 
         // ----------------------------------------------------------------------
         // Handler implementations for user-defined typed input ports
@@ -131,22 +120,22 @@ namespace Svc {
         //!
         void
             bufferSendInFill_handler(
-                    const FwIndexType portNum,  //!< The port number
+                    const NATIVE_INT_TYPE portNum,  //!< The port number
                     Fw::Buffer& buffer);
 
         //! Handler implementation for bufferSendInReturn
         //!
         void bufferSendInReturn_handler(
-                const FwIndexType portNum,  //!< The port number
+                const NATIVE_INT_TYPE portNum,  //!< The port number
                 Fw::Buffer& buffer);
 
         //! Handler implementation for pingIn
         //!
-        void pingIn_handler(const FwIndexType portNum,  //!< The port number
+        void pingIn_handler(const NATIVE_INT_TYPE portNum,  //!< The port number
                             U32 key  //!< Value to return to pinger
                             );
 
-      private:
+      PRIVATE:
 
         // ----------------------------------------------------------------------
         // Command handler implementations
@@ -167,7 +156,7 @@ namespace Svc {
                                         BufferAccumulator_BlockMode blockMode
                                         );
 
-      private:
+      PRIVATE:
 
         // ----------------------------------------------------------------------
         // Private helper methods
@@ -176,7 +165,7 @@ namespace Svc {
         //! Send a stored buffer
         void sendStoredBuffer();
 
-      private:
+      PRIVATE:
 
         // ----------------------------------------------------------------------
         // Private member variables
@@ -203,10 +192,10 @@ namespace Svc {
         U32 m_numWarnings;
 
         //! The number of buffers drained in a partial drain command
-        FwSizeType m_numDrained;
+        U32 m_numDrained;
 
         //! The number of buffers TO drain in a partial drain command
-        FwSizeType m_numToDrain;
+        U32 m_numToDrain;
 
         //! The DrainBuffers opcode to respond to
         FwOpcodeType m_opCode;
@@ -215,7 +204,7 @@ namespace Svc {
         U32 m_cmdSeq;
 
         //! The allocator ID
-        FwEnumStoreType m_allocatorId;
+        NATIVE_INT_TYPE m_allocatorId;
     };
 
 }  // namespace Svc

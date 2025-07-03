@@ -52,7 +52,7 @@ void UdpTester::test_with_loop(U32 iterations, bool recv_thread) {
     // Start up a receive thread
     if (recv_thread) {
         Os::TaskString name("receiver thread");
-        this->component.start(name, true, Os::Task::TASK_PRIORITY_DEFAULT, Os::Task::TASK_DEFAULT);
+        this->component.start(name, true, Os::Task::TASK_DEFAULT, Os::Task::TASK_DEFAULT);
     }
 
     // Loop through a bunch of client disconnects
@@ -91,10 +91,8 @@ void UdpTester::test_with_loop(U32 iterations, bool recv_thread) {
             Drv::Test::force_recv_timeout(udp2_fd.fd, udp2);
             m_data_buffer.setSize(sizeof(m_data_storage));
             size = Drv::Test::fill_random_buffer(m_data_buffer);
-            invoke_to_send(0, m_data_buffer);
-            ASSERT_from_sendReturnOut_SIZE(i + 1);
-            Drv::ByteStreamStatus status = this->fromPortHistory_sendReturnOut->at(i).status;
-            EXPECT_EQ(status, ByteStreamStatus::OP_OK);
+            Drv::SendStatus status = invoke_to_send(0, m_data_buffer);
+            EXPECT_EQ(status, SendStatus::SEND_OK);
             Drv::Test::receive_all(udp2, udp2_fd, buffer, size);
             Drv::Test::validate_random_buffer(m_data_buffer, buffer);
             // If receive thread is live, try the other way
@@ -158,23 +156,14 @@ void UdpTester ::test_advanced_reconnect() {
     test_with_loop(10, true); // Up to 10 * RECONNECT_MS
 }
 
-void UdpTester ::test_buffer_deallocation() {
-    U8 data[1];
-    Fw::Buffer buffer(data, sizeof(data));
-    this->invoke_to_recvReturnIn(0, buffer);
-    ASSERT_from_deallocate_SIZE(1);     // incoming buffer should be deallocated
-    ASSERT_EQ(this->fromPortHistory_deallocate->at(0).fwBuffer.getData(), data);
-    ASSERT_EQ(this->fromPortHistory_deallocate->at(0).fwBuffer.getSize(), sizeof(data));
-}
-
 // ----------------------------------------------------------------------
 // Handlers for typed from ports
 // ----------------------------------------------------------------------
 
-void UdpTester ::from_recv_handler(const FwIndexType portNum, Fw::Buffer& recvBuffer, const ByteStreamStatus& recvStatus) {
+void UdpTester ::from_recv_handler(const NATIVE_INT_TYPE portNum, Fw::Buffer& recvBuffer, const RecvStatus& recvStatus) {
     this->pushFromPortEntry_recv(recvBuffer, recvStatus);
     // Make sure we can get to unblocking the spinner
-    if (recvStatus == ByteStreamStatus::OP_OK){
+    if (recvStatus == RecvStatus::RECV_OK){
         EXPECT_EQ(m_data_buffer.getSize(), recvBuffer.getSize()) << "Invalid transmission size";
         Drv::Test::validate_random_buffer(m_data_buffer, recvBuffer.getData());
         m_spinner = true;
@@ -182,16 +171,29 @@ void UdpTester ::from_recv_handler(const FwIndexType portNum, Fw::Buffer& recvBu
     delete[] recvBuffer.getData();
 }
 
+void UdpTester ::from_ready_handler(const NATIVE_INT_TYPE portNum) {
+    this->pushFromPortEntry_ready();
+}
+
 Fw::Buffer UdpTester ::
     from_allocate_handler(
-        const FwIndexType portNum,
-        FwSizeType size
+        const NATIVE_INT_TYPE portNum,
+        U32 size
     )
   {
     this->pushFromPortEntry_allocate(size);
     Fw::Buffer buffer(new U8[size], size);
     m_data_buffer2 = buffer;
     return buffer;
+  }
+
+  void UdpTester ::
+    from_deallocate_handler(
+        const NATIVE_INT_TYPE portNum,
+        Fw::Buffer &fwBuffer
+    )
+  {
+    this->pushFromPortEntry_deallocate(fwBuffer);
   }
 
 }  // end namespace Drv

@@ -27,7 +27,7 @@ void PriorityQueueHandle ::store_data(FwSizeType index, const U8* data, FwSizeTy
     FW_ASSERT(index < this->m_depth);
 
     FwSizeType offset = this->m_maxSize * index;
-    (void)::memcpy(this->m_data + offset, data, static_cast<size_t>(size));
+    ::memcpy(this->m_data + offset, data, size);
     this->m_sizes[index] = size;
 }
 
@@ -35,7 +35,7 @@ void PriorityQueueHandle ::load_data(FwSizeType index, U8* destination, FwSizeTy
     FW_ASSERT(size <= this->m_maxSize);
     FW_ASSERT(index < this->m_depth);
     FwSizeType offset = this->m_maxSize * index;
-    (void)::memcpy(destination, this->m_data + offset, static_cast<size_t>(size));
+    ::memcpy(destination, this->m_data + offset, size);
 }
 
 PriorityQueue::~PriorityQueue() {
@@ -53,20 +53,20 @@ QueueInterface::Status PriorityQueue::create(const Fw::StringBase& name, FwSizeT
     // Allocate indices list
     FwSizeType* indices = new (std::nothrow) FwSizeType[depth];
     if (indices == nullptr) {
-        return QueueInterface::Status::ALLOCATION_FAILED;
+        return QueueInterface::Status::UNKNOWN_ERROR;
     }
     // Allocate sizes list or clean-up
     FwSizeType* sizes = new (std::nothrow) FwSizeType[depth];
     if (sizes == nullptr) {
         delete[] indices;
-        return QueueInterface::Status::ALLOCATION_FAILED;
+        return QueueInterface::Status::UNKNOWN_ERROR;
     }
     // Allocate sizes list or clean-up
     U8* data = new (std::nothrow) U8[depth * messageSize];
     if (data == nullptr) {
         delete[] indices;
         delete[] sizes;
-        return QueueInterface::Status::ALLOCATION_FAILED;
+        return QueueInterface::Status::UNKNOWN_ERROR;
     }
     // Allocate max heap or clean-up
     bool created = this->m_handle.m_heap.create(depth);
@@ -74,7 +74,7 @@ QueueInterface::Status PriorityQueue::create(const Fw::StringBase& name, FwSizeT
         delete[] indices;
         delete[] sizes;
         delete[] data;
-        return QueueInterface::Status::ALLOCATION_FAILED;
+        return QueueInterface::Status::UNKNOWN_ERROR;
     }
     // Assign initial indices and sizes
     for (FwSizeType i = 0; i < depth; i++) {

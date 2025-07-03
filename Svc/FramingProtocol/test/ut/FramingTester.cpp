@@ -15,17 +15,17 @@ namespace Svc {
   // ----------------------------------------------------------------------
 
   FramingTester ::
-    FramingTester(Fw::ComPacketType a_packetType) :
+    FramingTester(Fw::ComPacket::ComPacketType packetType) :
       // Pick a random data size
       dataSize(STest::Pick::lowerUpper(1, MAX_DATA_SIZE)),
-      packetType(a_packetType),
+      packetType(packetType),
       interface(*this)
   {
     FW_ASSERT(this->dataSize <= MAX_DATA_SIZE);
     this->fprimeFraming.setup(this->interface);
     // Fill in random data
     for (U32 i = 0; i < sizeof(this->data); ++i) {
-      this->data[i] = static_cast<U8>(STest::Pick::lowerUpper(0, 0xFF));
+      this->data[i] = STest::Pick::lowerUpper(0, 0xFF);
     }
     memset(this->bufferStorage, 0, sizeof this->bufferStorage);
   }
@@ -51,6 +51,10 @@ namespace Svc {
       // Check the packet size
       const U32 packetSize = this->getPacketSize();
       this->checkPacketSize(packetSize);
+      // Check the packet type
+      if (this->packetType != Fw::ComPacket::FW_PACKET_UNKNOWN) {
+        this->checkPacketType();
+      }
       // Check the data
       this->checkData();
       // Check the hash value
@@ -79,7 +83,11 @@ namespace Svc {
   void FramingTester ::
     checkPacketSize(FpFrameHeader::TokenType packetSize)
   {
-    FwSizeType expectedPacketSize = this->dataSize;
+    U32 expectedPacketSize = this->dataSize;
+    if (this->packetType != Fw::ComPacket::FW_PACKET_UNKNOWN) {
+      // Packet type is stored in header
+      expectedPacketSize += sizeof(SerialPacketType);
+    }
     ASSERT_EQ(packetSize, expectedPacketSize);
   }
 
@@ -94,7 +102,7 @@ namespace Svc {
     sb.fill();
     const Fw::SerializeStatus status = sb.deserialize(serialPacketType);
     FW_ASSERT(status == Fw::FW_SERIALIZE_OK, status);
-    typedef Fw::ComPacketType PacketType;
+    typedef Fw::ComPacket::ComPacketType PacketType;
     const PacketType pt = static_cast<PacketType>(serialPacketType);
     ASSERT_EQ(pt, this->packetType);
   }
@@ -116,7 +124,11 @@ namespace Svc {
   void FramingTester ::
     checkData()
   {
-    FwSizeType dataOffset = PACKET_TYPE_OFFSET;
+    U32 dataOffset = PACKET_TYPE_OFFSET;
+    if (this->packetType != Fw::ComPacket::FW_PACKET_UNKNOWN) {
+      // Packet type is stored in header
+      dataOffset += sizeof(SerialPacketType);
+    }
     const I32 result = memcmp(
         this->data,
         &this->bufferStorage[dataOffset],
@@ -130,12 +142,12 @@ namespace Svc {
   {
     Utils::Hash hash;
     Utils::HashBuffer hashBuffer;
-    const U32 localDataSize = FpFrameHeader::SIZE + packetSize;
-    hash.update(this->bufferStorage, localDataSize);
+    const U32 dataSize = FpFrameHeader::SIZE + packetSize;
+    hash.update(this->bufferStorage,  dataSize);
     hash.final(hashBuffer);
     const U8 *const hashAddr = hashBuffer.getBuffAddr();
     const I32 result = memcmp(
-        &this->bufferStorage[localDataSize],
+        &this->bufferStorage[dataSize],
         hashAddr,
         HASH_DIGEST_LENGTH
     );

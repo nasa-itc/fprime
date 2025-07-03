@@ -267,7 +267,7 @@ can be disabled to reduce the code size. Table 40 provides the macro to configur
 
 ### Serializable Type ID
 
-As described [in serializable types](../overview/05-enum-arr-ser.md), serializable types can be defined for use in the code.
+As described [in serializable types](../overview/enum-arr-ser.md), serializable types can be defined for use in the code.
 When objects of those types are serialized, an integer representing the type ID can be serialized along with the object
 data. This allows the type to be determined later if only the serialized form is available. Turning off this feature
 will lower the amount of data moved around for a given object when it is serialized. Table 41 provides
@@ -331,7 +331,7 @@ are less restrictive in size.
 
 | Macro                      | Definition                                                 | Default | Valid Values     |
 | -------------------------- | -----------------------------------------------------------|---------|------------------|
-| FW_FILE_BUFFER_MAX_SIZE    | Defines buffer and chunk size for file uplink and downlink | `FW_COM_BUFFER_MAX_SIZE`     | Positive integer |
+| FW_FILE_BUFFER_MAX_SIZE    | Defines buffer and chunk size for file uplink and downlink | 255     | Positive integer |
 | FW_INTERNAL_INTERFACE_STRING_MAX_SIZE | Maximum size for interface string               | 40      | Positive integer |
 
 ### Text Logging
@@ -379,6 +379,15 @@ Table 47 describes other user settings.
 
 > [!NOTE]
 > The following settings are defined by the build system and are in `FpConfig.hpp` to provide a default off value. These must be set by the build system as the setting works in unison with other modules that the build system includes when enabling these settings.
+
+Table 48 describes settings defined by the build system that should never be hand-set.
+
+**Table 48.** Macros for use by build system only
+
+| Macro                       | Definition                                              | Default | Valid Values     |
+| --------------------------- | --------------------------------------------------------|---------|------------------|
+| FW_BAREMETAL_SCHEDULER      | Enables baremetal scheduler hooks in active components  | 0 (off) | 0 (off) 1 (on)   |
+
 
 ## Component Configuration
 

@@ -20,7 +20,7 @@
 
 namespace Svc {
 
-class SystemResources final : public SystemResourcesComponentBase {
+class SystemResources : public SystemResourcesComponentBase {
   public:
     // ----------------------------------------------------------------------
     // Construction, initialization, and destruction
@@ -37,7 +37,7 @@ class SystemResources final : public SystemResourcesComponentBase {
 
     typedef void (SystemResourcesComponentBase::*cpuTlmFunc)(F32, Fw::Time) const;
 
-    private :
+    PRIVATE :
 
         // ----------------------------------------------------------------------
         // Handler implementations for user-defined typed input ports
@@ -46,7 +46,7 @@ class SystemResources final : public SystemResourcesComponentBase {
         //! Handler implementation for run
         //!
         void
-        run_handler(const FwIndexType portNum, /*!< The port number*/
+        run_handler(const NATIVE_INT_TYPE portNum, /*!< The port number*/
                     U32 context                    /*!< The call order*/
         );
 

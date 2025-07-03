@@ -24,7 +24,7 @@ DpManagerTester ::~DpManagerTester() {}
 // Handlers for typed from ports
 // ----------------------------------------------------------------------
 
-Fw::Buffer DpManagerTester::from_bufferGetOut_handler(const FwIndexType portNum, FwSizeType size) {
+Fw::Buffer DpManagerTester::from_bufferGetOut_handler(const NATIVE_INT_TYPE portNum, U32 size) {
     this->abstractState.bufferGetOutPortNumOpt = TestUtils::Option<FwIndexType>::some(portNum);
     this->pushFromPortEntry_bufferGetOut(size);
     Fw::Buffer buffer;
@@ -45,7 +45,7 @@ Fw::Buffer DpManagerTester::from_bufferGetOut_handler(const FwIndexType portNum,
     return buffer;
 }
 
-void DpManagerTester::from_productResponseOut_handler(const FwIndexType portNum,
+void DpManagerTester::from_productResponseOut_handler(const NATIVE_INT_TYPE portNum,
                                                       FwDpIdType id,
                                                       const Fw::Buffer& buffer,
                                                       const Fw::Success& status) {
@@ -53,7 +53,7 @@ void DpManagerTester::from_productResponseOut_handler(const FwIndexType portNum,
     this->pushFromPortEntry_productResponseOut(id, buffer, status);
 }
 
-void DpManagerTester::from_productSendOut_handler(const FwIndexType portNum, Fw::Buffer& fwBuffer) {
+void DpManagerTester::from_productSendOut_handler(const NATIVE_INT_TYPE portNum, Fw::Buffer& fwBuffer) {
     this->abstractState.productSendOutPortNumOpt = TestUtils::Option<FwIndexType>::some(portNum);
     this->pushFromPortEntry_productSendOut(fwBuffer);
 }
@@ -78,15 +78,6 @@ void DpManagerTester::checkTelemetry() {
     TESTER_CHECK_CHANNEL(NumFailedAllocations);
     TESTER_CHECK_CHANNEL(NumDataProducts);
     TESTER_CHECK_CHANNEL(NumBytes);
-}
-
-
-void DpManagerTester::doDispatch() {
-    this->component.doDispatch();
-}
-
-FwIndexType DpManagerTester::getBufferAllocationFailedThrottleCount() {
-    return this->component.DpManagerComponentBase::m_BufferAllocationFailedThrottle;
 }
 
 }  // end namespace Svc

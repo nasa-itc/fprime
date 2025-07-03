@@ -19,11 +19,11 @@
 // ----------------------------------------------------------------------
 
 void Tester ::testTime() {
-    Fw::Time random_time(STest::Pick::any(), STest::Pick::any());
+    Fw::Time time(STest::Pick::any(), STest::Pick::any());
     Fw::Time zero_time(TB_NONE, 0, 0);
     Fw::Time result;
 
-    this->setTestTime(random_time);
+    this->setTestTime(time);
 
     result = component.getTime();
     ASSERT_EQ(result, zero_time);
@@ -32,11 +32,11 @@ void Tester ::testTime() {
     ASSERT_TRUE(component.isConnected_timeGetOut_OutputPort(0));
 
     result = component.getTime();
-    ASSERT_EQ(result, random_time);
+    ASSERT_EQ(result, time);
 
     this->connectSpecialPortsSerial();
     ASSERT_TRUE(component.isConnected_timeGetOut_OutputPort(0));
 
     result = component.getTime();
-    ASSERT_EQ(result, random_time);
+    ASSERT_EQ(result, time);
 }

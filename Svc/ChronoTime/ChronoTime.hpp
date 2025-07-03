@@ -11,7 +11,7 @@
 
 namespace Svc {
 
-class ChronoTime final : public ChronoTimeComponentBase {
+class ChronoTime : public ChronoTimeComponentBase {
   public:
     // ----------------------------------------------------------------------
     // Component construction and destruction
@@ -24,7 +24,7 @@ class ChronoTime final : public ChronoTimeComponentBase {
     //! Destroy ChronoTime object
     ~ChronoTime();
 
-  private:
+  PRIVATE:
     // ----------------------------------------------------------------------
     // Handler implementations for user-defined typed input ports
     // ----------------------------------------------------------------------

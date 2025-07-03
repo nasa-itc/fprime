@@ -4,11 +4,7 @@
 
 `Svc::ComStub` is an example  F´ component implementing the
 [communication adapter interface](../../../docs/reference/communication-adapter-interface.md) required
-to work with F´ communication components. Projects would typically switch this component out for a
-radio manager component. The purpose of ComStub is to implement the communication adapter interface by delegating
-to a [`Drv.ByteStreamDriver`](../../../Drv/Interfaces/docs/sdd.md) (e.g. `Drv.TcpClient` or `Drv.LinuxUartDriver`) to send and receive data.
-
-Projects and users may choose to replace this with a complete communication
+to work with F´ communication components. Projects and users may choose to replace this with a complete communication
 implementation (i.e. a component managing a specific radio) once ready. As long as any communication implementation
 implements the communication adapter interface it can drop in and work with the standard F´ uplink and downlink setup.
 
@@ -59,46 +55,41 @@ be useful
 
 | Kind         | Name           | Port Type             | Usage                                                                             |
 |--------------|----------------|-----------------------|-----------------------------------------------------------------------------------|
-| `sync input` | `dataIn`    | `Svc.ComDataWithContext`  | Port receiving `Fw::Buffer`s for transmission out `drvSendOut`                    |
-| `output`     | `comStatusOut`    | `Svc.ComStatus`       | Port indicating success or failure to attached `Svc::ComQueue`                    |
-| `output`     | `dataOut`   | `Svc.ComDataWithContext`  | Port providing received `Fw::Buffers` to the broader application (typically a Deframer)              |
-| `output`     | `dataReturnOut`   | `Svc.ComDataWithContext`  | Port returning ownership of data that came in on `dataIn`                         |
-| `sync input` | `dataReturnIn`    | `Svc.ComDataWithContext`  | Port receiving back ownership of buffer sent out on `dataOut`                     |
+| `sync input` | `comDataIn`    | `Drv.ByteStreamSend`  | Port receiving `Fw::Buffer`s for transmission out `drvDataOut`                    |
+| `output`     | `comStatus`    | `Svc.ComStatus`       | Port indicating success or failure to attached `Svc::ComQueue`                    |
+| `output`     | `comDataOut`   | `Drv.ByteStreamRecv`  | Port providing received `Fw::Buffers` to a potential `Svc::Deframer`              |
 
 **Byte Stream Driver Model Ports**
 
 | Kind         | Name           | Port Type             | Usage                                                                             |
 |--------------|----------------|-----------------------|-----------------------------------------------------------------------------------|
 | `sync input` | `drvConnected` | `Drv.ByteStreamReady` | Port called when the underlying driver has connected                              |
-| `sync input` | `drvReceiveIn`    | `Drv.ByteStreamRecv`  | Port receiving `Fw::Buffers` from underlying communications bus driver            |
-| `output`     | `drvSendOut`   | `Drv.ByteStreamSend`  | Port providing received `Fw::Buffers` to the underlying communications bus driver |
-| `sync input` | `drvSendReturnIn`    | `Drv.ByteStreamData`  | Port receiving status and ownership of buffer sent out on `drvSendOut`            |
-| `output`     | `drvReceiveReturnOut`   | `Fw.BufferSend`  | Port returning ownership of buffer that came in on `drvReceiveIn`                 |
+| `sync input` | `drvDataIn`    | `Drv.ByteStreamRecv`  | Port receiving `Fw::Buffers` from underlying communications bus driver            |
+| `output`     | `drvDataOut`   | `Drv.ByteStreamSend`  | Port providing received `Fw::Buffers` to the underlying communications bus driver |
 
 
 ### 4.2. State, Configuration, and Runtime Setup
 
-`Svc::ComStub` stores a boolean `m_reinitialize` indicating when it should send `Fw::Success::SUCCESS` in
+`Svc::ComStub` has only stores a boolean `m_reinitialize` indicating when it should send `Fw::Success::SUCCESS` in
 response to a driver reconnection event. This is to implement the  Communication Adapter Protocol of a
-[communication adapter interface](../../../docs/reference/communication-adapter-interface.md). It also keeps
-track of a `m_retry_count` to limit the number of retries on an attempt to send data.
+[communication adapter interface](../../../docs/reference/communication-adapter-interface.md).
 
 ### 4.3. Port Handlers
 
-#### 4.3.1 dataIn
+#### 4.3.1 comDataIn
 
-The `dataIn` port handler receives an `Fw::Buffer` from the F´ system for transmission to the ground. Typically, it
+The `comDataIn` port handler receives an `Fw::Buffer` from the F´ system for transmission to the ground. Typically, it
 is connected to the output of the `Svc::Framer` component. In this `Svc::ComStub` implementation, it passes this
-`Fw::Buffer` directly to the `drvSendOut` port. It will retry when that port responds with a `RETRY` request. Otherwise, 
- the `comStatusOut` port will be invoked to indicate success or failure. Retries attempts are limited before the port
+`Fw::Buffer` directly to the `drvDataOut` port. It will retry when that port responds with a `RETRY` request. Otherwise, 
+ the `comStatus` port will be invoked to indicate success or failure. Retries attempts are limited before the port
 asserts.
 
 #### 4.3.1 drvConnected
 
 This port receives the connected signal from the driver and responds with exactly one `READY` invocation to the
-`comStatusOut` port. This starts downlink. This occurs each time the driver reconnects.
+`comStatus` port. This starts downlink. This occurs each time the driver reconnects.
 
-#### 4.3.1 drvReceiveIn
+#### 4.3.1 drvDataIn
 
-The `drvReceiveIn` handler receives data read from the driver and supplies it out the `dataOut` port. It is usually
+The `drvDataIn` handler receives data read from the driver and supplies it out the `comDataOut` port. It is usually
 connected to the `Svc::Deframer` component

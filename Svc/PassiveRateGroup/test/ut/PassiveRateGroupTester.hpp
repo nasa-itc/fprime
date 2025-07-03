@@ -9,7 +9,7 @@
 *
 *   Copyright 2014-2015, by the California Institute of Technology.
 *   ALL RIGHTS RESERVED. United States Government Sponsorship
-*   acknowledged.
+*   acknowledged. 
 */
 
 #ifndef PASSIVERATEGROUP_TEST_UT_PASSIVERATEGROUPIMPLTESTER_HPP_
@@ -25,16 +25,13 @@ namespace Svc {
             PassiveRateGroupTester(Svc::PassiveRateGroup& inst);
             virtual ~PassiveRateGroupTester();
 
-            void runNominal(U32 contexts[], FwIndexType numContexts, FwEnumStoreType instance);
+            void init(NATIVE_INT_TYPE instance = 0);
 
-            static FwSizeType getNumRateGroupMemberOutPorts() {
-                return Svc::PassiveRateGroupComponentBase::NUM_RATEGROUPMEMBEROUT_OUTPUT_PORTS;
-            }
-
+            void runNominal(NATIVE_INT_TYPE contexts[], U32 numContexts, NATIVE_INT_TYPE instance);
 
         private:
 
-            void from_RateGroupMemberOut_handler(FwIndexType portNum, U32 context);
+            void from_RateGroupMemberOut_handler(NATIVE_INT_TYPE portNum, U32 context);
 
             Svc::PassiveRateGroup& m_impl;
 
@@ -43,12 +40,12 @@ namespace Svc {
             struct {
                 bool portCalled;
                 U32 contextVal;
-                FwIndexType order;
+                NATIVE_UINT_TYPE order;
             } m_callLog[Svc::PassiveRateGroupComponentBase::NUM_RATEGROUPMEMBEROUT_OUTPUT_PORTS];
 
-            FwIndexType m_callOrder; //!< tracks order of port call.
+            U32 m_callOrder; //!< tracks order of port call.
 
-        };
+    };
 
 } /* namespace Svc */
 

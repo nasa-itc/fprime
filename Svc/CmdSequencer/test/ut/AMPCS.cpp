@@ -46,7 +46,7 @@ namespace Svc {
       ASSERT_CMD_RESPONSE_SIZE(1);
       ASSERT_CMD_RESPONSE(
           0,
-          this->getRunOpcode(),
+          CmdSequencerComponentBase::OPCODE_CS_RUN,
           0,
           Fw::CmdResponse::EXECUTION_ERROR
       );
@@ -74,7 +74,7 @@ namespace Svc {
       ASSERT_CMD_RESPONSE_SIZE(1);
       ASSERT_CMD_RESPONSE(
           0,
-          this->getRunOpcode(),
+          CmdSequencerComponentBase::OPCODE_CS_RUN,
           0,
           Fw::CmdResponse::EXECUTION_ERROR
       );

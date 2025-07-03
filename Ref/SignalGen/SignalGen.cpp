@@ -92,7 +92,7 @@ namespace Ref {
     }
 
     void SignalGen::schedIn_handler(
-        FwIndexType portNum, /*!< The port number*/
+        NATIVE_INT_TYPE portNum, /*!< The port number*/
         U32 context /*!< The call order*/
     )
     {
@@ -293,4 +293,4 @@ namespace Ref {
         }
     }
 
-}
+};

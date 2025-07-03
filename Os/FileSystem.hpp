@@ -6,7 +6,7 @@
 #ifndef _OS_FILESYSTEM_HPP_
 #define _OS_FILESYSTEM_HPP_
 
-#include <Fw/FPrimeBasicTypes.hpp>
+#include <FpConfig.hpp>
 #include <Os/Os.hpp>
 #include <Os/Directory.hpp>
 #include <Os/File.hpp>
@@ -19,7 +19,7 @@ class FileSystemInterface {
   public:
 
     // Size of file chunks to use for file system operations (e.g. copyFile)
-    static constexpr FwSizeType FILE_SYSTEM_FILE_CHUNK_SIZE = FW_FILE_CHUNK_SIZE; //!< Size of file system chunk
+    static constexpr FwSignedSizeType FILE_SYSTEM_FILE_CHUNK_SIZE = FW_FILE_CHUNK_SIZE; //!< Size of file system chunk
 
     enum Status {
         OP_OK, //!<  Operation was successful
@@ -44,7 +44,6 @@ class FileSystemInterface {
     enum PathType {
         FILE,      //!< Path is a file
         DIRECTORY, //!< Path is a directory
-        OTHER,     //!< Path is not a file or directory, e.g. a socket
         NOT_EXIST, //!< Path does not exist
     };
 
@@ -96,15 +95,6 @@ class FileSystemInterface {
     //! \param freeBytes Reference to store the free bytes on the filesystem
     //! \return Status of the operation
     virtual Status _getFreeSpace(const char* path, FwSizeType& totalBytes, FwSizeType& freeBytes) = 0;
-
-    //! \brief Get the type of the path (file, directory, etc.)
-    //!
-    //! It is invalid to pass `nullptr` as the path.
-    //!
-    //! \param path The path to check
-    //! \param pathType Reference to store the path type
-    //! \return Status of the operation
-    virtual Status _getPathType(const char* path, PathType& pathType) = 0;
 
     //! \brief Get the current working directory
     //! \param path Buffer to store the current working directory path
@@ -197,15 +187,6 @@ class FileSystem final : public FileSystemInterface {
     //! \param path The path of the new working directory
     //! \return Status of the operation
     Status _changeWorkingDirectory(const char* path) override;
-
-    //! \brief Get the type of the path (file, directory, etc.)
-    //!
-    //! It is invalid to pass `nullptr` as the path.
-    //!
-    //! \param path The path to check
-    //! \param pathType Reference to store the path type
-    //! \return Status of the operation
-    Status _getPathType(const char* path, PathType& pathType) override;
 
 
     // ------------------------------------------------------------
@@ -358,7 +339,7 @@ class FileSystem final : public FileSystemInterface {
     //! \param path The path of the file
     //! \param size Reference to store the size of the file
     //! \return Status of the operation
-    static Status getFileSize(const char* path, FwSizeType& size);
+    static Status getFileSize(const char* path, FwSignedSizeType& size);
 
 
   public:
@@ -390,7 +371,7 @@ class FileSystem final : public FileSystemInterface {
     //! @param source File to copy data from
     //! @param destination File to copy data to
     //! @param size The number of bytes to copy
-    static Status copyFileData(File& source, File& destination, FwSizeType size);
+    static Status copyFileData(File& source, File& destination, FwSignedSizeType size);
 
   private:
     // This section is used to store the implementation-defined FileSystem handle. To Os::FileSystem and fprime, this type is

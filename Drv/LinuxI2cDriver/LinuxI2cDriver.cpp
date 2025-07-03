@@ -11,7 +11,7 @@
 // ======================================================================
 
 #include "Fw/Types/Assert.hpp"
-#include <Fw/FPrimeBasicTypes.hpp>
+#include <FpConfig.hpp>
 #include <Drv/LinuxI2cDriver/LinuxI2cDriver.hpp>
 #include <Fw/Logger/Logger.hpp>
 
@@ -61,7 +61,7 @@ namespace Drv {
 
   Drv::I2cStatus LinuxI2cDriver ::
     write_handler(
-        const FwIndexType portNum,
+        const NATIVE_INT_TYPE portNum,
         U32 addr,
         Fw::Buffer &serBuffer
     )
@@ -78,9 +78,8 @@ namespace Drv {
       }
       // make sure it isn't a null pointer
       FW_ASSERT(serBuffer.getData());
-      FW_ASSERT_NO_OVERFLOW(serBuffer.getSize(), size_t);
       // write data
-      stat = static_cast<int>(write(this->m_fd, serBuffer.getData(), static_cast<size_t>(serBuffer.getSize())));
+      stat = static_cast<int>(write(this->m_fd, serBuffer.getData(), serBuffer.getSize()));
       if (stat == -1) {
 	  return I2cStatus::I2C_WRITE_ERR;
       }
@@ -89,7 +88,7 @@ namespace Drv {
 
   Drv::I2cStatus LinuxI2cDriver ::
     read_handler(
-        const FwIndexType portNum,
+        const NATIVE_INT_TYPE portNum,
         U32 addr,
         Fw::Buffer &serBuffer
     )
@@ -116,7 +115,7 @@ namespace Drv {
 
   Drv::I2cStatus LinuxI2cDriver ::
     writeRead_handler(
-      const FwIndexType portNum, /*!< The port number*/
+      const NATIVE_INT_TYPE portNum, /*!< The port number*/
       U32 addr,
       Fw::Buffer &writeBuffer,
       Fw::Buffer &readBuffer
@@ -131,10 +130,6 @@ namespace Drv {
     // make sure they are not null pointers
     FW_ASSERT(writeBuffer.getData());
     FW_ASSERT(readBuffer.getData());
-    // make sure downcasts are safe
-    FW_ASSERT_NO_OVERFLOW(addr, U16);
-    FW_ASSERT_NO_OVERFLOW(writeBuffer.getSize(), U16);
-    FW_ASSERT_NO_OVERFLOW(readBuffer.getSize(), U16);
 
     struct i2c_msg rdwr_msgs[2];
 
@@ -155,7 +150,7 @@ namespace Drv {
     rdwr_data.nmsgs = 2;
 
     //Use ioctl to perform the combined write/read transaction
-    int stat = ioctl(this->m_fd, I2C_RDWR, &rdwr_data);
+    NATIVE_INT_TYPE stat = ioctl(this->m_fd, I2C_RDWR, &rdwr_data);
 
     if(stat == -1){
       //Because we're using ioctl to perform the transaction we dont know exactly the type of error that occurred

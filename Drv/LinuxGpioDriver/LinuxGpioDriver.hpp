@@ -20,7 +20,7 @@
 
 namespace Drv {
 
-class LinuxGpioDriver final : public LinuxGpioDriverComponentBase {
+class LinuxGpioDriver : public LinuxGpioDriverComponentBase {
   public:
     static constexpr FwSizeType GPIO_POLL_TIMEOUT = 500;  // Timeout looking for interrupts to check for shutdown
     // ----------------------------------------------------------------------
@@ -67,10 +67,10 @@ class LinuxGpioDriver final : public LinuxGpioDriverComponentBase {
 
     //! \brief start interrupt detection thread
     //!
-    Drv::GpioStatus start(const FwTaskPriorityType priority = Os::Task::TASK_PRIORITY_DEFAULT,
+    Drv::GpioStatus start(const FwSizeType priority = Os::Task::TASK_DEFAULT,
                           const FwSizeType stackSize = Os::Task::TASK_DEFAULT,
                           const FwSizeType cpuAffinity = Os::Task::TASK_DEFAULT,
-                          const FwTaskIdType identifier = static_cast<FwTaskIdType>(Os::Task::TASK_DEFAULT));
+                          const PlatformUIntType identifier = static_cast<PlatformUIntType>(Os::Task::TASK_DEFAULT));
 
     //! \brief stop interrupt detection thread
     //!
@@ -80,19 +80,19 @@ class LinuxGpioDriver final : public LinuxGpioDriverComponentBase {
     //!
     void join();
 
-  private:
+  PRIVATE:
     //! \brief helper to setup a line handle (read or write).
-    Os::File::Status setupLineHandle(const int chip_descriptor,
+    Os::File::Status setupLineHandle(const PlatformIntType chip_descriptor,
                                      const U32 gpio,
                                      const GpioConfiguration& configuration,
                                      const Fw::Logic& default_state,
-                                     int& fd);
+                                     PlatformIntType& fd);
 
     //! \brief helper to setup a line event (interrupt)
-    Os::File::Status setupLineEvent(const int chip_descriptor,
+    Os::File::Status setupLineEvent(const PlatformIntType chip_descriptor,
                                     const U32 gpio,
                                     const GpioConfiguration& configuration,
-                                    int& fd);
+                                    PlatformIntType& fd);
 
     //! \brief poll for interrupt loop helper
     //!
@@ -112,12 +112,12 @@ class LinuxGpioDriver final : public LinuxGpioDriverComponentBase {
 
     //! Handler implementation for gpioRead
     //!
-    Drv::GpioStatus gpioRead_handler(const FwIndexType portNum, /*!< The port number*/
+    Drv::GpioStatus gpioRead_handler(const NATIVE_INT_TYPE portNum, /*!< The port number*/
                                      Fw::Logic& state);
 
     //! Handler implementation for gpioWrite
     //!
-    Drv::GpioStatus gpioWrite_handler(const FwIndexType portNum, /*!< The port number*/
+    Drv::GpioStatus gpioWrite_handler(const NATIVE_INT_TYPE portNum, /*!< The port number*/
                                       const Fw::Logic& state);
     //! Task to run interrupt polling
     Os::Task m_poller;
@@ -129,7 +129,7 @@ class LinuxGpioDriver final : public LinuxGpioDriverComponentBase {
     GpioConfiguration m_configuration = GpioConfiguration::MAX_GPIO_CONFIGURATION;
 
     //! File descriptor for GPIO
-    int m_fd = -1;
+    PlatformIntType m_fd = -1;
 
     //! Determine if the interrupt polling thread is running
     bool m_running = false;

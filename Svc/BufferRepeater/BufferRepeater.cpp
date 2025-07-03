@@ -10,7 +10,7 @@
 //
 // ======================================================================
 
-#include <Fw/FPrimeBasicTypes.hpp>
+#include <FpConfig.hpp>
 #include <Svc/BufferRepeater/BufferRepeater.hpp>
 
 namespace Svc {
@@ -32,7 +32,7 @@ void BufferRepeater ::configure(BufferRepeater::BufferRepeaterFailureOption allo
 bool BufferRepeater ::check_allocation(FwIndexType index,
                                        const Fw::Buffer& new_allocation,
                                        const Fw::Buffer& incoming_buffer) {
-    FW_ASSERT(index < NUM_PORTOUT_OUTPUT_PORTS, static_cast<FwAssertArgType>(index));
+    FW_ASSERT(index < NUM_PORTOUT_OUTPUT_PORTS, index);
     bool is_valid = (new_allocation.getData() != nullptr) && (new_allocation.getSize() >= incoming_buffer.getSize());
 
     // Respond to invalid buffer allocation
@@ -59,7 +59,7 @@ bool BufferRepeater ::check_allocation(FwIndexType index,
 // Handler implementations for user-defined serial input ports
 // ----------------------------------------------------------------------
 
-void BufferRepeater ::portIn_handler(FwIndexType portNum, /*!< The port number*/
+void BufferRepeater ::portIn_handler(NATIVE_INT_TYPE portNum, /*!< The port number*/
                                      Fw::Buffer& buffer       /*!< The serialization buffer*/
 ) {
     FW_ASSERT(this->m_allocation_failure_response < NUM_BUFFER_REPEATER_FAILURE_OPTIONS);
@@ -68,8 +68,7 @@ void BufferRepeater ::portIn_handler(FwIndexType portNum, /*!< The port number*/
             Fw::Buffer new_allocation = this->allocate_out(0, buffer.getSize());
             if (this->check_allocation(i, new_allocation, buffer)) {
                 // Clone the data and send it
-                FW_ASSERT_NO_OVERFLOW(buffer.getSize(), size_t);
-                ::memcpy(new_allocation.getData(), buffer.getData(), static_cast<size_t>(buffer.getSize()));
+                ::memcpy(new_allocation.getData(), buffer.getData(), buffer.getSize());
                 new_allocation.setSize(buffer.getSize());
                 this->portOut_out(i, new_allocation);
             }

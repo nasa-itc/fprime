@@ -21,9 +21,7 @@ namespace Svc {
     //! consistent ordering.  It also provides the option to write the text
     //! to a file as well.
 
-    class ActiveTextLogger final : public ActiveTextLoggerComponentBase {
-
-        friend class ActiveTextLoggerTester;
+    class ActiveTextLogger: public ActiveTextLoggerComponentBase {
 
         public:
 
@@ -54,7 +52,7 @@ namespace Svc {
             bool set_log_file(const char* fileName, const U32 maxSize, const U32 maxBackups = 10);
 
 
-        private:
+        PRIVATE:
 
         // ----------------------------------------------------------------------
         // Prohibit Copying
@@ -85,7 +83,7 @@ namespace Svc {
         //! Handler for input port TextLogger
         //
         virtual void TextLogger_handler(
-            FwIndexType portNum, /*!< The port number*/
+            NATIVE_INT_TYPE portNum, /*!< The port number*/
             FwEventIdType id, /*!< Log ID*/
             Fw::Time &timeTag, /*!< Time Tag*/
             const Fw::LogSeverity& severity, /*!< The severity argument*/

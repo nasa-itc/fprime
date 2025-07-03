@@ -16,7 +16,7 @@
 
 #include <Svc/CmdDispatcher/CommandDispatcherComponentAc.hpp>
 #include <Os/Mutex.hpp>
-#include <config/CommandDispatcherImplCfg.hpp>
+#include <CommandDispatcherImplCfg.hpp>
 
 namespace Svc {
 
@@ -29,10 +29,7 @@ namespace Svc {
     //! is connected to the seqCmdStatus port with the same number
     //! as the port that submitted the command, the command status will be returned.
 
-    class CommandDispatcherImpl final : public CommandDispatcherComponentBase {
-
-        friend class CommandDispatcherTester;
-
+    class CommandDispatcherImpl : public CommandDispatcherComponentBase {
         public:
             //!  \brief Command Dispatcher constructor
             //!
@@ -46,8 +43,8 @@ namespace Svc {
             //!
             //!  The destructor for this component is empty
             virtual ~CommandDispatcherImpl();
-        protected:
-        private:
+        PROTECTED:
+        PRIVATE:
             //!  \brief component command status handler
             //!
             //!  The command status handler is called when a component
@@ -57,7 +54,7 @@ namespace Svc {
             //!  \param opCode the opcode of the completed command.
             //!  \param cmdSeq the sequence number assigned to the command when it was dispatched
             //!  \param response the completion status of the command
-            void compCmdStat_handler(FwIndexType portNum, FwOpcodeType opCode, U32 cmdSeq, const Fw::CmdResponse &response);
+            void compCmdStat_handler(NATIVE_INT_TYPE portNum, FwOpcodeType opCode, U32 cmdSeq, const Fw::CmdResponse &response);
             //!  \brief component command buffer handler
             //!
             //!  The command buffer handler is called to submit a new
@@ -66,7 +63,7 @@ namespace Svc {
             //!  \param portNum the number of the incoming port.
             //!  \param data the buffer containing the command.
             //!  \param context a user value returned with the status
-            void seqCmdBuff_handler(FwIndexType portNum, Fw::ComBuffer &data, U32 context);
+            void seqCmdBuff_handler(NATIVE_INT_TYPE portNum, Fw::ComBuffer &data, U32 context);
             //!  \brief component command registration handler
             //!
             //!  The command registration handler is called to register
@@ -75,7 +72,7 @@ namespace Svc {
             //!
             //!  \param portNum the number of the incoming port.
             //!  \param opCode the opcode being registered.
-            void compCmdReg_handler(FwIndexType portNum, FwOpcodeType opCode);
+            void compCmdReg_handler(NATIVE_INT_TYPE portNum, FwOpcodeType opCode);
             //!  \brief component ping handler
             //!
             //!  The ping handler responds to messages to verify that the task
@@ -84,7 +81,7 @@ namespace Svc {
             //!  \param portNum the number of the incoming port.
             //!  \param opCode the opcode being registered.
             //!  \param key the key value that is returned with the ping response
-            void pingIn_handler(FwIndexType portNum, U32 key);
+            void pingIn_handler(NATIVE_INT_TYPE portNum, U32 key);
             //!  \brief NO_OP command handler
             //!
             //!  A test command that does nothing
@@ -135,8 +132,8 @@ namespace Svc {
 
             struct DispatchEntry {
                     bool used; //!< if entry has been used yet
-                    FwOpcodeType opcode; //!< opcode of entry
-                    FwIndexType port; //!< which port the entry invokes
+                    U32 opcode; //!< opcode of entry
+                    NATIVE_INT_TYPE port; //!< which port the entry invokes
             } m_entryTable[CMD_DISPATCHER_DISPATCH_TABLE_SIZE]; //!< table of dispatch entries
 
             //! \struct SequenceTracker
@@ -157,7 +154,7 @@ namespace Svc {
                     U32 seq; //!< command sequence number
                     FwOpcodeType opCode; //!< opcode being tracked
                     U32 context; //!< context passed by user
-                    FwIndexType callerPort; //!< port command source port
+                    NATIVE_INT_TYPE callerPort; //!< port command source port
             } m_sequenceTracker[CMD_DISPATCHER_SEQUENCER_TABLE_SIZE]; //!< sequence tracking port for command completions;
 
             U32 m_seq; //!< current command sequence number

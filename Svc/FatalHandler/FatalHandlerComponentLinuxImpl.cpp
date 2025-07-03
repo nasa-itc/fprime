@@ -15,7 +15,7 @@
 #include <Fw/Logger/Logger.hpp>
 #include <Svc/FatalHandler/FatalHandlerComponentImpl.hpp>
 #include <Os/Task.hpp>
-#include <Fw/FPrimeBasicTypes.hpp>
+#include <FpConfig.hpp>
 
 namespace Svc {
 
@@ -24,7 +24,7 @@ namespace Svc {
     // ----------------------------------------------------------------------
 
     void FatalHandlerComponentImpl::FatalReceive_handler(
-            const FwIndexType portNum,
+            const NATIVE_INT_TYPE portNum,
             FwEventIdType Id) {
         // for **nix, delay then exit with error code
         Fw::Logger::log("FATAL %d handled.\n",Id);

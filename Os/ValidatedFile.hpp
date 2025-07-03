@@ -14,7 +14,7 @@
 #define OS_ValidatedFile_HPP
 
 #include "Fw/Types/String.hpp"
-#include <Fw/FPrimeBasicTypes.hpp>
+#include <FpConfig.hpp>
 #include "Os/ValidateFile.hpp"
 
 namespace Os {
@@ -53,7 +53,7 @@ namespace Os {
       //! \return The hash file buffer
       const Utils::HashBuffer& getHashBuffer() const;
 
-    private:
+    PRIVATE:
 
       //! The file name
       Fw::String m_fileName;

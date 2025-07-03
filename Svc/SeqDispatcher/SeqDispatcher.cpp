@@ -33,11 +33,11 @@ void SeqDispatcher::runSequence(FwIndexType sequencerIdx,
   // this function is only designed for internal usage
   // we can guarantee it cannot be called with input that would fail
   FW_ASSERT(sequencerIdx >= 0 && sequencerIdx < SeqDispatcherSequencerPorts,
-            static_cast<FwAssertArgType>(sequencerIdx));
+            sequencerIdx);
   FW_ASSERT(this->isConnected_seqRunOut_OutputPort(sequencerIdx));
   FW_ASSERT(this->m_entryTable[sequencerIdx].state == 
               SeqDispatcher_CmdSequencerState::AVAILABLE, 
-              static_cast<FwAssertArgType>(this->m_entryTable[sequencerIdx].state));
+            this->m_entryTable[sequencerIdx].state);
 
   if (block == Fw::Wait::NO_WAIT) {
     this->m_entryTable[sequencerIdx].state =
@@ -58,11 +58,10 @@ void SeqDispatcher::runSequence(FwIndexType sequencerIdx,
 }
 
 void SeqDispatcher::seqStartIn_handler(
-    FwIndexType portNum, //!< The port number
+    NATIVE_INT_TYPE portNum, //!< The port number
     const Fw::StringBase& fileName //!< The sequence file name
 ) {
-  FW_ASSERT(portNum >= 0 && portNum < SeqDispatcherSequencerPorts,
-            static_cast<FwAssertArgType>(portNum));
+  FW_ASSERT(portNum >= 0 && portNum < SeqDispatcherSequencerPorts, portNum);
   if (this->m_entryTable[portNum].state ==
           SeqDispatcher_CmdSequencerState::RUNNING_SEQUENCE_BLOCK ||
       this->m_entryTable[portNum].state ==
@@ -92,13 +91,12 @@ void SeqDispatcher::seqStartIn_handler(
 }
 
 void SeqDispatcher::seqDoneIn_handler(
-    FwIndexType portNum,         //!< The port number
+    NATIVE_INT_TYPE portNum,         //!< The port number
     FwOpcodeType opCode,             //!< Command Op Code
     U32 cmdSeq,                      //!< Command Sequence
     const Fw::CmdResponse& response  //!< The command response argument
 ) {
-  FW_ASSERT(portNum >= 0 && portNum < SeqDispatcherSequencerPorts,
-            static_cast<FwAssertArgType>(portNum));
+  FW_ASSERT(portNum >= 0 && portNum < SeqDispatcherSequencerPorts, portNum);
   if (this->m_entryTable[portNum].state !=
           SeqDispatcher_CmdSequencerState::RUNNING_SEQUENCE_BLOCK &&
       this->m_entryTable[portNum].state !=
@@ -138,7 +136,7 @@ void SeqDispatcher::seqDoneIn_handler(
 }
 
 //! Handler for input port seqRunIn
-void SeqDispatcher::seqRunIn_handler(FwIndexType portNum,
+void SeqDispatcher::seqRunIn_handler(NATIVE_INT_TYPE portNum,
                                      const Fw::StringBase& fileName) {
   FwIndexType idx = this->getNextAvailableSequencerIdx();
   // no available sequencers
@@ -184,6 +182,5 @@ void SeqDispatcher::LOG_STATUS_cmdHandler(
   for(FwIndexType idx = 0; idx < SeqDispatcherSequencerPorts; idx++) {
     this->log_ACTIVITY_LO_LogSequencerStatus(static_cast<U16>(idx), this->m_entryTable[idx].state, Fw::LogStringArg(this->m_entryTable[idx].sequenceRunning));
   }
-  this->cmdResponse_out(opCode, cmdSeq, Fw::CmdResponse::OK);
 }
 }  // end namespace components

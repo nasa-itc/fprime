@@ -15,7 +15,6 @@ This document describes the format of FPP JSON dictionaries.
     - [String Type Descriptors](#string-type-descriptors)
         - [String Types](#string-types)
     - [Qualified Identifier Type Descriptors](#qualified-identifier-type-descriptors)
-- [Constants](#constants)
 - [Type Definitions](#type-definitions)
     - [Array Type Definition](#array-type-definition)
     - [Enumeration Type Definition](#enumeration-type-definition)
@@ -23,14 +22,12 @@ This document describes the format of FPP JSON dictionaries.
     - [Struct Type Definition](#struct-type-definition)
         - [Struct Type Definition](#struct-type-definition_1)
         - [Struct Member](#struct-member-descriptor)
-    - [Type Alias Definition](#type-alias-definition)
 - [Values](#values)
     - [Primitive Integer Values](#primitive-integer-values)
     - [Floating-Point Values](#floating-point-values)
     - [Boolean Values](#boolean-values)
     - [String Values](#string-values)
     - [Array Values](#array-values)
-    - [Constant Values](#constant-values)
     - [Enumeration Values](#enumeration-values)
     - [Struct Values](#struct-values)
     - [Invalid Values](#invalid-values)
@@ -46,13 +43,9 @@ This document describes the format of FPP JSON dictionaries.
 - [Data Products](#data-products)
     - [Records](#records)
     - [Containers](#containers)
-- [Telemetry Packet Sets](#telemetry-packet-sets) 
-  - [Telemetry Packets](#telemetry-packets) 
-  - [Telemetry Packet Sets](#telemetry-packet-sets-1)  
 - [Dictionaries](#dictionaries)
     - [Dictionary Metadata](#dictionary-metadata)
     - [Dictionary Content](#dictionary-content)
-    - [Framework Definitions Required by the Dictionary](#framework-definitions-required-by-the-dictionary)
 
 ## Type Descriptors
 
@@ -178,42 +171,6 @@ Example JSON of qualified name
 }
 ```
 
-## Constants
-
-| Field | Description | Options | Required | 
-| ----- | ----------- | ------- | -------- |
-| `qualifiedName` | Fully qualified name of element in FPP model | Period-separated **String** | true |
-| `type` | The type of the constant value | **[Type Descriptor](#type-descriptors)** | true
-| `value` | Value associated with the constant | **[Constant Value](#constant-values)** | true |
-| `annotation` | User-defined annotation | **String** | false |
-
-Type information for integer constant dictionary entries is determined by
-checking the sign of a constant and will always default to the maximum integer size (64 bits):
-- If the constant is positive, the type of the constant is U64.
-- If the constant is negative, the type of the constant is I64.
-  
-Example FPP model with JSON representation:
-```
-module M1 {
-  @ Constant with value 1
-  constant C = 1
-}
-```
-
-```json
-{
-  "qualifiedName" : "M1.C",
-  "type" : {
-    "name" : "U64",
-    "kind" : "integer",
-    "size" : 64,
-    "signed" : false
-  },
-  "value" : 1,
-  "annotation" : "Constant with value 1"
-}
-```
-
 ## Type Definitions
 
 ### Array Type Definition
@@ -224,7 +181,7 @@ module M1 {
 | `qualifiedName` | Fully qualified name of element in FPP model | Period-separated **String** | true |
 | `size` | Size of the data structure | **Number** | true |
 | `elementType` | The type of the array's elements | **[Type Descriptor](#type-descriptors)** | true
-| `default` | Default array value |  **[Array Value](#array-values)**  | true |
+| `default` | Default array value | Value of type specified in `elementType` | true |
 | `annotation` | User-defined annotation | **String** | false |
 
 Example FPP model with JSON representation:
@@ -260,7 +217,7 @@ module M1 {
 | `qualifiedName` | Fully qualified name of element in FPP model | Period-separated **String** | true |
 | `representationType` | Type of the enumerated values | **[Type Descriptor](#type-descriptors)** | true |
 | `enumeratedConstants` | The enumerated constants | JSON Dictionary of enumerated constants (keys) to [Enumerated Constant Descriptor](#enumerated-constant-descriptors) (values) | true |
-| `default` | Qualified name of the enumeration's default value | **[Enumeration Value](#enumeration-values)** | true |
+| `default` | Qualified name of the enumeration's default value | **String** | true |
 | `annotation` | User-defined annotation | **String** | false |
 
 #### Enumerated Constant Descriptors
@@ -321,7 +278,7 @@ module M1 {
 | `kind` | The kind of type | `struct` | true |
 | `qualifiedName` | Fully qualified name of element in FPP model | Period-separated **String** | true |
 | `members` | The members of the struct | JSON dictionary of Member Name (key) to [Struct Member Descriptor](#struct-member-descriptor) (value) | true |
-| `default` | The default value of the struct | JSON dictionary of Member Name (key) to **[Struct Value](#struct-values)** (value) | true |
+| `default` | The default value of the struct | JSON dictionary of Member Name (key) to default value (value) | true |
 | `annotation` | User-defined annotation | **String** extracted from FPP model | false |
 
 #### Struct Member Descriptor
@@ -387,62 +344,6 @@ module M1 {
 }
 ```
 
-### Type Alias Definition
-
-| Field | Description | Options | Required |
-| ----- | ----------- | ------- | -------- |
-| `kind` | The kind of type | `alias` | true |
-| `qualifiedName` | Fully qualified name of element in FPP model | Period-separated **String** | true |
-| `type` | [Type Descriptor](#type-descriptors) of the alias | [Type Descriptor](#type-descriptors) | true |
-| `underlyingType` | [Type Descriptor](#type-descriptors) of the underlying type of the alias | [Type Descriptor](#type-descriptors) | true |
-| `annotation` | User-defined annotation | **String** extracted from FPP model | false |
-
-Example FPP model with JSON representation:
-```
-module M1 {
-    @ Alias of type U32
-    type A1 = U32
-    @ Alias of type A1
-    type A2 = A1
-}
-```
-```json
-[
-  {
-    "kind": "alias",
-    "qualifiedName": "M1.A1",
-    "type": {
-      "name": "U32",
-      "kind": "integer",
-      "signed": false,
-      "size": 32
-    },
-    "underlyingType": {
-      "name": "U32",
-      "kind": "integer",
-      "signed": false,
-      "size": 32
-    },
-    "annotation": "Alias of type U32"
-  },
-  {
-    "kind": "alias",
-    "qualifiedName": "M1.A2",
-      "type": {
-        "name": "M1.A1",
-        "kind": "qualifiedIdentifier"
-      },
-      "underlyingType": {
-        "name": "U32",
-        "kind": "integer",
-        "signed": false,
-        "size": 32
-      },
-    "annotation": "Alias of type A2"
-  }
-]
-```
-
 ## Values
 
 ### Primitive Integer Values
@@ -491,10 +392,6 @@ Example JSON of an array of type U32 consisting of 10 elements
 ```json
 [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 ```
-
-### Constant Values
-Constant values include [Primitive Integer](#primitive-integer-values), [Floating-Point](#floating-point-values), 
-[String](#string-values), and [Boolean](#boolean-values) values.
 
 ### Enumeration Values
 String qualified identifier name of enumeration value
@@ -581,33 +478,18 @@ Formal Parameters are used in Commands and Events definitions.
 
 Example Command in FPP:
 ```
-module M {
-
-  active component Component1 { 
-
-    @ A sync command with parameters
-    sync command SyncParams(
-        param1: U32 @< Param 1
-        param2: string @< Param 2
-    ) opcode 0x01
-
-  }
-
-  instance c1: Component1 base id 0x100 \
-    queue size 10
-
-  topology T {
-    instance c1
-  }
-
-}
+@ A sync command with parameters
+sync command SyncParams(
+    param1: U32 @< Param 1
+    param2: string @< Param 2
+) opcode 0x100
 ```
 JSON representation:
 ```json
 {
-    "name": "M.c1.SyncParams",
+    "name": "M1.SyncParams",
     "commandKind": "sync",
-    "opcode": 257,
+    "opcode": 256,
     "annotation": "A sync command with parameters",
     "formalParams": [
         {
@@ -649,42 +531,25 @@ JSON representation:
 
 Example FPP model with JSON representation:
 ```
-
-module M {
-
-  active component Component1 { 
-
-    @ Telemetry channel 1
-    telemetry Channel1: F64 \
-      id 0x02 \
-      update on change \
-      low { yellow -1, orange -2, red -3 } \
-      high { yellow 1, orange 2, red 3 }
-
-  }
-
-  instance c1: Component1 base id 0x100 \
-    queue size 10
-
-  topology T {
-    instance c1
-  }
-
-}
-
+@ Telemetry channel 1
+telemetry Channel1: F64 \
+    id 0x100 \
+    update on change \
+    low { yellow -1, orange -2, red -3 } \
+    high { yellow 1, orange 2, red 3 }
 ```
 
 ```json
 [
     {
-        "name": "M.c1.Channel1",
+        "name": "M1.Channel1",
         "annotation": "Telemetry channel 1",
         "type": {
             "name": "F64",
             "kind": "float",
             "size": 64
         },
-        "id": 258,
+        "id": 256,
         "telemetryUpdate": "on change",
         "limit": {
             "low": {
@@ -717,51 +582,56 @@ module M {
 
 Example FPP model with JSON representation:
 ```
-module M {
-
-  active component Component1 { 
-
-    @ This is the annotation for Event 1
-    event Event1(
-      arg1: U32 @< Argument 1
-    ) \
-      severity activity low \
-      id 0x03 \
-      format "Event 1 occurred"
-
-  }
-
-  instance c1: Component1 base id 0x100 \
-    queue size 10
-
-  topology T {
-    instance c1
-  }
-
-}
-
+@ This is the annotation for Event 0
+event Event0 \
+    severity activity low \
+    id 0x100 \
+    format "Event 0 occurred"
 ```
 
 ```json
 {
-    "name": "M.c1.Event1",
-    "annotation": "This is the annotation for Event 1",
+    "name": "M1.Event0",
+    "annotation": "This is the annotation for Event 0",
     "severity": "ACTIVITY_LO",
+    "formalParams": [],
+    "id": 256,
+    "format": "Event 0 occurred",
+}
+```
+
+Example FPP model with JSON representation:
+```
+@ This is the annotation for Event 1
+@ Sample output: "Event 1 occurred with argument 42"
+event Event1(
+    arg1: U32 @< Argument 1
+) \
+    severity activity high \
+    id 0x101 \
+    format "Event 1 occurred with argument {}"
+
+```
+```json
+{
+    "name": "M1.Event1",
+    "annotation": "This is the annotation for Event 1\nSample output: \"Event 1 occurred with argument 42\"",
+    "severity": "ACTIVITY_HIGH",
     "formalParams": [
-      {
-        "name": "arg1",
-        "annotation": "Argument 1",
-        "type": {
-            "name": "U32",
-            "kind": "integer",
-            "size": 32,
-            "signed": false,
-        },
-        "ref": false  
-      }
+        {
+           "name": "arg1",
+            "annotation": "Argument 1",
+            "type": {
+                "name": "U32",
+                "kind": "integer",
+                "size": 32,
+                "signed": false,
+            },
+            "ref": false  
+        }
     ],
-    "id": 259,
-    "format": "Event 1 occurred",
+    "id": 257,
+    "format": "Event 1 occurred with argument {}",
 }
 ```
 
@@ -777,38 +647,23 @@ module M {
 
 Example FPP model with JSON representation:
 ```
-
-module M {
-
-  active component Component1 { 
-
-    @ This is the annotation for Parameter 1
-    param Parameter1: U32 \
-      id 0x04 \
-
-  }
-
-  instance c1: Component1 base id 0x100 \
-    queue size 10
-
-  topology T {
-    instance c1
-  }
-
-}
-
+@ This is the annotation for Parameter 1
+param Parameter1: U32 \
+    id 0x100 \
+    set opcode 0x101 \
+    save opcode 0x102
 ```
 
 ```json
 {
-    "name": "M.c1.Parameter1",
+    "name": "M1.Parameter1",
     "type": {
         "name": "U32",
         "kind": "integer",
         "signed": false,
         "size": 32
     },
-    "id": "260",
+    "id": "256",
     "annotation": "This is the annotation for Parameter 1",
     "default": 0
 }
@@ -827,44 +682,29 @@ module M {
 
 Example FPP model with JSON representation:
 ```
-module M {
+@ Record 0: A variable number of F32 values
+@ Implied id is 0x100
+product record Record0: F32 array
 
-  active component Component1 { 
-
-    @ Record 0: A variable number of F32 values
-    product record Record0: F32 array id 0x05
-
-    @ Record 1: A single U32 value
-    product record Record1: U32 id 0x06
-
-  }
-
-  instance c1: Component1 base id 0x100 \
-    queue size 10
-
-  topology T {
-    instance c1
-  }
-
-}
-
+@ Record 1: A single U32 value
+product record Record1: U32 id 0x102
 ```
 
 ```json
 [
     {
-        "name": "M.c1.Record0",
-        "annotation": "Record 0: A variable number of F32 values",
+        "name": "M1.Record0",
+        "annotation": "Record 0: A variable number of F32 values\nImplied id is 0x100",
         "type": {
             "name": "F32",
             "kind": "float",
             "size": 32
         },
         "array": true,
-        "id": 261 
+        "id": 256 
     },
     {
-        "name": "M.c1.Record1",
+        "name": "M1.Record1",
         "annotation": "Record 1: A single U32 value",
         "type": {
             "name": "U32",
@@ -873,7 +713,7 @@ module M {
             "size": 32
         },
         "array": false,
-        "id": 262
+        "id": 258
     }      
 ]
 ```
@@ -889,128 +729,35 @@ module M {
 
 Example FPP model with JSON representation:
 ```
-module M {
+@ Container 0
+@ Implied id is 0x100
+product container Container0
 
-  active component Component1 { 
+@ Container 1
+product container Container1 id 0x102
 
-    @ Container 0
-    product container Container0 id 0x07
-
-    @ Container 1
-    product container Container1 id 0x08
-
-    @ Container 2
-    product container Container2 id 0x09 default priority 10
-
-  }
-
-  instance c1: Component1 base id 0x100 \
-    queue size 10
-
-  topology T {
-    instance c1
-  }
-
-}
-
+@ Container 2
+@ Implied id is 0x103
+product container Container2 default priority 10
 ```
 
 ```json
 [
     {
-       "name": "M.c1.Container0",
-       "annotation": "Container 0",
-       "id": 263,
+       "name": "M1.Container0",
+       "annotation": "Container 0\nImplied id is 0x100",
+       "id": 256,
     },
     {
-        "name": "M.c1.Container1",
+        "name": "M1.Container1",
         "annotation": "Container 1",
-        "id": 264,
+        "id": 258,
     },
     {
-        "name": "M.c1.Container2",
-        "annotation": "Container 2",
-        "id": 265,
+        "name": "M1.Container2",
+        "annotation": "Container 2\nImplied id is 0x103",
+        "id": 3,
         "defaultPriority": 259
-    }
-]
-```
-
-## Telemetry Packet Sets
-
-### Telemetry Packets
-
-| Field | Description | Options | Required |
-| ----- | ----------- | ------- | -------- |
-| `name` | Name of the telemetry packet | **String** | true |
-| `id` | Numeric identifier of the packet | **Number** | true |
-| `group` | Packet group number | **Number** | true |
-| `members` | Telemetry Channels in the packet | Array of Fully Qualified Names of [Telemetry Channels](#telemetry-channels) | true
-
-### Telemetry Packet Sets
-
-| Field | Description | Options | Required |
-| ----- | ----------- | ------- | -------- |
-| `name` | Name of the telemetry packet set | **String** | true |
-| `members` | Telemetry Packets in the set | Array of [Telemetry Packets](#telemetry-packets) | true |
-| `omitted` | Telemetry Channels omitted from the set | Array of Fully Qualified Names of [Telemetry Channels](#telemetry-channels) | true |
-
-
-Example FPP model with JSON representation:
-```
-module M {
-
-  active component Component1 {
-    @ Telemetry channel 0
-    telemetry Channel0: U32 id 0x00
-
-    @ Telemetry channel 1
-    telemetry Channel1: U32 \
-      id 0x01 \
-      update on change
-
-    @ Telemetry channel 2
-    telemetry Channel2: F64 \
-      id 0x02 \
-      format "{.3f}"
-  }
-
-  instance c1: Component1 base id 0x100 \
-    queue size 10
-
-  topology T {
-    instance c1
-
-    telemetry packets Packets {
-      packet P1 id 0 level 0 {
-        M.c1.Channel0
-        M.c1.Channel1
-      }
-    } omit {
-      M.c1.Channel2
-    }
-  }
-}
-```
-
-```json
-[
-  {
-      "name" : "Packets",
-      "members" : [
-        {
-          "name" : "P1",
-          "id" : 0,
-          "group" : 0,
-          "members" : [
-            "M.c1.Channel0",
-            "M.c1.Channel1"
-          ]
-        }
-      ],
-      "omitted" : [
-        "M.c1.Channel2"
-      ]
     }
 ]
 ```
@@ -1020,7 +767,7 @@ module M {
 
 | Field | Description | Options | Required |
 | ----- | ----------- | ------- | -------- |
-| `deploymentName` | **String** representing the fully qualified name of the topology | **String** | true |
+| `deploymentName` | **String** representing the deployment name | **String** | true |
 | `frameworkVersion` | **String** representing the F´ framework version (semantic versioning) | **String** | true |
 | `projectVersion` | **String** representing the project version (semantic versioning) | **String** | true |
 | `libraryVersions` | **Array of Strings** corresponding to the version (semantic versioning) of libraries used by the F´ project | **Array of Strings** | true
@@ -1041,98 +788,17 @@ module M {
 | ----- | ------- | -------- |
 | `metadata` | [Dictionary Metadata](#dictionary-metadata) | true |
 | `typeDefinitions` | Array of [Type Definitions](#type-definitions)| true |
-| `constants` | Array of [Constants](#constants)| true |
 | `commands` | Array of [Commands](#commands) | true |
 | `events` | Array of [Events](#events) | true |
 | `telemetryChannels` | Array of [Telemetry Channels](#telemetry-channels) | true |
 | `parameters` | Array of [Parameters](#parameters) | true |
 | `records` | Array of [Records](#records) | true |
 | `containers` | Array of [Containers](#containers) | true |
-| `telemetryPacketSets` | Array of [Telemetry Packet Sets](#telemetry-packet-sets) | true |
-
-Example FPP model with JSON representation:
-```
-module M {
-
-  array StringArray = [2] string size 80 default [ "A", "B"]
-
-  enum StatusEnum {
-    YES
-    NO
-    MAYBE
-  } default MAYBE
-
-  struct A {
-    x: U32 format "The value of x is {}"
-    y: F32 format "The value of y is {}"
-  } default { x = 1, y = 1.15}
-
-
-  active component Component1 { 
-
-    @ A command with a single StringArray argument
-    sync command CommandString(
-        arg1: M.StringArray @< description for argument 1
-    ) opcode 0x01
-
-    @ This is the annotation for Parameter 1
-    param Parameter1: A \
-      id 0x02 \
-      set opcode 0x03 \
-      save opcode 0x04
-
-    @ Event with one StatusEnum argument
-    event Event1(
-      arg1: M.StatusEnum @< Description of arg1 formal param
-    ) \
-      severity activity high \
-      id 0x05 \
-      format "Event 1 occurred, status {}"
-
-    @ Telemetry channel 1 of type I32
-    telemetry Channel1: I32 \
-      id 0x06 \
-      update on change \
-      low { yellow -1, orange -2, red -3 } \
-      high { yellow 1, orange 2, red 3 }
-
-    @ Record 0: A variable number of F32 values
-    product record Record0: F32 array id 0x05
-
-    @ Record 1: A single U32 value
-    product record Record1: U32 id 0x06
-
-    @ Container 0
-    product container Container0 id 0x07
-
-    @ Container 1
-    product container Container1 id 0x08
-
-    @ Container 2
-    product container Container2 id 0x09 default priority 10
-
-  }
-
-  instance c1: Component1 base id 0x100 \
-    queue size 10
-
-  topology T {
-    instance c1
-
-    telemetry packets Packets {
-      packet P1 id 0 level 0 {
-        M.c1.Channel1
-      }
-    }
-  }
-}
-
-```
 
 ```json
 {
   "metadata": {
-    "deploymentName": "M.T",
+    "deploymentName": "MyDeployment",
     "frameworkVersion": "3.3.2",
     "projectVersion": "1.0.0",
     "libraryVersions": [],
@@ -1141,7 +807,7 @@ module M {
   "typeDefinitions" : [
     {
       "kind" : "array",
-      "qualifiedName" : "M.StringArray",
+      "qualifiedName" : "FppTest.StringArray",
       "size" : 2,
       "elementType" : {
         "name" : "string",
@@ -1156,7 +822,7 @@ module M {
     },
     {
       "kind" : "enum",
-      "qualifiedName" : "M.StatusEnum",
+      "qualifiedName" : "FppTest.MyEnum",
       "representationType" : {
         "name" : "U8",
         "kind" : "integer",
@@ -1174,20 +840,21 @@ module M {
         },
         {
           "name" : "MAYBE",
-          "value" : 2
+          "value" : 2,
+          "annotation" : "MAYBE is a maybe"
         }
       ],
-      "default" : "M1.StatusEnum.MAYBE"
+      "default" : "FppTest.MyEnum.YES"
     },
     {
       "kind" : "struct",
-      "qualifiedName" : "M.A",
+      "qualifiedName" : "FppTest.MyStruct",
       "members" : {
         "x" : {
           "type" : {
-            "name" : "U32",
+            "name" : "U64",
             "kind" : "integer",
-            "size" : 32,
+            "size" : 64,
             "signed" : false
           },
           "index" : 0,
@@ -1200,43 +867,54 @@ module M {
             "size" : 32
           },
           "index" : 1,
-          "format" : "The value of y is {}"
+          "format" : "The value of y is {.2f}",
+          "annotation" : "This is the y parameter"
         }
       },
       "default" : {
         "x" : 1,
-        "y" : 1.15
+        "y" : 1.5
       }
     }
   ],
-  "constants": [],
   "commands" : [
     {
-      "name" : "M.c1.CommandString",
+      "name" : "c1.CommandString",
       "commandKind" : "sync",
-      "opcode" : 257,
+      "opcode" : 5000,
       "formalParams" : [
         {
-          "name" : "arg1",
+          "name" : "a",
           "type" : {
-            "name" : "M.StringArray",
+            "name" : "FppTest.StringArray",
             "kind" : "qualifiedIdentifier"
           },
           "ref" : false,
-          "annotation" : "description for argument 1"
+          "annotation" : "description for argument a"
+        },
+        {
+          "name" : "b",
+          "type" : {
+            "name" : "U32",
+            "kind" : "integer",
+            "size" : 32,
+            "signed" : false
+          },
+          "ref" : false,
+          "annotation" : "description for argument b"
         }
       ],
-      "annotation" : "A command with a single StringArray argument"
+      "annotation" : "Command with 2 args (array of strings and U32)"
     },
     {
-      "name" : "M.c1.Parameter1_PRM_SET",
+      "name" : "c1.PARAM1_PARAM_SET",
       "commandKind" : "set",
-      "opcode" : 259,
+      "opcode" : 5001,
       "formalParams" : [
         {
           "name" : "val",
           "type" : {
-            "name" : "M.A",
+            "name" : "FppTest.MyStruct",
             "kind" : "qualifiedIdentifier"
           },
           "ref" : false
@@ -1245,9 +923,9 @@ module M {
       "annotation" : "Parameter (struct)"
     },
     {
-      "name" : "M.c1.Parameter1_PRM_SAVE",
+      "name" : "c1.PARAM1_PARAM_SAVE",
       "commandKind" : "save",
-      "opcode" : 260,
+      "opcode" : 5002,
       "formalParams" : [
       ],
       "annotation" : "Parameter (struct)"
@@ -1255,141 +933,74 @@ module M {
   ],
   "parameters" : [
     {
-      "name" : "M.c1.Parameter1",
+      "name" : "c1.Param1",
       "type" : {
-        "name" : "M.A",
+        "name" : "FppTest.MyStruct",
         "kind" : "qualifiedIdentifier"
       },
-      "id" : 258,
+      "id" : 5001,
       "default" : {
-        "x" : 1,
-        "y" : 1.15
+        "x" : 2,
+        "y" : 1.5
       },
       "annotation" : "Parameter (struct)"
     }
   ],
   "events" : [
     {
-      "name" : "M.c1.Event1",
+      "name" : "c1.Event1",
       "severity" : "ACTIVITY_HI",
       "formalParams" : [
         {
           "name" : "arg1",
           "type" : {
-            "name" : "M.StatusEnum",
+            "name" : "FppTest.MyEnum",
             "kind" : "qualifiedIdentifier"
           },
           "ref" : false,
-          "annotation" : "Description of arg1 formal param"
+          "annotation" : "description of arg1 formal param"
         }
       ],
-      "id" : 259,
-      "format" : "Event 1 occurred, status {}",
-      "annotation" : "Event with one StatusEnum argument"
+      "id" : 5000,
+      "format" : "Arg one is {} and there is no arg 2",
+      "annotation" : "Event with array arg (containing 4 F32 values)"
     }
   ],
   "telemetryChannels" : [
     {
-      "name" : "M.c1.Channel1",
+      "name" : "c1.MyTlmChannel2",
       "type" : {
-        "name" : "I32",
-        "kind" : "integer",
+        "name" : "F32",
+        "kind" : "float",
         "size" : 32
       },
-      "id" : 260,
-      "telemetryUpdate" : "on change",
-      "annotation" : "Telemetry channel 1 of type I32",
-      "limit": {
-        "low": {
-          "yellow": "-1",
-          "orange": "-2",
-          "red": "-3"
-        },
-        "high": {
-          "yellow": "1",
-          "orange": "2",
-          "red": "3"
-        }
-      }
+      "id" : 5000,
+      "telemetryUpdate" : "always",
+      "annotation" : "Telemetry channel of type F32"
     }
   ],
   "records" : [
     {
-        "name": "M.c1.Record0",
-        "annotation": "Record 0: A variable number of F32 values",
-        "type": {
-            "name": "F32",
-            "kind": "float",
-            "size": 32
-        },
-        "array": true,
-        "id": 261 
-    },
-    {
-        "name": "M.c1.Record1",
-        "annotation": "Record 1: A single U32 value",
-        "type": {
-            "name": "U32",
-            "kind": "integer",
-            "signed": false,
-            "size": 32
-        },
-        "array": false,
-        "id": 262
-    }   
+      "name" : "c1.U32Record",
+      "type" : {
+        "name" : "U32",
+        "kind" : "integer",
+        "size" : 32,
+        "signed" : false
+      },
+      "array" : false,
+      "id" : 5100,
+      "annotation" : "Record 1"
+    }
   ],
   "containers" : [
     {
-       "name": "M.c1.Container0",
-       "annotation": "Container 0",
-       "id": 263,
-    },
-    {
-        "name": "M.c1.Container1",
-        "annotation": "Container 1",
-        "id": 264,
-    },
-    {
-        "name": "M.c1.Container2",
-        "annotation": "Container 2",
-        "id": 265,
-        "defaultPriority": 10
-    }
-  ],
-  "telemetryPacketSets": [
-    {
-      "name" : "Packets",
-      "members" : [
-        {
-          "name" : "P1",
-          "id" : 0,
-          "group" : 0,
-          "members" : [
-            "M.c1.Channel1"
-          ]
-        }
-      ],
-      "omitted" : []
+      "name" : "c1.Container1",
+      "id" : 5100,
+      "defaultPriority" : 10,
+      "annotation" : "Container 1"
     }
   ]
 }
 
 ```
-
-### Framework Definitions Required by the Dictionary
-The following framework definitions are required by the dictionary and will always be present in the dictionary content:
-| Name  | Kind    | Location | Purpose  |
-| ----- | ------- | -------- | -------- |
-| `FwChanIdType` | [Alias type definition](#type-alias-definition)| `typeDefinitions` | The type of a telemetry channel identifier |
-| `FwEventIdType` | [Alias type definition](#type-alias-definition)| `typeDefinitions` | The type of an event identifier |
-| `FwOpcodeType` | [Alias type definition](#type-alias-definition)| `typeDefinitions` | The type of a command opcode | 
-| `FwPacketDescriptorType` | [Alias type definition](#type-alias-definition)| `typeDefinitions` | The type of a com packet descriptor | 
-| `FwDpIdType` | [Alias type definition](#type-alias-definition)| `typeDefinitions` | The type of a data product identifier | 
-| `FwDpPriorityType` | [Alias type definition](#type-alias-definition)| `typeDefinitions` | The type of a data product priority |
-| `FwSizeStoreType` | [Alias type definition](#type-alias-definition)| `typeDefinitions` | The type used to serialize a size value | 
-| `FwTimeBaseStoreType` | [Alias type definition](#type-alias-definition)| `typeDefinitions` | The type used to serialize a time base value |
-| `FwTimeContextStoreType` | [Alias type definition](#type-alias-definition)| `typeDefinitions` | The type used to serialize a time context value |
-| `Fw.DpState` | [Enum type definition](#enumeration-type-definition)| `typeDefinitions` | The data product state | |
-| `Fw.DpCfg.ProcType` | [Enum type definition](#enumeration-type-definition)| `typeDefinitions` | A bit mask for selecting the type of processing to perform on a container before writing it to disk. |
-| `Fw.DpCfg.CONTAINER_USER_DATA_SIZE` | [Constant Definition](#constants)| `constants` | The size in bytes of the user-configurable data in the container packet header |
-

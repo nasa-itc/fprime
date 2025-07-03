@@ -15,16 +15,10 @@
 #include "config/FppConstantsAc.hpp"
 #include "config/ProcTypeEnumAc.hpp"
 
-// Forward declare for UTs
-namespace Fw { class DpContainerTester; }
-
 namespace Fw {
 
 //! A data product Container
 class DpContainer {
-
-  friend class Fw::DpContainerTester;
-
   public:
     // ----------------------------------------------------------------------
     // Constants and Types
@@ -240,7 +234,7 @@ class DpContainer {
         return Header::SIZE + dataSize + 2 * HASH_DIGEST_LENGTH;
     }
 
-  private:
+  PRIVATE:
     // ----------------------------------------------------------------------
     // Private member functions
     // ----------------------------------------------------------------------
@@ -256,7 +250,7 @@ class DpContainer {
     //! The user data
     Header::UserData m_userData;
 
-  protected:
+  PROTECTED:
     // ----------------------------------------------------------------------
     // Protected member variables
     // ----------------------------------------------------------------------

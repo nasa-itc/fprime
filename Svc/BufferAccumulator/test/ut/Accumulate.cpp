@@ -21,10 +21,10 @@ namespace Accumulate {
 // ----------------------------------------------------------------------
 
 void BufferAccumulatorTester ::OK() {
-  ASSERT_EQ(BufferAccumulator_OpState::DRAIN, this->component.m_mode.e);
+  ASSERT_EQ(BufferAccumulator_OpState::DRAIN, this->component.mode.e);
   this->sendCmd_BA_SetMode(0, 0, BufferAccumulator_OpState::ACCUMULATE);
-  this->doDispatch();
-  ASSERT_EQ(BufferAccumulator_OpState::ACCUMULATE, this->component.m_mode.e);
+  this->component.doDispatch();
+  ASSERT_EQ(BufferAccumulator_OpState::ACCUMULATE, this->component.mode.e);
   ASSERT_FROM_PORT_HISTORY_SIZE(0);
 
   Fw::Buffer buffers[MAX_NUM_BUFFERS];
@@ -35,13 +35,13 @@ void BufferAccumulatorTester ::OK() {
     Fw::Buffer b(data, size, bufferID);
     buffers[i] = b;
     this->invoke_to_bufferSendInFill(0, buffers[i]);
-    this->doDispatch();
+    this->component.doDispatch();
     ASSERT_FROM_PORT_HISTORY_SIZE(0);
   }
 
   this->sendCmd_BA_SetMode(0, 0, BufferAccumulator_OpState::DRAIN);
-  this->doDispatch();
-  ASSERT_EQ(BufferAccumulator_OpState::DRAIN, this->component.m_mode.e);
+  this->component.doDispatch();
+  ASSERT_EQ(BufferAccumulator_OpState::DRAIN, this->component.mode.e);
   ASSERT_FROM_PORT_HISTORY_SIZE(1);
   ASSERT_from_bufferSendOutDrain_SIZE(1);
   ASSERT_from_bufferSendOutDrain(0, buffers[0]);
@@ -49,7 +49,7 @@ void BufferAccumulatorTester ::OK() {
   U32 expectedNumBuffers = 1;
   for (U32 i = 0; i < MAX_NUM_BUFFERS; ++i) {
     this->invoke_to_bufferSendInReturn(0, buffers[i]);
-    this->doDispatch();
+    this->component.doDispatch();
     ++expectedNumBuffers;
     if (i + 1 < MAX_NUM_BUFFERS) {
       ++expectedNumBuffers;

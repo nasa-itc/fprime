@@ -11,7 +11,7 @@
 namespace Fw {
 
     TlmPacket::TlmPacket() : m_numEntries(0) {
-        this->m_type = ComPacketType::FW_PACKET_TELEM;
+        this->m_type = FW_PACKET_TELEM;
         this->m_tlmBuffer.resetSer();
     }
 
@@ -24,7 +24,7 @@ namespace Fw {
         this->m_numEntries = 0;
         // make sure packet type is correct before serializing. It should
         // never be anything but FW_PACKET_TELEM, so assert.
-        FW_ASSERT(ComPacketType::FW_PACKET_TELEM == this->m_type, static_cast<FwAssertArgType>(this->m_type));
+        FW_ASSERT(FW_PACKET_TELEM == this->m_type,this->m_type);
         // serialize descriptor
         // The function serializeBase inherited from ComPacket converts this->m_type
         // to type FwPacketDescriptorType and serializes the result into this->m_tlmBuffer.
@@ -42,14 +42,14 @@ namespace Fw {
             return stat;
         }
         // make sure that this->m_tlmBuffer stores a telemetry packet
-        if (this->m_type != ComPacketType::FW_PACKET_TELEM) {
+        if (this->m_type != FW_PACKET_TELEM) {
             return Fw::FW_DESERIALIZE_TYPE_MISMATCH;
         }
 
         return Fw::FW_SERIALIZE_OK;
     }
 
-    FwSizeType TlmPacket::getNumEntries() {
+    NATIVE_UINT_TYPE TlmPacket::getNumEntries() {
         return this->m_numEntries;
     }
 
@@ -63,7 +63,7 @@ namespace Fw {
 
     SerializeStatus TlmPacket::addValue(FwChanIdType id, Time& timeTag, TlmBuffer& buffer) {
         // check to make sure there is room for all the fields
-        FwSizeType left = this->m_tlmBuffer.getBuffCapacity()-this->m_tlmBuffer.getBuffLength();
+        NATIVE_UINT_TYPE left = this->m_tlmBuffer.getBuffCapacity()-this->m_tlmBuffer.getBuffLength();
         if (
             (sizeof(FwChanIdType) + Time::SERIALIZED_SIZE + buffer.getBuffLength()) > left
         ) {
@@ -85,7 +85,7 @@ namespace Fw {
         }
 
         // telemetry buffer
-        stat = this->m_tlmBuffer.serialize(buffer.getBuffAddr(),buffer.getBuffLength(),Fw::Serialization::OMIT_LENGTH);
+        stat = this->m_tlmBuffer.serialize(buffer.getBuffAddr(),buffer.getBuffLength(),true);
         if (stat != Fw::FW_SERIALIZE_OK) {
             return stat;
         }
@@ -97,7 +97,7 @@ namespace Fw {
     }
 
             // extract telemetry value
-    SerializeStatus TlmPacket::extractValue(FwChanIdType &id, Time& timeTag, TlmBuffer& buffer, FwSizeType bufferSize) {
+    SerializeStatus TlmPacket::extractValue(FwChanIdType &id, Time& timeTag, TlmBuffer& buffer, NATIVE_UINT_TYPE bufferSize) {
 
         // deserialize items out of buffer
 
@@ -114,7 +114,7 @@ namespace Fw {
         }
 
         // telemetry buffer
-        stat = this->m_tlmBuffer.deserialize(buffer.getBuffAddr(),bufferSize,Fw::Serialization::OMIT_LENGTH);
+        stat = this->m_tlmBuffer.deserialize(buffer.getBuffAddr(),bufferSize,true);
         if (stat != Fw::FW_SERIALIZE_OK) {
             return stat;
         }
@@ -136,7 +136,7 @@ namespace Fw {
             return stat;
         }
         // Serialize the ComBuffer
-        return buffer.serialize(this->m_tlmBuffer.getBuffAddr(),m_tlmBuffer.getBuffLength(),Fw::Serialization::OMIT_LENGTH);
+        return buffer.serialize(this->m_tlmBuffer.getBuffAddr(),m_tlmBuffer.getBuffLength(),true);
     }
 
     SerializeStatus TlmPacket::deserialize(SerializeBufferBase& buffer) {
@@ -147,12 +147,12 @@ namespace Fw {
             return stat;
         }
         // deserialize the channel value entry buffers
-        FwSizeType size = buffer.getBuffLeft();
-        stat = buffer.deserialize(this->m_tlmBuffer.getBuffAddr(),size,Fw::Serialization::OMIT_LENGTH);
+        NATIVE_UINT_TYPE size = buffer.getBuffLeft();
+        stat = buffer.deserialize(this->m_tlmBuffer.getBuffAddr(),size,true);
         if (stat == FW_SERIALIZE_OK) {
             // Shouldn't fail
             stat = this->m_tlmBuffer.setBuffLen(size);
-            FW_ASSERT(stat == FW_SERIALIZE_OK,static_cast<FwAssertArgType>(stat));
+            FW_ASSERT(stat == FW_SERIALIZE_OK,static_cast<NATIVE_INT_TYPE>(stat));
         }
         return stat;
     }

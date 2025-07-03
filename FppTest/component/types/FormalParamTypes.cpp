@@ -10,8 +10,6 @@
 //
 // ======================================================================
 
-#include <cstdint>
-
 #include "FormalParamTypes.hpp"
 #include "FppTest/utils/Utils.hpp"
 #include "Fw/Types/StringTemplate.hpp"
@@ -31,10 +29,6 @@ BoolType::BoolType() {
 
 U32Type::U32Type() {
     val = STest::Pick::any();
-}
-
-I32Type::I32Type() {
-    val = static_cast<I32>(STest::Pick::lowerUpper(0, INT32_MAX));
 }
 
 F32Type::F32Type() {
@@ -61,8 +55,6 @@ EnumType::EnumType() {
 EnumTypes::EnumTypes() {
     val1 = getRandomFormalParamEnum();
     val2 = getRandomFormalParamEnum();
-    val3 = getRandomFormalParamEnum();
-    val4 = getRandomFormalParamEnum();
 }
 
 ArrayType::ArrayType() {
@@ -72,10 +64,6 @@ ArrayType::ArrayType() {
 ArrayTypes::ArrayTypes() {
     getRandomFormalParamArray(val1);
     getRandomFormalParamArray(val2);
-    getRandomFormalStringArray(val3);
-    getRandomFormalStringArray(val4);
-    getRandomFormalStringArray(val5);
-    getRandomFormalStringArray(val6);
 }
 
 StructType::StructType() {
@@ -147,19 +135,6 @@ PrmStringTypes::PrmStringTypes() {
     setRandomString(val2, FW_PARAM_STRING_MAX_SIZE / 2);
 }
 
-StringType::StringType() {
-    setRandomString(val, decltype(val)::STRING_SIZE);
-}
-
-AliasStringArrayType::AliasStringArrayType() {
-    getRandomFormalStringArray(val);
-}
-
-StringTypes::StringTypes() {
-    setRandomString(val1, decltype(val1)::STRING_SIZE / 2);
-    setRandomString(val2, decltype(val2)::STRING_SIZE / 2);
-}
-
 // ----------------------------------------------------------------------
 // Serial type
 // ----------------------------------------------------------------------
@@ -202,24 +177,13 @@ void getRandomFormalParamArray(FormalParamArray& a) {
     }
 }
 
-void getRandomFormalStringArray(FormalAliasStringArray& a) {
-    for (U32 i = 0; i < FormalParamArray::SIZE; i++) {
-        setRandomString(a[i], static_cast<U32>(a[i].getCapacity()));
-    }
-}
-
 FormalParamStruct getRandomFormalParamStruct() {
     FormalParamStruct s;
-
     char buf[s.gety().getCapacity()];
-    Utils::setString(buf, sizeof(buf));
-
     Fw::StringTemplate<80> str(buf);
 
     Utils::setString(buf, sizeof(buf));
-    Fw::StringTemplate<80> str2(buf);
-
-    s.set(STest::Pick::any(), str, str2);
+    s.set(STest::Pick::any(), str);
 
     return s;
 }

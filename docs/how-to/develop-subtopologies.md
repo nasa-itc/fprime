@@ -1,4 +1,4 @@
-# Develop a Subtopology
+# How-To: Develop an F´ Subtopology
 
 Subtopologies are topologies for smaller chunks of behavior in F Prime. It allows for grouping bits of topology architecture that fit together, to then be imported into a base deployment's topology. The use case for this is seen when working with shareable components, specifically in the form of [libraries](./develop-fprime-libraries.md).
 
@@ -296,7 +296,11 @@ void teardownTopology(const TopologyState& state){
 ```
 <!-- {% endraw %} -->
 
-Lastly, since our RNG component has some telemetry, we need to include (or ignore) these channels within the `Packets.fppi` file in this folder. As with any other component that is added to a deployment, you use the same syntax with the name of the instance followed by the name of the telemetry channel.
+Lastly, since our RNG component has some telemetry, we need to include (or ignore) these channels within the `Packets.xml` file in this folder. As with any other component that is added to a deployment, you use the same syntax with the name of the instance followed by the name of the telemetry channel. For example:
+
+```xml
+<channel name="rng.RNGValue"/> <!-- based on our instance name -->
+```
 
 Now go ahead and run and build your deployment, and you should see that you have a built deployment that uses a subtopology.
 

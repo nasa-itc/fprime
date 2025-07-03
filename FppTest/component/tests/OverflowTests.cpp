@@ -24,9 +24,9 @@ void Tester ::testOverflowAssert() {
     FormalParamEnum z = FormalParamEnum::T::Z;
 
     for (FwSizeType i = 0; i < Tester::TEST_INSTANCE_QUEUE_DEPTH; i++) {
-        this->invoke_to_enumArgsAsync(i % 2, x, y, x, y);
+        this->invoke_to_enumArgsAsync(i % 2, x, y);
     }
-    ASSERT_DEATH_IF_SUPPORTED(this->invoke_to_enumArgsAsync(0, y, z, y, z), "");
+    ASSERT_DEATH_IF_SUPPORTED(this->invoke_to_enumArgsAsync(0, y, z), "");
 }
 
 // ----------------------------------------------------------------------
@@ -54,13 +54,13 @@ void Tester ::testOverflowHook() {
     FormalParamEnum z = FormalParamEnum::T::Z;
 
     for (FwSizeType i = 0; i < Tester::TEST_INSTANCE_QUEUE_DEPTH; i++) {
-        this->invoke_to_enumArgsHook(i % 2, x, y, x, y);
+        this->invoke_to_enumArgsHook(i % 2, x, y);
     }
-    this->invoke_to_enumArgsHook(0, y, z, y, z);
-    this->invoke_to_enumArgsHook(1, z, x, z, x);
+    this->invoke_to_enumArgsHook(0, y, z);
+    this->invoke_to_enumArgsHook(1, z, x);
     ASSERT_from_enumArgsHookOverflowed_SIZE(2);
-    ASSERT_from_enumArgsHookOverflowed(0, y, z, y, z);
-    ASSERT_from_enumArgsHookOverflowed(1, z, x, z, x);
+    ASSERT_from_enumArgsHookOverflowed(0, y, z);
+    ASSERT_from_enumArgsHookOverflowed(1, z, x);
 
 }
 
@@ -68,10 +68,8 @@ void Tester ::testOverflowHook() {
 // Handler to support overflow hook test
 // ----------------------------------------------------------------------
 
-void Tester ::from_enumArgsHookOverflowed_handler(const FwIndexType portNum,
+void Tester ::from_enumArgsHookOverflowed_handler(const NATIVE_INT_TYPE portNum,
                                                   const FormalParamEnum& en,
-                                                  FormalParamEnum& enRef,
-                                                  const FormalAliasEnum& enA,
-                                                  FormalAliasEnum& enARef) {
-    this->pushFromPortEntry_enumArgsHookOverflowed(en, enRef, enA, enARef);
+                                                  FormalParamEnum& enRef) {
+    this->pushFromPortEntry_enumArgsHookOverflowed(en, enRef);
 }
