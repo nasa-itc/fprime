@@ -17,7 +17,7 @@ extern "C" {
 #include <Platform/PlatformTypes.h>
 #include <Fw/Types/BasicTypes.h>
 
-
+#define FW_ASSERT_LEVEL FW_FILENAME_ASSERT
 // ----------------------------------------------------------------------
 // Type aliases
 // ----------------------------------------------------------------------
@@ -122,9 +122,9 @@ extern "C" {
 //   4. FW_RELATIVE_PATH_ASSERT: asserts report a relative path within F´ or F´ library and line number
 //
 // Note: users who want alternate asserts should set assert level to FW_NO_ASSERT and define FW_ASSERT in this header
-#ifndef FW_ASSERT_LEVEL
-#define FW_ASSERT_LEVEL FW_FILENAME_ASSERT  //!< Defines the type of assert used
-#endif
+// #ifndef FW_ASSERT_LEVEL
+// #define FW_ASSERT_LEVEL FW_FILENAME_ASSERT  //!< Defines the type of assert used
+// #endif
 
 // Adjust various configuration parameters in the architecture. Some of the above enables may disable some of the values
 
