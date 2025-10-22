@@ -4,8 +4,8 @@ module CdhCoreConfig {
     
     module QueueSizes {
         constant cmdDisp     = 1000
-        constant events      = 10
-        constant tlmSend     = 10
+        constant events      = 100
+        constant tlmSend     = 100
         constant $health     = 25
     }
     
