@@ -1,4 +1,3 @@
-\page SvcFileDownlinkComponent Svc::FileDownlink Component
 # Svc::FileDownlink Component
 
 ## 1 Introduction
@@ -30,7 +29,7 @@ FD-003 | `FileDownlink` shall wait for a cooldown after completing a file downli
 The design of `FileDownlink` assumes the following:
 
 1. File downlink occurs by dividing files into packets
-of type [`Fw::FilePacket`](../../../Fw/FilePacket/docs/sdd.html).
+of type [`Fw::FilePacket`](../../../Fw/FilePacket/docs/sdd.md).
 
 2. One file downlink happens at a time.
 
@@ -44,11 +43,11 @@ of type [`Fw::FilePacket`](../../../Fw/FilePacket/docs/sdd.html).
 Name | Type | Role
 -----| ---- | ----
 `timeCaller` | `Fw::Time` | TimeGet
-`cmdIn` | [`Fw::Cmd`](../../../Fw/Cmd/docs/sdd.html) | Cmd
-`cmdRegOut` | [`Fw::CmdReg`](../../../Fw/Cmd/docs/sdd.html) | CmdReg
-`cmdResponseOut` | [`Fw::CmdResponse`](../../../Fw/Cmd/docs/sdd.html) | CmdResponse
-`tlmOut` | [`Fw::Tlm`](../../../Fw/Tlm/docs/sdd.html) | Telemetry
-`eventOut` | [`Fw::LogEvent`](../../../Fw/Log/docs/sdd.html) | LogEvent
+`cmdIn` | [`Fw::Cmd`](../../../Fw/Cmd/docs/sdd.md) | Cmd
+`cmdRegOut` | [`Fw::CmdReg`](../../../Fw/Cmd/docs/sdd.md) | CmdReg
+`cmdResponseOut` | [`Fw::CmdResponse`](../../../Fw/Cmd/docs/sdd.md) | CmdResponse
+`tlmOut` | [`Fw::Tlm`](../../../Fw/Tlm/docs/sdd.md) | Telemetry
+`eventOut` | [`Fw::LogEvent`](../../../Fw/Log/docs/sdd.md) | LogEvent
 
 #### 3.3.2 Component-Specific Ports
 
@@ -57,8 +56,8 @@ Name | Type | Kind | Purpose
 `sendFile` | `Svc::SendFileRequest` | guarded_input | Enqueues file for downlink
 `fileComplete` | `Svc::SendFileComplete` | output | Emits notifications when a file downlink initiated by a port completes
 `Run` | `Svc::Sched` | async_input | Periodic clock input used to trigger internal state machine
-<a name="bufferGet">`bufferGet`</a> | [`Fw::BufferGet`](../../../Fw/Buffer/docs/sdd.html) | output (caller) | Requests buffers for sending file packets.
-<a name="bufferSendOut">`bufferSendOut`</a> | [`Fw::BufferSend`](../../../Fw/Buffer/docs/sdd.html) | output | Sends buffers containing file packets.
+<a name="bufferGet">`bufferGet`</a> | [`Fw::BufferGet`](../../../Fw/Buffer/docs/sdd.md) | output (caller) | Requests buffers for sending file packets.
+<a name="bufferSendOut">`bufferSendOut`</a> | [`Fw::BufferSend`](../../../Fw/Buffer/docs/sdd.md) | output | Sends buffers containing file packets.
 
 ### 3.4 Constants
 
@@ -119,11 +118,11 @@ Otherwise it does nothing.
 
 ## 4 Checklists
 
-Document | Link
--------- | ----
-Design | [Link](Checklist/design.xlsx)
-Code | [Link](Checklist/code.xlsx)
-Unit Test | [Link](Checklist/unit_test.xls)
+Checklist |
+-------- |
+[Design](Checklist/design.xlsx) |
+[Code](Checklist/code.xlsx) |
+[Unit Test](Checklist/unit_test.xls) |
 
 ## 6 Unit Testing
 

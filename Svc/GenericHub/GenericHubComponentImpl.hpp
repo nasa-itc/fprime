@@ -17,7 +17,7 @@
 
 namespace Svc {
 
-class GenericHubComponentImpl : public GenericHubComponentBase {
+class GenericHubComponentImpl final : public GenericHubComponentBase {
   public:
     /**
      * HubType:
@@ -25,14 +25,14 @@ class GenericHubComponentImpl : public GenericHubComponentBase {
      * Type of serialized data on the wire. Allows for expanding them on the opposing end.
      */
     enum HubType {
-        HUB_TYPE_PORT,    //!< Port type transmission
-        HUB_TYPE_BUFFER,  //!< Buffer type transmission
-        HUB_TYPE_EVENT,   //!< Event transmission
-        HUB_TYPE_CHANNEL, //!< Telemetry channel type
+        HUB_TYPE_PORT,     //!< Port type transmission
+        HUB_TYPE_BUFFER,   //!< Buffer type transmission
+        HUB_TYPE_EVENT,    //!< Event transmission
+        HUB_TYPE_CHANNEL,  //!< Telemetry channel type
         HUB_TYPE_MAX
     };
 
-    const static U32 GENERIC_HUB_DATA_SIZE = 1024;
+    constexpr static FwSizeType GENERIC_HUB_DATA_SIZE = 1024;
     // ----------------------------------------------------------------------
     // Construction, initialization, and destruction
     // ----------------------------------------------------------------------
@@ -42,33 +42,28 @@ class GenericHubComponentImpl : public GenericHubComponentBase {
     GenericHubComponentImpl(const char* const compName /*!< The component name*/
     );
 
-    //! Initialize object GenericHub
-    //!
-    void init(const NATIVE_INT_TYPE instance = 0 /*!< The instance number*/
-    );
-
     //! Destroy object GenericHub
     //!
     ~GenericHubComponentImpl();
 
-  PRIVATE:
+  private:
     // ----------------------------------------------------------------------
     // Handler implementations for user-defined typed input ports
     // ----------------------------------------------------------------------
 
     //! Handler implementation for buffersIn
     //!
-    void buffersIn_handler(const NATIVE_INT_TYPE portNum, /*!< The port number*/
+    void buffersIn_handler(const FwIndexType portNum, /*!< The port number*/
                            Fw::Buffer& fwBuffer);
 
     //! Handler implementation for dataIn
     //!
-    void dataIn_handler(const NATIVE_INT_TYPE portNum, /*!< The port number*/
+    void dataIn_handler(const FwIndexType portNum, /*!< The port number*/
                         Fw::Buffer& fwBuffer);
 
     //! Handler implementation for LogRecv
     //!
-    void LogRecv_handler(const NATIVE_INT_TYPE portNum,   /*!< The port number*/
+    void LogRecv_handler(const FwIndexType portNum,       /*!< The port number*/
                          FwEventIdType id,                /*!< Log ID */
                          Fw::Time& timeTag,               /*!< Time Tag */
                          const Fw::LogSeverity& severity, /*!< The severity argument */
@@ -77,10 +72,10 @@ class GenericHubComponentImpl : public GenericHubComponentBase {
 
     //! Handler implementation for TlmRecv
     //!
-    void TlmRecv_handler(const NATIVE_INT_TYPE portNum, /*!< The port number*/
-                         FwChanIdType id,               /*!< Telemetry Channel ID */
-                         Fw::Time& timeTag,             /*!< Time Tag */
-                         Fw::TlmBuffer& val             /*!< Buffer containing serialized telemetry value */
+    void TlmRecv_handler(const FwIndexType portNum, /*!< The port number*/
+                         FwChanIdType id,           /*!< Telemetry Channel ID */
+                         Fw::Time& timeTag,         /*!< Time Tag */
+                         Fw::TlmBuffer& val         /*!< Buffer containing serialized telemetry value */
     );
 
     // ----------------------------------------------------------------------
@@ -89,12 +84,12 @@ class GenericHubComponentImpl : public GenericHubComponentBase {
 
     //! Handler implementation for portIn
     //!
-    void portIn_handler(NATIVE_INT_TYPE portNum,        /*!< The port number*/
+    void portIn_handler(FwIndexType portNum,            /*!< The port number*/
                         Fw::SerializeBufferBase& Buffer /*!< The serialization buffer*/
     );
 
     // Helpers and members
-    void send_data(const HubType type, const NATIVE_INT_TYPE port, const U8* data, const U32 size);
+    void send_data(const HubType type, const FwIndexType port, const U8* data, const FwSizeType size);
 };
 
 }  // end namespace Svc

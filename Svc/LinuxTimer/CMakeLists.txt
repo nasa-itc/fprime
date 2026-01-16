@@ -5,30 +5,25 @@
 # MOD_DEPS: (optional) module dependencies
 #
 ####
+restrict_platforms(Linux Darwin)
 
 
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
 	set(SOURCE_FILES
 		"${CMAKE_CURRENT_LIST_DIR}/LinuxTimer.fpp"
-		"${CMAKE_CURRENT_LIST_DIR}/LinuxTimerComponentImplTaskDelay.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/LinuxTimerComponentImplCommon.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/LinuxTimerTaskDelay.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/LinuxTimerCommon.cpp"
 	)
 elseif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 	set(SOURCE_FILES
 		"${CMAKE_CURRENT_LIST_DIR}/LinuxTimer.fpp"
-		"${CMAKE_CURRENT_LIST_DIR}/LinuxTimerComponentImplTimerFd.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/LinuxTimerComponentImplCommon.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/LinuxTimerFd.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/LinuxTimerCommon.cpp"
 	)
-elseif(${CMAKE_SYSTEM_NAME} STREQUAL "RTEMS5")
-	set(SOURCE_FILES
-		"${CMAKE_CURRENT_LIST_DIR}/LinuxTimer.fpp"
-		"${CMAKE_CURRENT_LIST_DIR}/LinuxTimerComponentImplTaskDelay.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/LinuxTimerComponentImplCommon.cpp"
-		)
 else()
 	set(SOURCE_FILES
 		"${CMAKE_CURRENT_LIST_DIR}/LinuxTimer.fpp"
-		"${CMAKE_CURRENT_LIST_DIR}/LinuxTimerComponentImplCommon.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/LinuxTimerCommon.cpp"
 	)
 endif()
 

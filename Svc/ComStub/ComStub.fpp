@@ -1,31 +1,39 @@
 module Svc {
-    @ Communication adapter interface implementing communication adapter interface via a Drv.ByteStreamDriverModel.
+    @ Communication adapter interface implementing communication adapter interface via a Drv.ByteStreamDriver
+    @ ComStub can use both synchronous and asynchronous byte stream drivers, users should connect the appropriate
+    @ based on their driver type
     passive component ComStub {
+        import Com
 
         # ----------------------------------------------------------------------
-        # Framer, deframer, and queue ports
-        # ----------------------------------------------------------------------
-
-        @ Data coming in from the framing component
-        sync input port comDataIn: Drv.ByteStreamSend
-
-        @ Status of the last radio transmission
-        output port comStatus: Fw.SuccessCondition
-
-        @ Com data passing back out
-        output port comDataOut: Drv.ByteStreamRecv
-
-        # ----------------------------------------------------------------------
-        # Byte stream model
+        # Byte stream model (common)
         # ----------------------------------------------------------------------
 
         @ Ready signal when driver is connected
         sync input port drvConnected: Drv.ByteStreamReady
 
-        @ Data received from driver
-        sync input port drvDataIn: Drv.ByteStreamRecv
+        @ Receive (read) data from driver. This gets forwarded to dataOut
+        sync input port drvReceiveIn: Drv.ByteStreamData
 
-        @ Data going to the underlying driver
-        output port drvDataOut: Drv.ByteStreamSend
+        @ Returning ownership of buffer that came in on drvReceiveIn
+        output port drvReceiveReturnOut: Fw.BufferSend
+
+        # ----------------------------------------------------------------------
+        # Byte stream model (synchronous)
+        # ----------------------------------------------------------------------
+
+        @ Send (write) data to the driver. This gets invoked on dataIn invocation
+        output port drvSendOut: Drv.ByteStreamSend
+
+        # ----------------------------------------------------------------------
+        # Byte stream model (asynchronous)
+        # ----------------------------------------------------------------------
+    
+        @ Send (write) data to the driver asynchronously
+        output port drvAsyncSendOut: Fw.BufferSend
+
+        @ Callback from drvAsyncSendOut (retrieving status and ownership of sent buffer)
+        sync input port drvAsyncSendReturnIn: Drv.ByteStreamData
+
     }
 }

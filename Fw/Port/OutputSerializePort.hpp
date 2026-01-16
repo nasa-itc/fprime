@@ -1,7 +1,7 @@
 #ifndef FW_OUTPUT_SERIALIZE_PORT_HPP
 #define FW_OUTPUT_SERIALIZE_PORT_HPP
 
-#include <FpConfig.hpp>
+#include <Fw/FPrimeBasicTypes.hpp>
 
 #if FW_PORT_SERIALIZATION == 1
 
@@ -9,28 +9,25 @@
 
 namespace Fw {
 
-    class OutputSerializePort : public OutputPortBase {
-        public:
-            OutputSerializePort();
-            virtual ~OutputSerializePort();
-            virtual void init();
+class OutputSerializePort final : public OutputPortBase {
+  public:
+    OutputSerializePort();
+    virtual ~OutputSerializePort();
+    void init() override;
 
-        protected:
-
-
+  protected:
 #if FW_OBJECT_TO_STRING == 1
-            virtual void toString(char* str, NATIVE_INT_TYPE size);
+    const char* getToStringFormatString() override;  //!< Get format string for toString call
 #endif
 
-        private:
+  private:
+    OutputSerializePort(OutputSerializePort*);
+    OutputSerializePort(OutputSerializePort&);
+    OutputSerializePort& operator=(OutputSerializePort&);
+};
 
-            OutputSerializePort(OutputSerializePort*);
-            OutputSerializePort(OutputSerializePort&);
-            OutputSerializePort& operator=(OutputSerializePort&);
-    };
+}  // namespace Fw
 
-}
-
-#endif // FW_OUTPUT_SERIALIZE_PORT_HPP
+#endif  // FW_OUTPUT_SERIALIZE_PORT_HPP
 
 #endif

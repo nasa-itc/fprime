@@ -11,30 +11,22 @@
 // ======================================================================
 
 #include <Drv/LinuxSpiDriver/LinuxSpiDriverComponentImpl.hpp>
-#include <FpConfig.hpp>
+#include <Fw/FPrimeBasicTypes.hpp>
 
 namespace Drv {
 
-    bool LinuxSpiDriverComponentImpl::open(NATIVE_INT_TYPE device,
-                                           NATIVE_INT_TYPE select,
-                                           SpiFrequency clock,
-                                           SpiMode spiMode) {
-        //TODO: fill this function out
-        return false;
-    }
+bool LinuxSpiDriverComponentImpl::open(FwIndexType device, FwIndexType select, SpiFrequency clock, SpiMode spiMode) {
+    return false;
+}
 
-    // ----------------------------------------------------------------------
-    // Handler implementations for user-defined typed input ports
-    // ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+// Handler implementations for user-defined typed input ports
+// ----------------------------------------------------------------------
 
-    void LinuxSpiDriverComponentImpl::SpiReadWrite_handler(
-            const NATIVE_INT_TYPE portNum, Fw::Buffer &WriteBuffer,
-            Fw::Buffer &readBuffer) {
-        // TODO
-    }
+void LinuxSpiDriverComponentImpl::SpiReadWrite_handler(const FwIndexType portNum,
+                                                       Fw::Buffer& WriteBuffer,
+                                                       Fw::Buffer& readBuffer) {}
 
-    LinuxSpiDriverComponentImpl::~LinuxSpiDriverComponentImpl() {
+LinuxSpiDriverComponentImpl::~LinuxSpiDriverComponentImpl() {}
 
-    }
-
-} // end namespace Drv
+}  // end namespace Drv

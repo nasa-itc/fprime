@@ -13,155 +13,127 @@
 #ifndef Svc_FileManager_HPP
 #define Svc_FileManager_HPP
 
-#include "Svc/FileManager/FileManagerComponentAc.hpp"
 #include "Os/FileSystem.hpp"
+#include "Svc/FileManager/FileManagerComponentAc.hpp"
 
 namespace Svc {
 
-  class FileManager :
-    public FileManagerComponentBase
-  {
+class FileManager final : public FileManagerComponentBase {
+  public:
+    // ----------------------------------------------------------------------
+    // Construction, initialization, and destruction
+    // ----------------------------------------------------------------------
 
-    public:
+    //! Construct object FileManager
+    //!
+    FileManager(const char* const compName  //!< The component name
+    );
 
-      // ----------------------------------------------------------------------
-      // Construction, initialization, and destruction
-      // ----------------------------------------------------------------------
+    //! Destroy object FileManager
+    //!
+    ~FileManager();
 
-      //! Construct object FileManager
-      //!
-      FileManager(
-          const char *const compName //!< The component name
-      );
+  private:
+    // ----------------------------------------------------------------------
+    // Command handler implementations
+    // ----------------------------------------------------------------------
 
-      //! Initialize object FileManager
-      //!
-      void init(
-          const NATIVE_INT_TYPE queueDepth, //!< The queue depth
-          const NATIVE_INT_TYPE instance //!< The instance number
-      );
+    //! Implementation for CreateDirectory command handler
+    //!
+    void CreateDirectory_cmdHandler(const FwOpcodeType opCode,       //!< The opcode
+                                    const U32 cmdSeq,                //!< The command sequence number
+                                    const Fw::CmdStringArg& dirName  //!< The directory to create
+    );
 
-      //! Destroy object FileManager
-      //!
-      ~FileManager();
+    //! Implementation for RemoveFile command handler
+    //!
+    void RemoveFile_cmdHandler(const FwOpcodeType opCode,         //!< The opcode
+                               const U32 cmdSeq,                  //!< The command sequence number
+                               const Fw::CmdStringArg& fileName,  //!< The file to remove
+                               const bool ignoreErrors            //!< Ignore missing files
+    );
 
-    PRIVATE:
+    //! Implementation for MoveFile command handler
+    //!
+    void MoveFile_cmdHandler(const FwOpcodeType opCode,               //!< The opcode
+                             const U32 cmdSeq,                        //!< The command sequence number
+                             const Fw::CmdStringArg& sourceFileName,  //!< The source file name
+                             const Fw::CmdStringArg& destFileName     //!< The destination file name
+    );
 
-      // ----------------------------------------------------------------------
-      // Command handler implementations
-      // ----------------------------------------------------------------------
+    //! Implementation for RemoveDirectory command handler
+    //!
+    void RemoveDirectory_cmdHandler(const FwOpcodeType opCode,       //!< The opcode
+                                    const U32 cmdSeq,                //!< The command sequence number
+                                    const Fw::CmdStringArg& dirName  //!< The directory to remove
+    );
 
-      //! Implementation for CreateDirectory command handler
-      //!
-      void CreateDirectory_cmdHandler(
-          const FwOpcodeType opCode, //!< The opcode
-          const U32 cmdSeq, //!< The command sequence number
-          const Fw::CmdStringArg& dirName //!< The directory to create
-      );
+    //! Implementation for ShellCommand command handler
+    //!
+    void ShellCommand_cmdHandler(const FwOpcodeType opCode,           //!< The opcode
+                                 const U32 cmdSeq,                    //!< The command sequence number
+                                 const Fw::CmdStringArg& command,     //!< The shell command string
+                                 const Fw::CmdStringArg& logFileName  //!< The name of the log file
+    );
 
-      //! Implementation for RemoveFile command handler
-      //!
-      void RemoveFile_cmdHandler(
-          const FwOpcodeType opCode, //!< The opcode
-          const U32 cmdSeq, //!< The command sequence number
-          const Fw::CmdStringArg& fileName, //!< The file to remove
-          const bool ignoreErrors //!< Ignore missing files
-      );
+    //! Implementation for ConcatFiles command handler
+    //! Append 1 file's contents to the end of another.
+    void AppendFile_cmdHandler(const FwOpcodeType opCode,       //!< The opcode
+                               const U32 cmdSeq,                //!< The command sequence number
+                               const Fw::CmdStringArg& source,  //! The name of the file to take content from
+                               const Fw::CmdStringArg& target   //! The name of the file to append to
+    );
 
-      //! Implementation for MoveFile command handler
-      //!
-      void MoveFile_cmdHandler(
-          const FwOpcodeType opCode, //!< The opcode
-          const U32 cmdSeq, //!< The command sequence number
-          const Fw::CmdStringArg& sourceFileName, //!< The source file name
-          const Fw::CmdStringArg& destFileName //!< The destination file name
-      );
+    //! Implementation for FileSize command handler
+    //!
+    void FileSize_cmdHandler(const FwOpcodeType opCode,        //!< The opcode
+                             const U32 cmdSeq,                 //!< The command sequence number
+                             const Fw::CmdStringArg& fileName  //!< The file to get the size of
+    );
 
-      //! Implementation for RemoveDirectory command handler
-      //!
-      void RemoveDirectory_cmdHandler(
-          const FwOpcodeType opCode, //!< The opcode
-          const U32 cmdSeq, //!< The command sequence number
-          const Fw::CmdStringArg& dirName //!< The directory to remove
-      );
+    //! Handler implementation for pingIn
+    //!
+    void pingIn_handler(const FwIndexType portNum, /*!< The port number*/
+                        U32 key                    /*!< Value to return to pinger*/
+    );
 
-      //! Implementation for ShellCommand command handler
-      //!
-      void ShellCommand_cmdHandler(
-          const FwOpcodeType opCode, //!< The opcode
-          const U32 cmdSeq, //!< The command sequence number
-          const Fw::CmdStringArg& command, //!< The shell command string
-          const Fw::CmdStringArg& logFileName //!< The name of the log file
-      );
+  private:
+    // ----------------------------------------------------------------------
+    // Helper methods
+    // ----------------------------------------------------------------------
 
-      //! Implementation for ConcatFiles command handler
-      //! Append 1 file's contents to the end of another.
-      void AppendFile_cmdHandler(
-          const FwOpcodeType opCode, //!< The opcode
-          const U32 cmdSeq, //!< The command sequence number
-          const Fw::CmdStringArg& source, //! The name of the file to take content from
-          const Fw::CmdStringArg& target //! The name of the file to append to
-      );
+    //! A system command with no arguments
+    //!
+    int systemCall(const Fw::CmdStringArg& command,     //!< The command
+                   const Fw::CmdStringArg& logFileName  //!< The log file name
+    ) const;
 
-      //! Implementation for FileSize command handler
-      //!
-      void FileSize_cmdHandler(
-          const FwOpcodeType opCode, //!< The opcode
-          const U32 cmdSeq, //!< The command sequence number
-          const Fw::CmdStringArg& fileName //!< The file to get the size of
-      );
+    //! Emit telemetry based on status
+    //!
+    void emitTelemetry(const Os::FileSystem::Status status  //!< The status
+    );
 
-      //! Handler implementation for pingIn
-      //!
-      void pingIn_handler(
-          const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          U32 key /*!< Value to return to pinger*/
-      );
+    //! Send command response based on status
+    //!
+    void sendCommandResponse(const FwOpcodeType opCode,           //!< The opcode
+                             const U32 cmdSeq,                    //!< The command sequence value
+                             const Os::FileSystem::Status status  //!< The status
+    );
 
-    PRIVATE:
+  private:
+    // ----------------------------------------------------------------------
+    // Variables
+    // ----------------------------------------------------------------------
 
-      // ----------------------------------------------------------------------
-      // Helper methods
-      // ----------------------------------------------------------------------
+    //! The total number of commands successfully executed
+    //!
+    U32 commandCount;
 
-      //! A system command with no arguments
-      //!
-      NATIVE_INT_TYPE systemCall(
-          const Fw::CmdStringArg& command, //!< The command
-          const Fw::CmdStringArg& logFileName //!< The log file name
-      ) const;
+    //! The total number of errors
+    //!
+    U32 errorCount;
+};
 
-      //! Emit telemetry based on status
-      //!
-      void emitTelemetry(
-          const Os::FileSystem::Status status //!< The status
-      );
-
-      //! Send command response based on status
-      //!
-      void sendCommandResponse(
-          const FwOpcodeType opCode, //!< The opcode
-          const U32 cmdSeq, //!< The command sequence value
-          const Os::FileSystem::Status status //!< The status
-      );
-
-    PRIVATE:
-
-      // ----------------------------------------------------------------------
-      // Variables
-      // ----------------------------------------------------------------------
-
-      //! The total number of commands successfully executed
-      //!
-      U32 commandCount;
-
-      //! The total number of errors
-      //!
-      U32 errorCount;
-
-
-  };
-
-} // end namespace Svc
+}  // end namespace Svc
 
 #endif

@@ -1,12 +1,11 @@
-\page FwDp Framework Support for Data Products
-# Framework Support for Data Products
+# Fw::Dp Framework Support for Data Products
 
 ## 1. Introduction
 
 This build module defines FPP ports and C++ classes that support
 the collection and storage of data products.
 For more information on data products and records, see the
-[data products documentation](../../../docs/Design/data-products.md).
+[data products documentation](../../../docs/user-manual/framework/data-products.md).
 
 ## 2. Configuration
 
@@ -72,7 +71,7 @@ The data product header has the following format.
 |`ProcTypes`|`Fw::DpCfg::ProcType::SerialType`|`sizeof(Fw::DpCfg::ProcType::SerialType)`|The processing types, represented as a bit mask|
 |`UserData`|`Header::UserData`|`DpCfg::CONTAINER_USER_DATA_SIZE`|User-configurable data|
 |`DpState`|`DpState`|`DpState::SERIALIZED_SIZE`|The data product state
-|`DataSize`|`FwSizeType`|`sizeof(FwSizeType)`|The size of the data payload in bytes|
+|`DataSize`|`FwSizeType`|`sizeof(FwSizeStoreType)`|The size of the data payload in bytes|
 
 `Header::UserData` is an array of `U8` of size `Fw::DpCfg::CONTAINER_USER_DATA_SIZE`.
 
@@ -99,7 +98,7 @@ Single-value records with _type = T_ have the following format:
 |Field Name|Data Type|Serialized Size|Description|
 |----------|---------|---------------|-----------|
 |`Id`|`FwDpIdType`|`sizeof(FwDpIdType)`|The record ID|
-|`Data`|_T_|`sizeof(`_T_`)` if _T_ is a primitive type; otherwise _T_`::SERIALIZED_SIZE`|The serialized data|
+|`Data`|_T_|Size of the serialized data|The serialized data|
 
 **Array records:**
 An array record is specified in FPP in the form `product record` _name_ `:` _type_ `array`.
@@ -110,8 +109,8 @@ Array records with _type = T_ have the following format:
 |Field Name|Data Type|Serialized Size|Description|
 |----------|---------|---------------|-----------|
 |`Id`|`FwDpIdType`|`sizeof(FwDpIdType)`|The record ID|
-|`Size`|`FwSizeType`|`sizeof(FwSizeType)`|The number _n_ of elements in the record|
-|`Data`|Array of _n_ _T_|_n_ * [`sizeof(`_T_`)` if _T_ is a primitive type; otherwise _T_`::SERIALIZED_SIZE`]|_n_ elements, each of type _T_|
+|`Size`|`FwSizeType`|`sizeof(FwSizeStoreType)`|The number _n_ of elements in the record|
+|`Data`|Array of _n_ _T_|Sum of the serialized sizes of the elements in the array|_n_ elements, each of type _T_|
 
 #### 5.1.4. Data Hash
 

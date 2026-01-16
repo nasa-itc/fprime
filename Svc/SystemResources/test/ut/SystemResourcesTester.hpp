@@ -13,8 +13,8 @@
 #ifndef TESTER_HPP
 #define TESTER_HPP
 
-#include "SystemResourcesGTestBase.hpp"
 #include "Svc/SystemResources/SystemResources.hpp"
+#include "SystemResourcesGTestBase.hpp"
 
 namespace Svc {
 
@@ -44,10 +44,6 @@ class SystemResourcesTester : public SystemResourcesGTestBase {
     //! Test the telemetry enable/disable
     //!
     void test_disable_enable();
-
-    //! Test version EVR
-    //!
-    void test_version_evr();
 
   private:
     // ----------------------------------------------------------------------
