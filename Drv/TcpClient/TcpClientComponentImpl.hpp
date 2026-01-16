@@ -14,13 +14,15 @@
 #define TcpClientComponentImpl_HPP
 
 #include <Drv/Ip/IpSocket.hpp>
-#include <Drv/Ip/SocketReadTask.hpp>
+#include <Drv/Ip/SocketComponentHelper.hpp>
 #include <Drv/Ip/TcpClientSocket.hpp>
 #include "Drv/TcpClient/TcpClientComponentAc.hpp"
 
 namespace Drv {
 
-class TcpClientComponentImpl : public TcpClientComponentBase, public SocketReadTask {
+class TcpClientComponentImpl final : public TcpClientComponentBase, public SocketComponentHelper {
+    friend class TcpClientTester;
+
   public:
     // ----------------------------------------------------------------------
     // Construction, initialization, and destruction
@@ -54,14 +56,16 @@ class TcpClientComponentImpl : public TcpClientComponentBase, public SocketReadT
      * \param send_timeout_seconds: send timeout seconds component. Defaults to: SOCKET_TIMEOUT_SECONDS
      * \param send_timeout_microseconds: send timeout microseconds component. Must be less than 1000000. Defaults to:
      * SOCKET_TIMEOUT_MICROSECONDS
+     * \param buffer_size: size of the buffer to be allocated. Defaults to 1024.
      * \return status of the configure
      */
     SocketIpStatus configure(const char* hostname,
                              const U16 port,
                              const U32 send_timeout_seconds = SOCKET_SEND_TIMEOUT_SECONDS,
-                             const U32 send_timeout_microseconds = SOCKET_SEND_TIMEOUT_MICROSECONDS);
+                             const U32 send_timeout_microseconds = SOCKET_SEND_TIMEOUT_MICROSECONDS,
+                             FwSizeType buffer_size = 1024);
 
-  PROTECTED:
+  protected:
     // ----------------------------------------------------------------------
     // Implementations for socket read task virtual methods
     // ----------------------------------------------------------------------
@@ -74,7 +78,7 @@ class TcpClientComponentImpl : public TcpClientComponentBase, public SocketReadT
      *
      * \return IpSocket reference
      */
-    IpSocket& getSocketHandler();
+    IpSocket& getSocketHandler() override;
 
     /**
      * \brief returns a buffer to fill with data
@@ -84,7 +88,7 @@ class TcpClientComponentImpl : public TcpClientComponentBase, public SocketReadT
      *
      * \return Fw::Buffer to fill with data
      */
-    Fw::Buffer getBuffer();
+    Fw::Buffer getBuffer() override;
 
     /**
      * \brief sends a buffer to be filled with data
@@ -94,16 +98,14 @@ class TcpClientComponentImpl : public TcpClientComponentBase, public SocketReadT
      *
      * \return Fw::Buffer filled with data to send out
      */
-    void sendBuffer(Fw::Buffer buffer, SocketIpStatus status);
+    void sendBuffer(Fw::Buffer buffer, SocketIpStatus status) override;
 
     /**
      * \brief called when the IPv4 system has been connected
-    */
-    void connected();
+     */
+    void connected() override;
 
-
-  PRIVATE:
-
+  private:
     // ----------------------------------------------------------------------
     // Handler implementations for user-defined typed input ports
     // ----------------------------------------------------------------------
@@ -113,7 +115,7 @@ class TcpClientComponentImpl : public TcpClientComponentBase, public SocketReadT
      *
      * Passing data to this port will send data from the TcpClient to whatever TCP server this component has connected
      * to. Should the socket not be opened or was disconnected, then this port call will return SEND_RETRY and critical
-     * transmissions should be retried. SEND_ERROR indicates an unresolvable error. SEND_OK is returned when the data
+     * transmissions should be retried. OTHER_ERROR indicates an unresolvable error. OP_OK is returned when the data
      * has been sent.
      *
      * Note: this component delegates the reopening of the socket to the read thread and thus the caller should retry
@@ -121,13 +123,22 @@ class TcpClientComponentImpl : public TcpClientComponentBase, public SocketReadT
      *
      * \param portNum: fprime port number of the incoming port call
      * \param fwBuffer: buffer containing data to be sent
-     * \return SEND_OK on success, SEND_RETRY when critical data should be retried and SEND_ERROR upon error
      */
-    Drv::SendStatus send_handler(const NATIVE_INT_TYPE portNum, Fw::Buffer& fwBuffer);
+    Drv::ByteStreamStatus send_handler(const FwIndexType portNum, Fw::Buffer& fwBuffer) override;
 
-    Drv::TcpClientSocket m_socket; //!< Socket implementation
+    //! Handler implementation for recvReturnIn
+    //!
+    //! Port receiving back ownership of data sent out on $recv port
+    void recvReturnIn_handler(FwIndexType portNum,  //!< The port number
+                              Fw::Buffer& fwBuffer  //!< The buffer
+                              ) override;
+
+    Drv::TcpClientSocket m_socket;  //!< Socket implementation
+
+    // Member variable to store the buffer size
+    FwSizeType m_allocation_size;
 };
 
 }  // end namespace Drv
 
-#endif // end TcpClientComponentImpl
+#endif  // end TcpClientComponentImpl

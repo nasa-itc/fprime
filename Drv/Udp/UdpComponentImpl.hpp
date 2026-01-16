@@ -1,7 +1,7 @@
 // ======================================================================
 // \title  UdpComponentImpl.hpp
 // \author mstarch
-// \brief  hpp file for UdpComponentImpl component implementation class
+// \brief  hpp file for UdpComponentImpl component implementation
 //
 // \copyright
 // Copyright 2009-2020, by the California Institute of Technology.
@@ -14,13 +14,15 @@
 #define UdpComponentImpl_HPP
 
 #include <Drv/Ip/IpSocket.hpp>
-#include <Drv/Ip/SocketReadTask.hpp>
+#include <Drv/Ip/SocketComponentHelper.hpp>
 #include <Drv/Ip/UdpSocket.hpp>
 #include "Drv/Udp/UdpComponentAc.hpp"
 
 namespace Drv {
 
-class UdpComponentImpl : public UdpComponentBase, public SocketReadTask {
+class UdpComponentImpl : public UdpComponentBase, public SocketComponentHelper {
+    friend class UdpTester;
+
   public:
     // ----------------------------------------------------------------------
     // Construction, initialization, and destruction
@@ -70,11 +72,22 @@ class UdpComponentImpl : public UdpComponentBase, public SocketReadTask {
      *
      * \param hostname: ip address of remote tcp server in the form x.x.x.x
      * \param port: port of remote tcp server
+     * \param buffer_size: size of the buffer to be allocated. Defaults to 1024.
      *  \return status of the configure
      */
-    SocketIpStatus configureRecv(const char* hostname, const U16 port);
+    SocketIpStatus configureRecv(const char* hostname, const U16 port, FwSizeType buffer_size = 1024);
 
-  PROTECTED:
+    /**
+     * \brief get the port being received on
+     *
+     * Most useful when receive was configured to use port "0", this will return the port used for receiving data after
+     * a port has been determined. Will return 0 if the connection has not been setup.
+     *
+     * \return receive port
+     */
+    U16 getRecvPort();
+
+  protected:
     // ----------------------------------------------------------------------
     // Implementations for socket read task virtual methods
     // ----------------------------------------------------------------------
@@ -87,7 +100,7 @@ class UdpComponentImpl : public UdpComponentBase, public SocketReadTask {
      *
      * \return IpSocket reference
      */
-    IpSocket& getSocketHandler();
+    IpSocket& getSocketHandler() override;
 
     /**
      * \brief returns a buffer to fill with data
@@ -97,7 +110,7 @@ class UdpComponentImpl : public UdpComponentBase, public SocketReadTask {
      *
      * \return Fw::Buffer to fill with data
      */
-    Fw::Buffer getBuffer();
+    Fw::Buffer getBuffer() override;
 
     /**
      * \brief sends a buffer to be filled with data
@@ -107,15 +120,14 @@ class UdpComponentImpl : public UdpComponentBase, public SocketReadTask {
      *
      * \return Fw::Buffer filled with data to send out
      */
-    void sendBuffer(Fw::Buffer buffer, SocketIpStatus status);
+    void sendBuffer(Fw::Buffer buffer, SocketIpStatus status) override;
 
     /**
      * \brief called when the IPv4 system has been connected
-    */
-    void connected();
+     */
+    void connected() override;
 
-  PRIVATE:
-
+  private:
     // ----------------------------------------------------------------------
     // Handler implementations for user-defined typed input ports
     // ----------------------------------------------------------------------
@@ -125,7 +137,7 @@ class UdpComponentImpl : public UdpComponentBase, public SocketReadTask {
      *
      * Passing data to this port will send data from the TcpClient to whatever TCP server this component has connected
      * to. Should the socket not be opened or was disconnected, then this port call will return SEND_RETRY and critical
-     * transmissions should be retried. SEND_ERROR indicates an unresolvable error. SEND_OK is returned when the data
+     * transmissions should be retried. OTHER_ERROR indicates an unresolvable error. OP_OK is returned when the data
      * has been sent.
      *
      * Note: this component delegates the reopening of the socket to the read thread and thus the caller should retry
@@ -133,13 +145,21 @@ class UdpComponentImpl : public UdpComponentBase, public SocketReadTask {
      *
      * \param portNum: fprime port number of the incoming port call
      * \param fwBuffer: buffer containing data to be sent
-     * \return SEND_OK on success, SEND_RETRY when critical data should be retried and SEND_ERROR upon error
      */
-    Drv::SendStatus send_handler(const NATIVE_INT_TYPE portNum, Fw::Buffer& fwBuffer);
+    Drv::ByteStreamStatus send_handler(const FwIndexType portNum, Fw::Buffer& fwBuffer) override;
 
-    Drv::UdpSocket m_socket; //!< Socket implementation
+    //! Handler implementation for recvReturnIn
+    //!
+    //! Port receiving back ownership of data sent out on $recv port
+    void recvReturnIn_handler(FwIndexType portNum,  //!< The port number
+                              Fw::Buffer& fwBuffer  //!< The buffer
+                              ) override;
+
+    Drv::UdpSocket m_socket;  //!< Socket implementation
+
+    FwSizeType m_allocation_size;  //!< Member variable to store the buffer size
 };
 
 }  // end namespace Drv
 
-#endif // end UdpComponentImpl
+#endif  // end UdpComponentImpl

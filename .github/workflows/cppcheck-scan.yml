@@ -1,5 +1,5 @@
 # Adapted from https://github.com/nasa/cFS/blob/c36aa2c1df0fb47a3838577908af3d0d0ab0ef54/.github/workflows/static-analysis.yml
-name: "Cppcheck Scan"
+name: "Code Scan: CppCheck"
 
 on:
   push:
@@ -12,11 +12,15 @@ on:
       - '**.md'
       - '.github/actions/spelling/**'
       - '.github/ISSUE_TEMPLATE/**'
+# Cancel in-progress runs if a newer run is started on a given PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ !contains(github.ref, 'devel') && !contains(github.ref, 'release/')}}
 
 jobs:
   cppcheck:
     name: Cppcheck
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     permissions:
       actions: read
       contents: read
@@ -31,7 +35,7 @@ jobs:
       - uses: ./.github/actions/setup
 
       - name: Install cppcheck
-        run: sudo apt-get install cppcheck xsltproc -y
+        run: sudo apt-get update && sudo apt-get install cppcheck xsltproc -y
 
       - name: Install sarif tool
         run: npm i -g @microsoft/sarif-multitool
@@ -43,6 +47,9 @@ jobs:
         run: |
           fprime-util generate -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
           fprime-util build --all --jobs "$(nproc || printf '%s\n' 1)"
+
+          # Since our subtopologies have EXCLUDE_FROM_ALL, we need to explicitly build them
+          fprime-util build --target Svc_Subtopologies --jobs "$(nproc || printf '%s\n' 1)"
           echo CPPCHECK_OPTS=--project="$GITHUB_WORKSPACE/build-fprime-automatic-native/compile_commands.json" >> $GITHUB_ENV
 
       - name: Run cppcheck
@@ -55,13 +62,13 @@ jobs:
         run: xsltproc .github/scripts/cppcheck-xml2text.xslt cppcheck_err.xml | tee $GITHUB_STEP_SUMMARY cppcheck_err.txt
 
       - name: Upload SARIF file to GitHub Code Scanning Alerts
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: ${{ github.workspace }}/cppcheck_err.sarif
           category: "cppcheck"
 
       - name: Archive static analysis artifacts to download and view
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: cppcheck-errors
           path: ./*cppcheck_err.*

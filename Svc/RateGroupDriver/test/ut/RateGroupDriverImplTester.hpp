@@ -13,27 +13,23 @@
 
 namespace Svc {
 
-    class RateGroupDriverImplTester: public RateGroupDriverGTestBase {
-        public:
-            RateGroupDriverImplTester(Svc::RateGroupDriver& inst);
-            virtual ~RateGroupDriverImplTester();
+class RateGroupDriverImplTester : public RateGroupDriverGTestBase {
+  public:
+    RateGroupDriverImplTester(Svc::RateGroupDriver& inst);
+    virtual ~RateGroupDriverImplTester();
 
-            void init(NATIVE_INT_TYPE instance = 0);
+    void runSchedNominal(Svc::RateGroupDriver::DividerSet dividersSet, FwIndexType numDividers);
 
-            void runSchedNominal(Svc::RateGroupDriver::DividerSet dividersSet, NATIVE_INT_TYPE numDividers);
+  private:
+    void from_CycleOut_handler(FwIndexType portNum, Os::RawTime& cycleStart);
 
-        private:
+    Svc::RateGroupDriver& m_impl;
 
-            void from_CycleOut_handler(NATIVE_INT_TYPE portNum, Svc::TimerVal& cycleStart);
+    void clearPortCalls();
 
-            Svc::RateGroupDriver& m_impl;
-
-            void clearPortCalls();
-
-            bool m_portCalls[3];
-
-    };
+    bool m_portCalls[Svc::RateGroupDriver::DIVIDER_SIZE];
+};
 
 } /* namespace Svc */
 
-#endif /* RATEGROUPDRIVER_TEST_UT_ACTIVELOGGERIMPLTESTER_HPP_ */
+#endif

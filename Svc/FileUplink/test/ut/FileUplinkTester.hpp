@@ -20,170 +20,151 @@
 
 namespace Svc {
 
-  class FileUplinkTester :
-    public FileUplinkGTestBase
-  {
+class FileUplinkTester : public FileUplinkGTestBase {
+    // ----------------------------------------------------------------------
+    // Construction and destruction
+    // ----------------------------------------------------------------------
 
-      // ----------------------------------------------------------------------
-      // Construction and destruction
-      // ----------------------------------------------------------------------
+  public:
+    //! Construct object FileUplinkTester
+    //!
+    FileUplinkTester();
 
-    public:
+    //! Destroy object FileUplinkTester
+    //!
+    ~FileUplinkTester();
 
-      //! Construct object FileUplinkTester
-      //!
-      FileUplinkTester();
+  public:
+    // ----------------------------------------------------------------------
+    // Tests
+    // ----------------------------------------------------------------------
 
-      //! Destroy object FileUplinkTester
-      //!
-      ~FileUplinkTester();
+    //! Send a file
+    //!
+    void sendFile();
 
-    public:
+    //! Send a file with a bad checksum value
+    //!
+    void badChecksum();
 
-      // ----------------------------------------------------------------------
-      // Tests
-      // ----------------------------------------------------------------------
+    //! Cause a file open error
+    //!
+    void fileOpenError();
 
-      //! Send a file
-      //!
-      void sendFile();
+    //! Cause a file write error
+    //!
+    void fileWriteError();
 
-      //! Send a file with a bad checksum value
-      //!
-      void badChecksum();
+    //! Send a START packet in DATA mode
+    //!
+    void startPacketInDataMode();
 
-      //! Cause a file open error
-      //!
-      void fileOpenError();
+    //! Send a DATA packet in START mode
+    //!
+    void dataPacketInStartMode();
 
-      //! Cause a file write error
-      //!
-      void fileWriteError();
+    //! Send an END packet in START mode
+    //!
+    void endPacketInStartMode();
 
-      //! Send a START packet in DATA mode
-      //!
-      void startPacketInDataMode();
+    //! Send a file with an out-of-bounds packet
+    //!
+    void packetOutOfBounds();
 
-      //! Send a DATA packet in START mode
-      //!
-      void dataPacketInStartMode();
+    //! Send a file with an out-of-order packet
+    //!
+    void packetOutOfOrder();
 
-      //! Send an END packet in START mode
-      //!
-      void endPacketInStartMode();
+    //! Send a file with an duplicated packet
+    //!
+    void packetDuplicated();
 
-      //! Send a file with an out-of-bounds packet
-      //!
-      void packetOutOfBounds();
+    //! Send a CANCEL packet in START mode
+    //!
+    void cancelPacketInStartMode();
 
-      //! Send a file with an out-of-order packet
-      //!
-      void packetOutOfOrder();
+    //! Send a CANCEL packet in DATA mode
+    //!
+    void cancelPacketInDataMode();
 
-      //! Send a CANCEL packet in START mode
-      //!
-      void cancelPacketInStartMode();
+  private:
+    // ----------------------------------------------------------------------
+    // Handlers for from ports
+    // ----------------------------------------------------------------------
 
-      //! Send a CANCEL packet in DATA mode
-      //!
-      void cancelPacketInDataMode();
+    //! Handler for from_bufferSendOut
+    //!
+    void from_bufferSendOut_handler(const FwIndexType portNum,  //!< The port number
+                                    Fw::Buffer& buffer);
 
-    private:
+    //! Handler for from_pingOut
+    //!
+    void from_pingOut_handler(const FwIndexType portNum, /*!< The port number*/
+                              U32 key                    /*!< Value to return to pinger*/
+    );
 
-      // ----------------------------------------------------------------------
-      // Handlers for from ports
-      // ----------------------------------------------------------------------
+  private:
+    // ----------------------------------------------------------------------
+    // Helper methods
+    // ----------------------------------------------------------------------
 
-      //! Handler for from_bufferSendOut
-      //!
-      void from_bufferSendOut_handler(
-          const NATIVE_INT_TYPE portNum, //!< The port number
-          Fw::Buffer& buffer
-      );
+    //! Connect ports
+    //!
+    void connectPorts();
 
-      //! Handler for from_pingOut
-      //!
-      void from_pingOut_handler(
-          const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          U32 key /*!< Value to return to pinger*/
-      );
+    //! Initialize components
+    //!
+    void initComponents();
 
+    //! Send a FilePacket
+    //!
+    void sendFilePacket(const Fw::FilePacket& filePacket);
 
+    //! Send a StartPacket
+    //!
+    void sendStartPacket(const char* const sourcePath,  //!< The source path
+                         const char* const destPath,    //!< The destination path
+                         const size_t fileSize          //!< The file size
+    );
 
-    private:
+    //! Send a DataPacket
+    //!
+    void sendDataPacket(const size_t byteOffset, U8* const packetData);
 
-      // ----------------------------------------------------------------------
-      // Helper methods
-      // ----------------------------------------------------------------------
+    //! Send an EndPacket
+    //!
+    void sendEndPacket(const CFDP::Checksum& checksum);
 
-      //! Connect ports
-      //!
-      void connectPorts();
+    //! Send a CancelPacket
+    //!
+    void sendCancelPacket();
 
-      //! Initialize components
-      //!
-      void initComponents();
+    //! Verify file data
+    //!
+    void verifyFileData(const char* const path, const U8* const sentData, const size_t sentDataSize);
 
-      //! Send a FilePacket
-      //!
-      void sendFilePacket(const Fw::FilePacket& filePacket);
+    //! Remove a file
+    //!
+    void removeFile(const char* const path);
 
-      //! Send a StartPacket
-      //!
-      void sendStartPacket(
-          const char *const sourcePath, //!< The source path
-          const char *const destPath, //!< The destination path
-          const size_t fileSize //!< The file size
-      );
+  private:
+    // ----------------------------------------------------------------------
+    // Variables
+    // ----------------------------------------------------------------------
 
-      //! Send a DataPacket
-      //!
-      void sendDataPacket(
-          const size_t byteOffset,
-          U8 *const packetData
-      );
+    //! The component under test
+    //!
+    FileUplink component;
 
-      //! Send an EndPacket
-      //!
-      void sendEndPacket(const CFDP::Checksum& checksum);
+    //! The expected number of packets received so far
+    //!
+    U32 expectedPacketsReceived;
 
-      //! Send a CancelPacket
-      //!
-      void sendCancelPacket();
+    //! The current sequence index
+    //!
+    U32 sequenceIndex;
+};
 
-      //! Verify file data
-      //!
-      void verifyFileData(
-          const char *const path,
-          const U8 *const sentData,
-          const size_t sentDataSize
-      );
-
-      //! Remove a file
-      //!
-      void removeFile(const char *const path);
-
-    private:
-
-      // ----------------------------------------------------------------------
-      // Variables
-      // ----------------------------------------------------------------------
-
-      //! The component under test
-      //!
-      FileUplink component;
-
-      //! The expected number of packets received so far
-      //!
-      U32 expectedPacketsReceived;
-
-      //! The current sequence index
-      //!
-      U32 sequenceIndex;
-
-
-  };
-
-}
+}  // namespace Svc
 
 #endif

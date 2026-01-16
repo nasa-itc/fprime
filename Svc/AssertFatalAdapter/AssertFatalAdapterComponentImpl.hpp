@@ -17,75 +17,59 @@
 
 namespace Svc {
 
-  class AssertFatalAdapterComponentImpl :
-    public AssertFatalAdapterComponentBase
-  {
+class AssertFatalAdapterComponentImpl final : public AssertFatalAdapterComponentBase {
+  public:
+    // ----------------------------------------------------------------------
+    // Construction, initialization, and destruction
+    // ----------------------------------------------------------------------
 
-    public:
+    //! Construct object AssertFatalAdapter
+    //!
+    AssertFatalAdapterComponentImpl(const char* const compName /*!< The component name*/
+    );
 
-      // ----------------------------------------------------------------------
-      // Construction, initialization, and destruction
-      // ----------------------------------------------------------------------
+    //! Destroy object AssertFatalAdapter
+    //!
+    ~AssertFatalAdapterComponentImpl();
 
-      //! Construct object AssertFatalAdapter
-      //!
-      AssertFatalAdapterComponentImpl(
-          const char *const compName /*!< The component name*/
-      );
+    //! Report the assert as a FATAL
+    void reportAssert(FILE_NAME_ARG file,
+                      FwSizeType lineNo,
+                      FwSizeType numArgs,
+                      FwAssertArgType arg1,
+                      FwAssertArgType arg2,
+                      FwAssertArgType arg3,
+                      FwAssertArgType arg4,
+                      FwAssertArgType arg5,
+                      FwAssertArgType arg6);
 
-      //! Initialize object AssertFatalAdapter
-      //!
-      void init(
-          const NATIVE_INT_TYPE instance = 0 /*!< The instance number*/
-      );
+  private:
+    class AssertFatalAdapter : public Fw::AssertHook {
+      public:
+        AssertFatalAdapter();
+        ~AssertFatalAdapter();
+        void regAssertReporter(AssertFatalAdapterComponentImpl* compPtr);
 
-      //! Destroy object AssertFatalAdapter
-      //!
-      ~AssertFatalAdapterComponentImpl();
+      private:
+        void reportAssert(FILE_NAME_ARG file,
+                          FwSizeType lineNo,
+                          FwSizeType numArgs,
+                          FwAssertArgType arg1,
+                          FwAssertArgType arg2,
+                          FwAssertArgType arg3,
+                          FwAssertArgType arg4,
+                          FwAssertArgType arg5,
+                          FwAssertArgType arg6);
 
-      //! Report the assert as a FATAL
-      void reportAssert(
-          FILE_NAME_ARG file,
-          NATIVE_UINT_TYPE lineNo,
-          NATIVE_UINT_TYPE numArgs,
-          FwAssertArgType arg1,
-          FwAssertArgType arg2,
-          FwAssertArgType arg3,
-          FwAssertArgType arg4,
-          FwAssertArgType arg5,
-          FwAssertArgType arg6
-          );
+        // Prevent actual assert since FATAL handler will deal with it
+        void doAssert();
 
-    private:
-
-      class AssertFatalAdapter : public Fw::AssertHook {
-          public:
-              AssertFatalAdapter();
-              ~AssertFatalAdapter();
-              void regAssertReporter(AssertFatalAdapterComponentImpl* compPtr);
-          private:
-              void reportAssert(
-                  FILE_NAME_ARG file,
-                  NATIVE_UINT_TYPE lineNo,
-                  NATIVE_UINT_TYPE numArgs,
-                  FwAssertArgType arg1,
-                  FwAssertArgType arg2,
-                  FwAssertArgType arg3,
-                  FwAssertArgType arg4,
-                  FwAssertArgType arg5,
-                  FwAssertArgType arg6
-                  );
-
-              // Prevent actual assert since FATAL handler will deal with it
-              void doAssert();
-
-              AssertFatalAdapterComponentImpl* m_compPtr;
-      };
-
-      AssertFatalAdapter m_adapter;
-
+        AssertFatalAdapterComponentImpl* m_compPtr;
     };
 
-} // end namespace Svc
+    AssertFatalAdapter m_adapter;
+};
+
+}  // end namespace Svc
 
 #endif

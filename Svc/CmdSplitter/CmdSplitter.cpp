@@ -4,11 +4,11 @@
 // \brief  cpp file for CmdSplitter component implementation class
 // ======================================================================
 
-#include <FpConfig.hpp>
 #include <Fw/Cmd/CmdPacket.hpp>
-#include <Svc/CmdSplitter/CmdSplitter.hpp>
+#include <Fw/FPrimeBasicTypes.hpp>
 #include <Fw/Types/Assert.hpp>
-#include <FppConstantsAc.hpp>
+#include <Svc/CmdSplitter/CmdSplitter.hpp>
+#include <config/FppConstantsAc.hpp>
 
 namespace Svc {
 
@@ -28,9 +28,9 @@ void CmdSplitter ::configure(const FwOpcodeType remoteBaseOpcode) {
 // Handler implementations for user-defined typed input ports
 // ----------------------------------------------------------------------
 
-void CmdSplitter ::CmdBuff_handler(const NATIVE_INT_TYPE portNum, Fw::ComBuffer& data, U32 context) {
+void CmdSplitter ::CmdBuff_handler(const FwIndexType portNum, Fw::ComBuffer& data, U32 context) {
     Fw::CmdPacket cmdPkt;
-    Fw::SerializeStatus stat = cmdPkt.deserialize(data);
+    Fw::SerializeStatus stat = cmdPkt.deserializeFrom(data);
 
     FW_ASSERT(portNum < CmdSplitterPorts);
     if (stat != Fw::FW_SERIALIZE_OK) {
@@ -46,7 +46,7 @@ void CmdSplitter ::CmdBuff_handler(const NATIVE_INT_TYPE portNum, Fw::ComBuffer&
     }
 }
 
-void CmdSplitter ::seqCmdStatus_handler(const NATIVE_INT_TYPE portNum,
+void CmdSplitter ::seqCmdStatus_handler(const FwIndexType portNum,
                                         FwOpcodeType opCode,
                                         U32 cmdSeq,
                                         const Fw::CmdResponse& response) {

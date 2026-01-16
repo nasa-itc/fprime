@@ -10,48 +10,45 @@
 //
 // ======================================================================
 #include "FprimeProtocol.hpp"
-#include "FpConfig.hpp"
+#include "Fw/FPrimeBasicTypes.hpp"
 #include "Utils/Hash/Hash.hpp"
 
 namespace Svc {
 
-FprimeFraming::FprimeFraming(): FramingProtocol() {}
+FprimeFraming::FprimeFraming() : FramingProtocol() {}
 
-FprimeDeframing::FprimeDeframing(): DeframingProtocol() {}
+FprimeDeframing::FprimeDeframing() : DeframingProtocol() {}
 
-void FprimeFraming::frame(const U8* const data, const U32 size, Fw::ComPacket::ComPacketType packet_type) {
+void FprimeFraming::frame(const U8* const data, const U32 size, Fw::ComPacketType packet_type) {
+    // NOTE: packet_type is not used in this implementation
+
     FW_ASSERT(data != nullptr);
     FW_ASSERT(m_interface != nullptr);
-    // Use of I32 size is explicit as ComPacketType will be specifically serialized as an I32
-    FpFrameHeader::TokenType real_data_size = size + ((packet_type != Fw::ComPacket::FW_PACKET_UNKNOWN) ? sizeof(I32) : 0);
-    FpFrameHeader::TokenType total = real_data_size + FpFrameHeader::SIZE + HASH_DIGEST_LENGTH;
-    Fw::Buffer buffer = m_interface->allocate(total);
-    Fw::SerializeBufferBase& serializer = buffer.getSerializeRepr();
+
+    FpFrameHeader::TokenType totalSize = size + FpFrameHeader::SIZE + HASH_DIGEST_LENGTH;
+    Fw::Buffer buffer = m_interface->allocate(totalSize);
+    auto serializer = buffer.getSerializer();
     Utils::HashBuffer hash;
 
-    // Serialize data
+    // Serialize start word
     Fw::SerializeStatus status;
     status = serializer.serialize(FpFrameHeader::START_WORD);
     FW_ASSERT(status == Fw::FW_SERIALIZE_OK, status);
-    
-    status = serializer.serialize(real_data_size);
+
+    // Serialize data size
+    status = serializer.serialize(size);
     FW_ASSERT(status == Fw::FW_SERIALIZE_OK, status);
 
-    // Serialize packet type if supplied, otherwise it *must* be present in the data
-    if (packet_type != Fw::ComPacket::FW_PACKET_UNKNOWN) {
-        status = serializer.serialize(static_cast<I32>(packet_type)); // I32 used for enum storage
-        FW_ASSERT(status == Fw::FW_SERIALIZE_OK, status);
-    }
-    
-    status = serializer.serialize(data, size, true);  // Serialize without length
+    // Serialize data
+    status = serializer.serialize(data, size, Fw::Serialization::OMIT_LENGTH);  // Serialize without length
     FW_ASSERT(status == Fw::FW_SERIALIZE_OK, status);
 
     // Calculate and add transmission hash
-    Utils::Hash::hash(buffer.getData(), total - HASH_DIGEST_LENGTH, hash);
-    status = serializer.serialize(hash.getBuffAddr(), HASH_DIGEST_LENGTH, true);
+    Utils::Hash::hash(buffer.getData(), static_cast<FwSizeType>(totalSize - HASH_DIGEST_LENGTH), hash);
+    status = serializer.serialize(hash.getBuffAddr(), HASH_DIGEST_LENGTH, Fw::Serialization::OMIT_LENGTH);
     FW_ASSERT(status == Fw::FW_SERIALIZE_OK, status);
 
-    buffer.setSize(total);
+    buffer.setSize(totalSize);
 
     m_interface->send(buffer);
 }
@@ -70,7 +67,7 @@ bool FprimeDeframing::validate(Types::CircularBuffer& ring, U32 size) {
     hash.final(hashBuffer);
     // Now loop through the hash digest bytes and check for equality
     for (U32 i = 0; i < HASH_DIGEST_LENGTH; i++) {
-        U8 calc = static_cast<char>(hashBuffer.getBuffAddr()[i]);
+        U8 calc = static_cast<U8>(hashBuffer.getBuffAddr()[i]);
         U8 sent = 0;
         const Fw::SerializeStatus status = ring.peek(sent, size + i);
         FW_ASSERT(status == Fw::FW_SERIALIZE_OK, status);
@@ -131,4 +128,4 @@ DeframingProtocol::DeframingStatus FprimeDeframing::deframe(Types::CircularBuffe
     m_interface->route(buffer);
     return DeframingProtocol::DEFRAMING_STATUS_SUCCESS;
 }
-}
+}  // namespace Svc

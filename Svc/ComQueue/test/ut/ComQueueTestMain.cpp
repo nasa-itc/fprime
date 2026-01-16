@@ -19,9 +19,14 @@ TEST(Nominal, Priority) {
     tester.testPrioritySend();
 }
 
-TEST(Nominal, Full) {
+TEST(Nominal, ExternalQueueOverflow) {
     Svc::ComQueueTester tester;
-    tester.testQueueOverflow();
+    tester.testExternalQueueOverflow();
+}
+
+TEST(Nominal, InternalQueueOverflow) {
+    Svc::ComQueueTester tester;
+    tester.testInternalQueueOverflow();
 }
 
 TEST(Nominal, ReadyFirst) {
@@ -29,7 +34,17 @@ TEST(Nominal, ReadyFirst) {
     tester.testReadyFirst();
 }
 
-int main(int argc, char **argv) {
+TEST(Nominal, ContextData) {
+    Svc::ComQueueTester tester;
+    tester.testContextData();
+}
+
+TEST(Nominal, testBufferQueueReturn) {
+    Svc::ComQueueTester tester;
+    tester.testBufferQueueReturn();
+}
+
+int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }

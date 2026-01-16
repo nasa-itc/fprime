@@ -91,22 +91,6 @@ if (DEFINED FPRIME_USE_BAREMETAL_SCHEDULER AND NOT "${FPRIME_USE_BAREMETAL_SCHED
 endif()
 
 ####
-# `FPRIME_ENABLE_UTIL_TARGETS`:
-#
-# Enables the targets required to run using `fprime-util`.  These include: check and refresh_cache.
-# This switch defaults to "ON" providing those targets, but may be set to off when running within an
-# IDE where limiting the number of targets is desirable. Note: unit test targets are still only generated when running
-# with -DBUILD_TESTING=ON.
-#
-# **Values:**
-# - ON: (default) generate all targets
-# - OFF: only generate executable, and library targets
-#
-# e.g. `-DFPRIME_ENABLE_UTIL_TARGETS=ON`
-####
-option(FPRIME_ENABLE_UTIL_TARGETS "Enable fprime-util targets" ON)
-
-####
 # `FPRIME_ENABLE_FRAMEWORK_UTS`:
 #
 # Allow a project to run fprime UTs from the core framework. Default: on,  run fprime framework UTs. This
@@ -198,11 +182,13 @@ option(FPRIME_CHECK_FRAMEWORK_VERSION "(Internal) Check framework version when b
 #
 # **Values:**
 # - ON: enables AddressSanitizer.
-# - OFF: (default) does not enable AddressSanitizer.
+# - OFF: does not enable AddressSanitizer.
 #
-# e.g. `-DENABLE_SANITIZER_ADDRESS=ON`
+# Defaults to ON when BUILD_TESTING is ON
+#
+# e.g. `-DENABLE_SANITIZER_ADDRESS=OFF`
 ####
-option(ENABLE_SANITIZER_ADDRESS "Enable address sanitizer" OFF)
+option(ENABLE_SANITIZER_ADDRESS "Enable address sanitizer" ${BUILD_TESTING})
 
 ####
 # `ENABLE_SANITIZER_LEAK:`
@@ -215,11 +201,13 @@ option(ENABLE_SANITIZER_ADDRESS "Enable address sanitizer" OFF)
 #
 # **Values:**
 # - ON: enables LeakSanitizer.
-# - OFF: (default) does not enable LeakSanitizer.
+# - OFF: does not enable LeakSanitizer.
 #
-# e.g. `-DENABLE_SANITIZER_LEAK=ON`
+# Defaults to ON when BUILD_TESTING is ON
+#
+# e.g. `-DENABLE_SANITIZER_LEAK=OFF`
 ####
-option(ENABLE_SANITIZER_LEAK "Enable leak sanitizer" OFF)
+option(ENABLE_SANITIZER_LEAK "Enable leak sanitizer" ${BUILD_TESTING})
 
 ####
 # `ENABLE_SANITIZER_UNDEFINED_BEHAVIOR:`
@@ -230,11 +218,13 @@ option(ENABLE_SANITIZER_LEAK "Enable leak sanitizer" OFF)
 #
 # **Values:**
 # - ON: enables UndefinedBehaviorSanitizer.
-# - OFF: (default) does not enable UndefinedBehaviorSanitizer.
+# - OFF: does not enable UndefinedBehaviorSanitizer.
+#
+# Defaults to ON when BUILD_TESTING is ON
 #
 # e.g. `-DENABLE_SANITIZER_UNDEFINED_BEHAVIOR=ON`
 ####
-option(ENABLE_SANITIZER_UNDEFINED_BEHAVIOR "Enable undefined behavior sanitizer" OFF)
+option(ENABLE_SANITIZER_UNDEFINED_BEHAVIOR "Enable undefined behavior sanitizer" ${BUILD_TESTING})
 
 ####
 # `ENABLE_SANITIZER_THREAD:`
@@ -253,16 +243,13 @@ option(ENABLE_SANITIZER_UNDEFINED_BEHAVIOR "Enable undefined behavior sanitizer"
 ####
 option(ENABLE_SANITIZER_THREAD "Enable thread sanitizer" OFF)
 
-# Backwards compatibility, when build type=TESTING BUILD_TESTING is on
-string(TOUPPER "${CMAKE_BUILD_TYPE}" FPRIME_BUILD_TYPE)
-if (FPRIME_BUILD_TYPE STREQUAL "TESTING")
-else()
-    option(BUILD_TESTING OFF)
-endif()
+# CTest inclusion will default BUILD_TESTING to ON but F Prime uses a default of OFF instead
+# Must come before include(CTest)
+option(BUILD_TESTING "Enable unit testing in the build" OFF)
 include(CTest)
 
 ####
-# Locations `FPRIME_FRAMEWORK_PATH`, `FPRIME_PROJECT_ROOT`, `FPRIME_LIBRARY_LOCATIONS`, and `FPRIME_CONFIG_DIR`:
+# Locations `FPRIME_FRAMEWORK_PATH`, `FPRIME_PROJECT_ROOT`, and `FPRIME_LIBRARY_LOCATIONS`:
 #
 # Note: these settings are supplied by `fprime-util` and need not be provided unless running CMake directly or through
 # any way bypassing that utility (e.g. inside your beloved IDE).
@@ -336,13 +323,6 @@ if (DEFINED FPRIME_ENVIRONMENT_FILE)
     set(FPRIME_ENVIRONMENT_FILE "${FPRIME_ENVIRONMENT_FILE}" CACHE PATH "F prime environment file" FORCE)
     set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${FPRIME_ENVIRONMENT_FILE}")
 endif()
-
-# Settings for F config directory
-if (NOT DEFINED FPRIME_CONFIG_DIR)
-    set(FPRIME_CONFIG_DIR "${FPRIME_FRAMEWORK_PATH}/config/")
-endif()
-set(FPRIME_CONFIG_DIR "${FPRIME_CONFIG_DIR}" CACHE PATH "F prime configuration header directory" FORCE)
-
 
 # Set FPRIME_TOOLCHAIN_NAME when not set by toolchain directly
 if (NOT DEFINED FPRIME_TOOLCHAIN_NAME)

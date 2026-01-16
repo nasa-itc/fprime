@@ -6,6 +6,7 @@
 #
 # Note: using PROJECT_NAME as EXECUTABLE_NAME
 ####
+
 set(SOURCE_FILES
   "${CMAKE_CURRENT_LIST_DIR}/BufferManager.fpp"
   "${CMAKE_CURRENT_LIST_DIR}/BufferManagerComponentImpl.cpp"
@@ -14,9 +15,16 @@ set(SOURCE_FILES
 register_fprime_module()
 
 ### UTS ###
+set(UT_MOD_DEPS
+    STest
+)
 set(UT_SOURCE_FILES
   "${FPRIME_FRAMEWORK_PATH}/Svc/BufferManager/BufferManager.fpp"
   "${CMAKE_CURRENT_LIST_DIR}/test/ut/BufferManagerTester.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/test/ut/BufferManagerTestMain.cpp"
 )
 register_fprime_ut()
+set (UT_TARGET_NAME "${FPRIME_CURRENT_MODULE}_ut_exe")
+if (TARGET "${UT_TARGET_NAME}")
+    target_compile_options("${UT_TARGET_NAME}" PRIVATE -Wno-conversion)
+endif()
